@@ -1,0 +1,7 @@
+<Translation_Unit> ::= <Expression>CODE_EOF
+
+<Expression> ::= <PlusMinus_Expression>
+<PlusMinus_Expression> ::= <MulDiv_Expression>{("+" | "-")<MulDiv_Expression>}
+<MulDiv_Expression> ::= <Unary_Expression>{("*" | "/")<Unary_Expression>}
+<Unary_Expression> ::= <Primary_Expression> | (("+" | "-")<Unary_Expression>)
+<Primary_Expression> ::= CONSTANT_INT
