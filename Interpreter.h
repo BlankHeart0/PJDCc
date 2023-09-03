@@ -4,7 +4,7 @@
 class Interpreter
 {
 public:
-    AST A;
+    AST ast;
 
     bool DEBUG;
     

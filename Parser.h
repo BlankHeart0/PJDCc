@@ -8,7 +8,7 @@ class Parser
 public:
     vector<Token>tokens;
     int current;
-    AST A;
+    AST ast;
 
     bool is_error;
     bool DEBUG;
@@ -18,6 +18,8 @@ public:
     void Parse();
 
     ASTNode* Translation_Unit();
+
+    ASTNode* Statement();
 
     ASTNode* Expression();
     ASTNode* PlusMinus_Expression();

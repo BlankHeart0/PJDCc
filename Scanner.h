@@ -19,6 +19,7 @@ public:
     void Scan();
 
     void Scan_Int();
+    void Scan_IdentifierKeyword();
 
     void Scan_Error(string error_message);
 
@@ -27,6 +28,9 @@ public:
 
     bool Is_AtEnd();
     bool Is_Digit(char c);
+    bool Is_AlphaUnderline(char c);
+    bool Is_DigitAlphaUnderline(char c);
+
 
     void Tokens_PrintTable();
 };

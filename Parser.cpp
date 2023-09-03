@@ -9,17 +9,17 @@ using namespace std;
 
 void Parser::Parse()
 {
-    A.Translation=Translation_Unit();
+    ast.Translation=Translation_Unit();
 
     if(!is_error)
     {
         cout<<endl<<"----- The AST -----"<<endl;
-        A.AST_Print();
+        ast.AST_Print();
         cout<<endl<<"----- Print Done -----"<<endl;
 
-        Interpreter I;
-        I.A=this->A;
-        I.Interpret();
+        //Interpreter I;
+        //I.ast=this->ast;
+        //I.Interpret();
     }
 }
 
@@ -31,10 +31,32 @@ ASTNode* Parser::Translation_Unit()
 
     ASTNode* node=new ASTNode(false,TRANSLATION_UNIT,0);
 
-    node->Children.push_back(Expression());
+    while(!is_error&&!Is_AtEnd())node->Children.push_back(Statement());
     
     return node;    
 }
+
+ASTNode* Parser::Statement()
+{
+    WhoAmI("Statement");
+
+    ASTNode* node=new ASTNode(false,STATEMENT,0);
+
+    if(Match(PRINT))
+    {
+        node->Children.push_back(new ASTNode(true,AST_PRINT,0));        
+        node->Children.push_back(Expression());
+        if(is_error)return nullptr;
+
+        if(Match(SEMICOLON))node->Children.push_back(new ASTNode(true,AST_SEMICOLON,0));        
+        else Parse_Error("Semicolon ; loss.");
+    }
+    else Parse_Error("Keyword print loss.");
+
+    return node;
+}
+
+
 
 ASTNode* Parser::Expression()
 {

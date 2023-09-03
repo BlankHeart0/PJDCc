@@ -7,14 +7,24 @@ using namespace std;
 enum ASTNodeType
 {
     //Terminal
+
+    //Keyword
+    AST_PRINT,
+
+    //Separator
+    AST_SEMICOLON, //;
+
     //Operator
     AST_PLUS, AST_MINUS, AST_STAR, AST_SLASH, // + - * /
 
     //Constant
     AST_CONSTANT_INT,
 
+
     //Nonterminal
+
     TRANSLATION_UNIT,
+    STATEMENT,
     EXPRESSION,
     PLUSMINUS_EXPRESSION,MULDIV_EXPRESSION,UNARY_EXPRESSION,PRIMARY_EXPRESSION 
 };
@@ -22,6 +32,13 @@ enum ASTNodeType
 static vector<string>ASTNodeType_text
 {
     //Terminal
+
+    //Keyword
+    "AST_PRINT",
+
+    //Separator
+    "AST_SEMICOLON", //;
+    
     //Operator
     "AST_PLUS", "AST_MINUS", "AST_STAR", "AST_SLASH", // + - * /
 
@@ -29,7 +46,9 @@ static vector<string>ASTNodeType_text
     "AST_CONSTANT_INT",
 
     //Nonterminal
+
     "TRANSLATION_UNIT",
+    "STATEMENT",
     "EXPRESSION",
     "PLUSMINUS_EXPRESSION","MULDIV_EXPRESSION","UNARY_EXPRESSION","PRIMARY_EXPRESSION" 
 };

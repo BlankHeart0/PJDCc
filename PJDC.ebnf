@@ -1,4 +1,6 @@
-<Translation_Unit> ::= <Expression>CODE_EOF
+<Translation_Unit> ::= {<Statement>}CODE_EOF
+
+<Statement> ::= PRINT<Expression>";"
 
 <Expression> ::= <PlusMinus_Expression>
 <PlusMinus_Expression> ::= <MulDiv_Expression>{("+" | "-")<MulDiv_Expression>}

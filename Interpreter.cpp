@@ -4,8 +4,8 @@
 void Interpreter::Interpret()
 {
     cout<<endl<<"--- Interpret Begin ---"<<endl;
-    Interpret_Translation_Unit(A.Translation);
-    cout<<"Expression Calculate Result : "<<A.Translation->value<<endl;
+    Interpret_Translation_Unit(ast.Translation);
+    cout<<"Expression Calculate Result : "<<ast.Translation->value<<endl;
     cout<<"--- Interpret Done ---"<<endl<<endl;
 }
 

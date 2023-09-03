@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Token.h"
 #include "Scanner.h"
 
 using namespace std;
@@ -12,6 +13,7 @@ void Scanner::Scan()
         switch(source[current++])
         {
             //one character
+            case ';':Add_Token(SEMICOLON);break;
             case '+':Add_Token(PLUS);break;
             case '-':Add_Token(MINUS);break;
             case '*':Add_Token(STAR);break;
@@ -24,6 +26,8 @@ void Scanner::Scan()
             default:
             //Constant int
                 if(Is_Digit(source[current-1]))Scan_Int();
+				//Identifier and Keyword
+                else if(Is_AlphaUnderline(source[current-1]))Scan_IdentifierKeyword();
                 else Scan_Error("Unexpected character.");
                 break;
         }
@@ -41,7 +45,7 @@ void Scanner::Scan_Int()
 {
     current--;
     int value=0;
-    while(Is_Digit(source[current]))
+    while(!Is_AtEnd()&&Is_Digit(source[current]))
     {
         value=value*10+source[current]-'0';
         current++;
@@ -49,6 +53,14 @@ void Scanner::Scan_Int()
     Add_Token(CONSTANT_INT,value);
 }
 
+void Scanner::Scan_IdentifierKeyword()
+{
+    while(!Is_AtEnd()&&Is_DigitAlphaUnderline(source[current]))current++;
+    string text=source.substr(start,current-start);
+    auto it=Keyword_map.find(text);
+    if(it==Keyword_map.end())Add_Token(ID);
+    else Add_Token(it->second);
+}
 
 
 void Scanner::Scan_Error(string error_message)
@@ -83,6 +95,15 @@ bool Scanner::Is_Digit(char c)
     return c>='0'&&c<='9';
 }
 
+bool Scanner::Is_AlphaUnderline(char c)
+{
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')||c=='_';
+}
+
+bool Scanner::Is_DigitAlphaUnderline(char c)
+{
+	return Is_Digit(c) || Is_AlphaUnderline(c);
+}
 
 
 void Scanner::Tokens_PrintTable()

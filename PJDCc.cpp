@@ -6,6 +6,7 @@
 #include "Token.h"
 #include "Scanner.h"
 #include "Parser.h"
+#include "CodeGenerator.h"
 
 using namespace std;
 
@@ -22,6 +23,8 @@ public:
     Scanner S;
     
     Parser P;
+
+    CodeGenerator C;
 
 };
 
@@ -67,18 +70,24 @@ void PJDCc::Compile(string path)
     S.source=this->source;
     S.Scan();
     if(!S.is_error)S.Tokens_PrintTable();
+    else return;
 
     //Parse
     P.tokens=S.tokens;
     P.Parse();
     if(!P.is_error)cout<<"--- Parse Successfully! ---"<<endl;
+    else return;
+
+    //Genernate
+    C.ast=P.ast;
+    C.CodeGenerate("Calculator.asm");
 }
 
 
 int main()
 {
     PJDCc pjdcc;
-    pjdcc.Compile("./test/Parser_Test.c");
+    pjdcc.Compile("./test/CodeGen_Test.c");
 
     return 0;
 }
