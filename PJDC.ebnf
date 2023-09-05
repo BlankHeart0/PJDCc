@@ -1,9 +1,17 @@
 <Translation_Unit> ::= {<Statement>}CODE_EOF
 
-<Statement> ::= PRINT<Expression>";"
+<Statement> ::= <Print_Statement> | <Variable_Definition> | <Assignment_Statement>
+
+<Print_Statement> ::= PRINT <Expression>";"
+
+<Assignment_Statement> ::= IDENTIFIER"="<Expression>";"
+
+<Variable_Definition> ::= <Variable_Declaration>["="<Expression>]";"
+<Variable_Declaration> ::= INT IDENTIFIER
+ 
 
 <Expression> ::= <PlusMinus_Expression>
 <PlusMinus_Expression> ::= <MulDiv_Expression>{("+" | "-")<MulDiv_Expression>}
 <MulDiv_Expression> ::= <Unary_Expression>{("*" | "/")<Unary_Expression>}
 <Unary_Expression> ::= <Primary_Expression> | (("+" | "-")<Unary_Expression>)
-<Primary_Expression> ::= CONSTANT_INT
+<Primary_Expression> ::= CONSTANT_INT | IDENTIFIER

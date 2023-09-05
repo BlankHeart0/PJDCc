@@ -1,4 +1,5 @@
-objects = PJDCc.o Scanner.o Parser.o AbstractSyntaxTree.o Interpreter.o Register.o CodeGenerator.o
+objects = PJDCc.o Scanner.o Parser.o AbstractSyntaxTree.o Interpreter.o \
+		  Register.o CodeGenerator.o SymbolTable.o
 
 
 pjdcc: $(objects)
@@ -11,7 +12,8 @@ Parser.o: Token.h Parser.h AbstractSyntaxTree.h Interpreter.h
 AbstractSyntaxTree.o: AbstractSyntaxTree.h
 Interpreter.o: AbstractSyntaxTree.h Interpreter.h
 Register.o: Register.h
-CodeGenerator.o: Register.h CodeGenerator.h AbstractSyntaxTree.h
+CodeGenerator.o: Register.h CodeGenerator.h AbstractSyntaxTree.h Token.h SymbolTable.h
+SymbolTable.o: SymbolTable.h
 
 .PHONY: clean
 clean:

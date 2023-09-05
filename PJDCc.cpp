@@ -80,14 +80,21 @@ void PJDCc::Compile(string path)
 
     //Genernate
     C.ast=P.ast;
-    C.CodeGenerate("Calculator.asm");
-}
+    C.CodeGenerate("./test/CodeGen_Test/Variable.asm");
+    if(!C.is_error)cout<<"--- Compile Successfully! ---"<<endl;
+
+}   
 
 
 int main()
 {
     PJDCc pjdcc;
-    pjdcc.Compile("./test/CodeGen_Test.c");
+
+    // pjdcc.Compile("./test/Scanner_Test_Variable.c");
+    // pjdcc.Compile("./test/Parser_Test_Variable.c");
+
+    //pjdcc.Compile("./test/CodeGen_Test/Calculator.c");
+    pjdcc.Compile("./test/CodeGen_Test/Variable.c");
 
     return 0;
 }

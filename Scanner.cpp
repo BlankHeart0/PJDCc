@@ -18,7 +18,8 @@ void Scanner::Scan()
             case '-':Add_Token(MINUS);break;
             case '*':Add_Token(STAR);break;
             case '/':Add_Token(SLASH);break;
-
+            case '=':Add_Token(ASSIGN);break;
+            
             //Blank
             case ' ':case '\r':case '\t':break;
             case '\n':line++;break;

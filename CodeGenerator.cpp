@@ -45,10 +45,65 @@ void CodeGenerator::CodeGenerate_Translation_Unit(ASTNode* root)
 void CodeGenerator::CodeGenerate_Statement(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Statement");
+
+    for(int i=0;i<root->Children.size();i++)
+    {
+        switch(root->Children[i]->type)
+        {
+            case PRINT_STATEMENT:
+                CodeGenerate_Print_Statement(root->Children[i]);break;
+            case VARIABLE_DEFINITION:
+                CodeGenerate_Variable_Definition(root->Children[i]);break;
+            case ASSIGNMENT_STATEMENT:
+                CodeGenerate_Assignment_Statement(root->Children[i]);break;
+        }
+    }
+}
+
+void CodeGenerator::CodeGenerate_Print_Statement(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Print_Statement");
+
     int print_ri=CodeGenerate_Expression(root->Children[1]);
     Print(print_ri);
 }
 
+void CodeGenerator::CodeGenerate_Assignment_Statement(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Assignment_Statement");
+
+    string identifier=FirstChild(root)->lexeme;
+    if(ST.Symbol_Exist(identifier))
+    {
+        int exp_i=CodeGenerate_Expression(root->Children[2]);
+        Store(exp_i,identifier);
+    }
+    else CodeGenerate_Error("The identifier "+identifier+" is not defined.",FirstChild(root));
+}
+
+void CodeGenerator::CodeGenerate_Variable_Definition(ASTNode* root)
+{
+    string identifier=CodeGenerate_Variable_Declaration(FirstChild(root));
+    
+    if(root->Children[1]->type==AST_ASSIGN)
+    {
+        int exp_i=CodeGenerate_Expression(root->Children[2]);
+        Store(exp_i,identifier);
+    }
+}
+    
+string CodeGenerator::CodeGenerate_Variable_Declaration(ASTNode* root)
+{
+    string identifier=root->Children[1]->lexeme;
+    if(!ST.Symbol_Exist(identifier))
+    {
+        ST.Symbol_Add(identifier);
+        CreateVar(identifier);
+    }
+    else CodeGenerate_Error("The identifier "+identifier+" is redefined.",root->Children[1]);
+    
+    return identifier; 
+}
 
 
 int CodeGenerator::CodeGenerate_Expression(ASTNode* root)
@@ -100,8 +155,14 @@ int CodeGenerator::CodeGenerate_Unary_Expression(ASTNode* root)
 int CodeGenerator::CodeGenerate_Primary_Expression(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Primary_Expression");
-
-    return Load(FirstChild(root)->value);
+    if(FirstChild(root)->type==AST_CONSTANT_INT)return Load(FirstChild(root)->literal);
+    else if(FirstChild(root)->type==AST_ID)
+    {
+        string identifier=FirstChild(root)->lexeme;
+        if(ST.Symbol_Exist(identifier))return Load(identifier);
+        else CodeGenerate_Error("The identifier "+identifier+" is not defined.",FirstChild(root));
+    }
+    return -1;
 }
 
 
@@ -128,44 +189,66 @@ ASTNode* CodeGenerator::FirstChild(ASTNode* root)
 
 int CodeGenerator::Load(int value)
 {
-    int register_i=R.Alloc();
+    int register_i=RC.Alloc();
 
-    OutFile<<"\tmov\t"<<R.Register_Table[register_i].name<<", "<<value<<endl;
+    OutFile<<"\tmov\t"<<RC.Name(register_i)<<", "<<value<<endl;
     return register_i;
 }
 
+int CodeGenerator::Load(string identifier)
+{
+    int register_i=RC.Alloc();
+
+    OutFile<<"\tmov\t"<<RC.Name(register_i)<<", ["<<identifier<<"]"<<endl;
+    return register_i;
+}
+
+void CodeGenerator::Store(int r_i,string identifier)
+{
+    OutFile<<"\tmov\t["<<identifier<<"], "<<RC.Name(r_i)<<endl;
+    //++
+    RC.Free(r_i);
+}
+
+void CodeGenerator::CreateVar(string identifier)
+{
+    OutFile<<"\tcommon\t"<<identifier<<"  8:8"<<endl;
+}
+
+
+
 int CodeGenerator::Add(int r1_i,int r2_i)
 {
-    OutFile<<"\tadd\t"<<R.Register_Table[r1_i].name<<", "<<R.Register_Table[r2_i].name<<endl;
+    OutFile<<"\tadd\t"<<RC.Name(r1_i)<<", "<<RC.Name(r2_i)<<endl;
     
-    R.Free(r2_i);
+    RC.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Sub(int r1_i,int r2_i)
 {
-    OutFile<<"\tsub\t"<<R.Register_Table[r1_i].name<<", "<<R.Register_Table[r2_i].name<<endl;
+    OutFile<<"\tsub\t"<<RC.Name(r1_i)<<", "<<RC.Name(r2_i)<<endl;
     
-    R.Free(r2_i);
+    RC.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Mul(int r1_i,int r2_i)
 {
-    OutFile<<"\timul\t"<<R.Register_Table[r1_i].name<<", "<<R.Register_Table[r2_i].name<<endl;
+    OutFile<<"\timul\t"<<RC.Name(r1_i)<<", "<<RC.Name(r2_i)<<endl;
 
-    R.Free(r2_i);
+    RC.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Div(int r1_i,int r2_i)
 {
-    OutFile<<"\tmov\trax, "<<R.Register_Table[r1_i].name<<endl;
+    OutFile<<"\tmov\trax, "<<RC.Name(r1_i)<<endl;
     OutFile<<"\tcqo"<<endl;
-    OutFile<<"\tidiv\t"<<R.Register_Table[r2_i].name<<endl;
-    OutFile<<"\tmov\t"<<R.Register_Table[r1_i].name<<", rax"<<endl;
+    OutFile<<"\tidiv\t"<<RC.Name(r2_i)<<endl;
+    OutFile<<"\tmov\t"<<RC.Name(r1_i)<<", rax"<<endl;
 
-    R.Free(r2_i);
+    RC.Free(r2_i);
     return r1_i;
 }
 
@@ -174,12 +257,26 @@ void CodeGenerator::Print(int r_i)
     OutFile<<"\tpush\trbp"<<endl;
 
     OutFile<<"\tmov\trdi, format"<<endl;
-    OutFile<<"\tmov\trsi, "<<R.Name(r_i)<<endl;
+    OutFile<<"\tmov\trsi, "<<RC.Name(r_i)<<endl;
     OutFile<<"\tmov\trax, 0"<<endl;
     OutFile<<"\tcall\tprintf"<<endl;
 
     OutFile<<"\tpop\trbp"<<endl;
-    R.Free(r_i);
+    RC.Free(r_i);
+}
+
+
+
+void CodeGenerator::CodeGenerate_Error(string error_message,ASTNode* root)
+{
+    is_error=true;
+    cout<< "CodeGenerate Error: Line "<<root->line<<": "<<error_message<<endl;
+}
+
+void CodeGenerator::CodeGenerate_Error(string error_message)
+{
+    is_error=true;
+    cout<< "CodeGenerate Error: "<<": "<<error_message<<endl;
 }
 
 void CodeGenerator::WhoAmI(string name)

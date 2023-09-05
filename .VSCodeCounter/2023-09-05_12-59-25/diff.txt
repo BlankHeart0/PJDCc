@@ -1,0 +1,42 @@
+Date : 2023-09-05 12:59:25
+Directory : /home/blankheart0/PJDCc
+Total : 11 files,  238 codes, -2 comments, 14 blanks, all 250 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| nasm     |          3 |        177 |          0 |          6 |        183 |
+| C++      |          4 |         42 |         -2 |          6 |         46 |
+| C        |          3 |         17 |          0 |          2 |         19 |
+| Makefile |          1 |          2 |          0 |          0 |          2 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                     | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                        |         11 |        238 |         -2 |         14 |        250 |
+| . (Files)                                                |          6 |         40 |         -2 |          4 |         42 |
+| test                                                     |          5 |        198 |          0 |         10 |        208 |
+| test (Files)                                             |          1 |         -5 |          0 |          0 |         -5 |
+| test/CodeGen_Test                                        |          4 |        203 |          0 |         10 |        213 |
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                 | language | code       | comment    | blank      | total      |
++----------------------------------------------------------+----------+------------+------------+------------+------------+
+| /home/blankheart0/PJDCc/AbstractSyntaxTree.h             | C++      |          2 |         -4 |          2 |          0 |
+| /home/blankheart0/PJDCc/Calculator.asm                   | nasm     |         -4 |          0 |         -2 |         -6 |
+| /home/blankheart0/PJDCc/CodeGenerator.cpp                | C++      |         34 |          1 |          1 |         36 |
+| /home/blankheart0/PJDCc/CodeGenerator.h                  | C++      |          3 |          0 |          0 |          3 |
+| /home/blankheart0/PJDCc/Makefile                         | Makefile |          2 |          0 |          0 |          2 |
+| /home/blankheart0/PJDCc/PJDCc.cpp                        | C++      |          3 |          1 |          3 |          7 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test.c              | C        |         -5 |          0 |          0 |         -5 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Calculator.asm | nasm     |         61 |          0 |          4 |         65 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Calculator.c   | C        |          5 |          0 |          0 |          5 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Variable.asm   | nasm     |        120 |          0 |          4 |        124 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Variable.c     | C        |         17 |          0 |          2 |         19 |
+| Total                                                    |          |        238 |         -2 |         14 |        250 |
++----------------------------------------------------------+----------+------------+------------+------------+------------+

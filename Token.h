@@ -9,13 +9,15 @@ using namespace std;
 enum TokenType
 {
     //Keyword
+    INT,
     PRINT,
 
     //Separator
-    SEMICOLON, //;
+    SEMICOLON, // ;
 
     //Operator
     PLUS, MINUS, STAR, SLASH, // + - * /
+    ASSIGN, // =
 
     //Constant
     CONSTANT_INT, 
@@ -29,10 +31,12 @@ enum TokenType
 static vector<string>TokenType_text
 {
     //Keyword
+    "INT",
     "PRINT",
 
     //Separator
     "SEMICOLON", //;
+    "ASSIGN", // =
 
     //Operator
     "PLUS", "MINUS", "STAR", "SLASH", // + - * /
@@ -48,7 +52,7 @@ static vector<string>TokenType_text
 
 static unordered_map<string,TokenType>Keyword_map
 {
-    {"print",PRINT}
+    {"print",PRINT},{"int",INT}
 };
 
 class Token

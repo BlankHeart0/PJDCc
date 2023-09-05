@@ -21,6 +21,12 @@ public:
 
     ASTNode* Statement();
 
+    ASTNode* Print_Statement();
+    ASTNode* Assignment_Statement();
+
+    ASTNode* Variable_Definition();
+    ASTNode* Variable_Declaration();
+
     ASTNode* Expression();
     ASTNode* PlusMinus_Expression();
     ASTNode* MulDiv_Expression();
@@ -31,7 +37,9 @@ public:
 
     bool Is_AtEnd();
     bool Match(TokenType expected);
-    TokenType Previous_TokenType();
+    bool Peek(TokenType expected);
+
+    Token Previous_Token();
 
     void WhoAmI(string name);
 };

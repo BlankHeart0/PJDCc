@@ -1,0 +1,49 @@
+Date : 2023-09-04 22:24:14
+Directory : /home/blankheart0/PJDCc
+Total : 20 files,  272 codes, 22 comments, 121 blanks, all 415 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C++      |         12 |        262 |         22 |        107 |        391 |
+| nasm     |          2 |          7 |          0 |          6 |         13 |
+| BNF      |          1 |          5 |          0 |          5 |         10 |
+| C        |          5 |         -2 |          0 |          3 |          1 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                           | files      | code       | comment    | blank      | total      |
++------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                              |         20 |        272 |         22 |        121 |        415 |
+| . (Files)                                      |         15 |        274 |         22 |        118 |        414 |
+| test                                           |          5 |         -2 |          0 |          3 |          1 |
++------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                       | language | code       | comment    | blank      | total      |
++------------------------------------------------+----------+------------+------------+------------+------------+
+| /home/blankheart0/PJDCc/AbstractSyntaxTree.cpp | C++      |          1 |          0 |          0 |          1 |
+| /home/blankheart0/PJDCc/AbstractSyntaxTree.h   | C++      |         23 |         10 |         19 |         52 |
+| /home/blankheart0/PJDCc/Calculator.asm         | nasm     |         -8 |          0 |          1 |         -7 |
+| /home/blankheart0/PJDCc/CodeGenerator.cpp      | C++      |         81 |          0 |         30 |        111 |
+| /home/blankheart0/PJDCc/CodeGenerator.h        | C++      |         13 |          0 |          5 |         18 |
+| /home/blankheart0/PJDCc/PJDC.ebnf              | BNF      |          5 |          0 |          5 |         10 |
+| /home/blankheart0/PJDCc/PJDCc.cpp              | C++      |          0 |          2 |          0 |          2 |
+| /home/blankheart0/PJDCc/Parser.cpp             | C++      |         76 |          3 |         31 |        110 |
+| /home/blankheart0/PJDCc/Parser.h               | C++      |          6 |          0 |          4 |         10 |
+| /home/blankheart0/PJDCc/Printf.asm             | nasm     |         15 |          0 |          5 |         20 |
+| /home/blankheart0/PJDCc/Scanner.cpp            | C++      |         20 |          1 |          1 |         22 |
+| /home/blankheart0/PJDCc/Scanner.h              | C++      |          3 |          0 |          1 |          4 |
+| /home/blankheart0/PJDCc/SymbolTable.cpp        | C++      |         13 |          0 |          2 |         15 |
+| /home/blankheart0/PJDCc/SymbolTable.h          | C++      |         11 |          0 |          7 |         18 |
+| /home/blankheart0/PJDCc/Token.h                | C++      |         15 |          6 |          7 |         28 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test.c    | C        |          4 |          0 |          0 |          4 |
+| /home/blankheart0/PJDCc/test/Load_Test.c       | C        |        184 |          6 |         34 |        224 |
+| /home/blankheart0/PJDCc/test/Load_Test1.c      | C        |       -184 |         -6 |        -34 |       -224 |
+| /home/blankheart0/PJDCc/test/Parser_Test.c     | C        |          1 |          0 |          4 |          5 |
+| /home/blankheart0/PJDCc/test/Scanner_Test.c    | C        |         -7 |          0 |         -1 |         -8 |
+| Total                                          |          |        272 |         22 |        121 |        415 |
++------------------------------------------------+----------+------------+------------+------------+------------+
