@@ -35,6 +35,9 @@ public:
 
     void CodeGenerate_If_Statement(ASTNode* root);
 
+    void CodeGenerate_Iteration_Statement(ASTNode* root);
+    void CodeGenerate_While_Statement(ASTNode* root);
+    void CodeGenerate_DoWhile_Statement(ASTNode* root);
 
     int CodeGenerate_Expression(ASTNode* root);
     int CodeGenerate_Equality_Expression(ASTNode* root);

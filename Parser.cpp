@@ -46,7 +46,10 @@ ASTNode* Parser::Statement()
     else if(Peek(ID))Add_Child(node,Assignment_Statement());
     else if(Peek(LEFT_BRACE))Add_Child(node,Compound_Statement());
     else if(Peek(IF))Add_Child(node,If_Statement());
-    else Add_Child(node,Variable_Definition());
+    else if(Peek(WHILE)||Peek(DO))Add_Child(node,Iteration_Statement());
+    else if(Peek(INT))Add_Child(node,Variable_Definition());
+    
+    else Parse_Error("Wrong statement.");
 
     return node;
 }
@@ -83,8 +86,7 @@ ASTNode* Parser::Print_Statement()
         Add_Child(node,new ASTNode(AST_PRINT,Previous_Token()));
         Add_Child(node,Expression());
 
-        if(Match(SEMICOLON))Add_Child(node,new ASTNode(AST_SEMICOLON,Previous_Token()));        
-        else Parse_Error("Semicolon ; loss.");
+        Match_Semicolon(node);
     }
     else Parse_Error("Keyword print loss.");
 
@@ -105,8 +107,7 @@ ASTNode* Parser::Assignment_Statement()
             Add_Child(node,new ASTNode(AST_ASSIGN,Previous_Token()));
             Add_Child(node,Expression());
 
-            if(Match(SEMICOLON))Add_Child(node,new ASTNode(AST_SEMICOLON,Previous_Token()));        
-            else Parse_Error("Semicolon ; loss.");
+            Match_Semicolon(node);
         }
         else Parse_Error("Assign character = loss.");
     }
@@ -131,8 +132,7 @@ ASTNode* Parser::Variable_Definition()
         Add_Child(node,Expression());
     }  
 
-    if(Match(SEMICOLON))Add_Child(node,new ASTNode(AST_SEMICOLON,Previous_Token()));        
-    else Parse_Error("Semicolon ; loss.");
+    Match_Semicolon(node);
 
     return node;
 }
@@ -187,6 +187,82 @@ ASTNode* Parser::If_Statement()
         else Parse_Error("Left paren ( loss.");
     }
     else Parse_Error("Keyword if loss.");
+
+    return node;
+}
+
+
+
+ASTNode* Parser::Iteration_Statement()
+{
+    WhoAmI("Iteration_Statement");
+
+    ASTNode* node=new ASTNode(ITERATION_STATEMENT);
+
+    if(Peek(WHILE))Add_Child(node,While_Statement());
+    else if(Peek(DO))Add_Child(node,DoWhile_Statement());
+    else Parse_Error("Wrong loop statement.");
+
+    return node;
+}
+
+ASTNode* Parser::While_Statement()
+{
+    WhoAmI("While_Statement");
+    
+    ASTNode* node=new ASTNode(WHILE_STATEMENT);
+
+    if(Match(WHILE))
+    {
+        Add_Child(node,new ASTNode(AST_WHILE,Previous_Token()));
+        if(Match(LEFT_PAREN))
+        {
+            Add_Child(node,new ASTNode(AST_LEFT_PAREN,Previous_Token()));
+            Add_Child(node,Expression());
+            if(Match(RIGHT_PAREN))
+            {
+                Add_Child(node,new ASTNode(AST_RIGHT_PAREN,Previous_Token()));
+                Add_Child(node,Statement());
+            }
+            else Parse_Error("Right paren ) loss.");
+        }
+        else Parse_Error("Left paren ( loss.");
+    }
+    else Parse_Error("Keyword while loss.");
+
+    return node;
+}
+    
+ASTNode* Parser::DoWhile_Statement()
+{
+    WhoAmI("DoWhile_Statement");
+
+    ASTNode* node=new ASTNode(DOWHILE_STATEMENT);
+
+    if(Match(DO))
+    {
+        Add_Child(node,new ASTNode(AST_DO,Previous_Token()));
+        Add_Child(node,Statement());
+        if(Match(WHILE))
+        {
+            Add_Child(node,new ASTNode(AST_WHILE,Previous_Token()));
+            if(Match(LEFT_PAREN))
+            {
+                Add_Child(node,new ASTNode(AST_LEFT_PAREN,Previous_Token()));
+                Add_Child(node,Expression());
+                if(Match(RIGHT_PAREN))
+                {
+                    Add_Child(node,new ASTNode(AST_RIGHT_PAREN,Previous_Token()));
+                    
+                    Match_Semicolon(node);
+                }
+                else Parse_Error("Right paren ) loss.");
+            }
+            else Parse_Error("Left paren ( loss.");
+        }
+        else Parse_Error("Keyword while loss.");
+    }
+    else Parse_Error("Keyword do loss.");
 
     return node;
 }
@@ -371,6 +447,14 @@ void Parser::Add_Child(ASTNode* root,ASTNode* child)
 {
     root->Children.push_back(child);
 }
+
+void Parser::Match_Semicolon(ASTNode* root)
+{
+    if(Match(SEMICOLON))Add_Child(root,new ASTNode(AST_SEMICOLON,Previous_Token()));        
+    else Parse_Error("Semicolon ; loss.");
+}
+
+
 
 void Parser::WhoAmI(string name)
 {

@@ -15,6 +15,7 @@ enum ASTNodeType
     AST_INT,
     AST_PRINT,
     AST_IF,AST_ELSE,
+    AST_WHILE,AST_DO,
 
     //Separator
     AST_SEMICOLON, //;
@@ -42,13 +43,18 @@ enum ASTNodeType
 
     STATEMENT,
     COMPOUND_STATEMENT,
-    IF_STATEMENT,
-
+ 
     PRINT_STATEMENT,
     ASSIGNMENT_STATEMENT,
 
     VARIABLE_DEFINITION,
     VARIABLE_DECLARATION,
+
+    IF_STATEMENT,
+
+    ITERATION_STATEMENT,
+    WHILE_STATEMENT,
+    DOWHILE_STATEMENT,
 
     EXPRESSION,
     EQUALITY_EXPRESSION,
@@ -68,6 +74,7 @@ static vector<string>ASTNodeType_text
     "AST_INT",
     "AST_PRINT",
     "AST_IF","AST_ELSE",
+    "AST_WHILE","AST_DO",
 
     //Separator
     "AST_SEMICOLON", //;
@@ -95,13 +102,18 @@ static vector<string>ASTNodeType_text
 
     "STATEMENT",
     "COMPOUND_STATEMENT",
-    "IF_STATEMENT",
     
     "PRINT_STATEMENT",
     "ASSIGNMENT_STATEMENT",
 
     "VARIABLE_DEFINITION",
     "VARIABLE_DECLARATION",
+
+    "IF_STATEMENT",
+    
+    "ITERATION_STATEMENT",
+    "WHILE_STATEMENT",
+    "DOWHILE_STATEMENT",
 
     "EXPRESSION",
     "EQUALITY_EXPRESSION",

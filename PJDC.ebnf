@@ -1,6 +1,8 @@
 <Translation_Unit> ::= {<Statement>}CODE_EOF
 
-<Statement> ::= <Print_Statement> | <Variable_Definition> | <Assignment_Statement> | <Compound_Statement> | <If_Statement>
+<Statement> ::= <Print_Statement> | <Variable_Definition> | <Assignment_Statement> | <Compound_Statement> 
+                | <If_Statement> | <Iteration_Statement>
+
 <Compound_Statement> ::= "{"{<Statement>}"}"
 
 <Print_Statement> ::= PRINT <Expression>";"
@@ -11,6 +13,12 @@
 <Variable_Declaration> ::= INT IDENTIFIER
  
 <If_Statement> ::= IF"("<Expression>")"<Statement>[ELSE<Statement>]
+
+<Iteration_Statement> ::= <While_Statement> | <DoWhile_Statement>
+<While_Statement> ::= WHILE"("<Expression>")"<Statement>
+<DoWhile_Statement> ::= DO<Statement>WHILE"("<Expression>")"";"
+
+
 
 <Expression> ::= <Equality_Expression>
 

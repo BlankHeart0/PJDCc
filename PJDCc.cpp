@@ -24,7 +24,7 @@ public:
     
     Parser P;
 
-    CodeGenerator C;
+    CodeGenerator CG;
 
 };
 
@@ -77,8 +77,8 @@ void PJDCc::Compile(string path)
     cout<<"--- Parse Successfully! ---"<<endl;
 
     //Genernate
-    C.ast=P.ast;
-    C.CodeGenerate("./test/CodeGen_Test/If.asm");
+    CG.ast=P.ast;
+    CG.CodeGenerate("./test/CodeGen_Test/While.asm");
     
     cout<<endl<<"--- Compile Successfully! ---"<<endl;
 
@@ -99,7 +99,9 @@ int main()
     //pjdcc.Compile("./test/CodeGen_Test/Calculator.c");
     //pjdcc.Compile("./test/CodeGen_Test/Variable.c");
     //pjdcc.Compile("./test/CodeGen_Test/Compare.c");
-    pjdcc.Compile("./test/CodeGen_Test/If.c");
+    //pjdcc.Compile("./test/CodeGen_Test/If.c");
+    pjdcc.Compile("./test/CodeGen_Test/While.c");
+
 
     return 0;
 }

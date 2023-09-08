@@ -29,6 +29,11 @@ public:
 
     ASTNode* If_Statement();
 
+    ASTNode* Iteration_Statement();
+    ASTNode* While_Statement();
+    ASTNode* DoWhile_Statement();
+
+
     ASTNode* Expression();
     ASTNode* Equality_Expression();
     ASTNode* Relational_Expression();
@@ -45,6 +50,7 @@ public:
 
     Token Previous_Token();
     void Add_Child(ASTNode* root,ASTNode* child);
-    
+    void Match_Semicolon(ASTNode* root);
+
     void WhoAmI(string name);
 };

@@ -1,9 +1,15 @@
-{
-  int i; int j;
-  i=6; j=12;
-  if (i < j) {
+{ int i;
+  i=1;
+  while (i <= 10) {
     print i;
-  } else {
-    print j;
+    i= i + 1;
   }
 }
+
+int t=0;
+do
+{
+  if(t>=5)print t;
+  else print 0;
+  t++;
+} while (t<10);

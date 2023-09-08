@@ -9,6 +9,8 @@ void CodeGenerator::CodeGenerate(string path)
         return;
     }
 
+    RC.FreeAll();
+
     cout<<endl<<"--- CodeGenerate Begin ---"<<endl;
 
     CodeGenerate_Head();
@@ -46,21 +48,20 @@ void CodeGenerator::CodeGenerate_Statement(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Statement");
 
-    for(int i=0;i<root->Children.size();i++)
+    switch(FirstChild(root)->type)
     {
-        switch(root->Children[i]->type)
-        {
-            case PRINT_STATEMENT:
-                CodeGenerate_Print_Statement(root->Children[i]);break;
-            case VARIABLE_DEFINITION:
-                CodeGenerate_Variable_Definition(root->Children[i]);break;
-            case ASSIGNMENT_STATEMENT:
-                CodeGenerate_Assignment_Statement(root->Children[i]);break;
-            case COMPOUND_STATEMENT:
-                CodeGenerate_Compound_Statement(root->Children[i]);break;
-            case IF_STATEMENT:
-                CodeGenerate_If_Statement(root->Children[i]);break;
-        }
+        case PRINT_STATEMENT:
+            CodeGenerate_Print_Statement(FirstChild(root));break;
+        case VARIABLE_DEFINITION:
+            CodeGenerate_Variable_Definition(FirstChild(root));break;
+        case ASSIGNMENT_STATEMENT:
+            CodeGenerate_Assignment_Statement(FirstChild(root));break;
+        case COMPOUND_STATEMENT:
+            CodeGenerate_Compound_Statement(FirstChild(root));break;
+        case IF_STATEMENT:
+            CodeGenerate_If_Statement(FirstChild(root));break;
+        case ITERATION_STATEMENT:
+            CodeGenerate_Iteration_Statement(FirstChild(root));break;
     }
 }
 
@@ -125,13 +126,16 @@ string CodeGenerator::CodeGenerate_Variable_Declaration(ASTNode* root)
     return identifier; 
 }
 
+
+
 void CodeGenerator::CodeGenerate_If_Statement(ASTNode* root)
 {
     WhoAmI("CodeGenerate_If_Statement");
 
     int expression_ri=CodeGenerate_Expression(root->Children[2]);
-
+   
     CompareZero(expression_ri);
+
     int lable1=NewLable();
     Jump("je",lable1);
 
@@ -148,7 +152,56 @@ void CodeGenerator::CodeGenerate_If_Statement(ASTNode* root)
 
         LablePrint(lable2);
     }
-    else LablePrint(lable1);
+    else LablePrint(lable1); //only if
+}
+
+
+
+void CodeGenerator::CodeGenerate_Iteration_Statement(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Iteration_Statement");
+
+    switch(FirstChild(root)->type)
+    {
+        case WHILE_STATEMENT:
+            CodeGenerate_While_Statement(FirstChild(root));break;
+        case DOWHILE_STATEMENT:
+            CodeGenerate_DoWhile_Statement(FirstChild(root));break;
+    }
+}
+
+void CodeGenerator::CodeGenerate_While_Statement(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_While_Statement");
+
+    int lable1=NewLable();
+    LablePrint(lable1);
+
+    int expression_ri=CodeGenerate_Expression(root->Children[2]);
+    CompareZero(expression_ri);
+
+    int lable2=NewLable();
+    Jump("je",lable2);
+
+    CodeGenerate_Statement(root->Children[4]);
+    Jump("jmp",lable1);
+
+    LablePrint(lable2);
+}
+
+void CodeGenerator::CodeGenerate_DoWhile_Statement(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_DoWhile_Statement");
+
+    int lable=NewLable();
+    LablePrint(lable);
+
+    CodeGenerate_Statement(root->Children[1]);
+
+    int expression_ri=CodeGenerate_Expression(root->Children[4]);
+    CompareZero(expression_ri);
+
+    Jump("jne",lable);
 }
 
 
