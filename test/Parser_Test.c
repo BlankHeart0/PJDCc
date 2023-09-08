@@ -1,9 +1,4 @@
-print 2 + 3 * 5 - 8 / 3;
+if (i < j) 
+    print i;
 
-int a=28;
-
-int b;
-
-print a*b/2;
-
-__asd=a/b+-0;
+print jaf;

@@ -11,16 +11,14 @@ void Parser::Parse()
 {
     ast.Translation=Translation_Unit();
 
-    if(!is_error)
-    {
-        cout<<endl<<"----- The AST -----"<<endl;
-        ast.AST_Print();
-        cout<<endl<<"----- Print Done -----"<<endl;
+    cout<<endl<<"----- The AST -----"<<endl;
+    ast.AST_Print();
+    cout<<endl<<"----- Print Done -----"<<endl;
 
-        //Interpreter I;
-        //I.ast=this->ast;
-        //I.Interpret();
-    }
+    //Interpreter I;
+    //I.ast=this->ast;
+    //I.Interpret();
+
 }
 
 
@@ -31,7 +29,7 @@ ASTNode* Parser::Translation_Unit()
 
     ASTNode* node=new ASTNode(TRANSLATION_UNIT);
 
-    while(!is_error&&!Is_AtEnd())node->Children.push_back(Statement());
+    while(!Is_AtEnd())Add_Child(node,Statement());
     
     return node;    
 }
@@ -44,12 +42,35 @@ ASTNode* Parser::Statement()
 
     ASTNode* node=new ASTNode(STATEMENT);
 
-    if(Peek(PRINT))node->Children.push_back(Print_Statement());
-    else if(Peek(ID))node->Children.push_back(Assignment_Statement());
-    else node->Children.push_back(Variable_Definition());
+    if(Peek(PRINT))Add_Child(node,Print_Statement());
+    else if(Peek(ID))Add_Child(node,Assignment_Statement());
+    else if(Peek(LEFT_BRACE))Add_Child(node,Compound_Statement());
+    else if(Peek(IF))Add_Child(node,If_Statement());
+    else Add_Child(node,Variable_Definition());
 
     return node;
 }
+
+ASTNode* Parser::Compound_Statement()
+{
+    WhoAmI("Compound_Statement");
+
+    ASTNode* node=new ASTNode(COMPOUND_STATEMENT);
+    
+    if (Match(LEFT_BRACE))
+	{
+        Add_Child(node,new ASTNode(AST_LEFT_BARCE,Previous_Token()));
+        while(!Match(RIGHT_BRACE))Add_Child(node,Statement());
+        
+        if(Previous_Token().type!=RIGHT_BRACE)Parse_Error("Right barce } loss.");
+        Add_Child(node,new ASTNode(AST_RIGHT_BRACE,Previous_Token()));
+	}
+	else Parse_Error("Left barce { loss.");
+
+    return node;
+}
+
+
 
 ASTNode* Parser::Print_Statement()
 {
@@ -59,11 +80,10 @@ ASTNode* Parser::Print_Statement()
 
     if(Match(PRINT))
     {
-        node->Children.push_back(new ASTNode(AST_PRINT,Previous_Token()));
-        node->Children.push_back(Expression());
-        if(is_error)return nullptr;
+        Add_Child(node,new ASTNode(AST_PRINT,Previous_Token()));
+        Add_Child(node,Expression());
 
-        if(Match(SEMICOLON))node->Children.push_back(new ASTNode(AST_SEMICOLON,Previous_Token()));        
+        if(Match(SEMICOLON))Add_Child(node,new ASTNode(AST_SEMICOLON,Previous_Token()));        
         else Parse_Error("Semicolon ; loss.");
     }
     else Parse_Error("Keyword print loss.");
@@ -79,14 +99,13 @@ ASTNode* Parser::Assignment_Statement()
 
     if(Match(ID))
     {
-        node->Children.push_back(new ASTNode(AST_ID,Previous_Token()));
+        Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
         if(Match(ASSIGN))
         {
-            node->Children.push_back(new ASTNode(AST_ASSIGN,Previous_Token()));
-            node->Children.push_back(Expression());
-            if(is_error)return nullptr;
+            Add_Child(node,new ASTNode(AST_ASSIGN,Previous_Token()));
+            Add_Child(node,Expression());
 
-            if(Match(SEMICOLON))node->Children.push_back(new ASTNode(AST_SEMICOLON,Previous_Token()));        
+            if(Match(SEMICOLON))Add_Child(node,new ASTNode(AST_SEMICOLON,Previous_Token()));        
             else Parse_Error("Semicolon ; loss.");
         }
         else Parse_Error("Assign character = loss.");
@@ -104,17 +123,15 @@ ASTNode* Parser::Variable_Definition()
 
     ASTNode* node=new ASTNode(VARIABLE_DEFINITION);
 
-    node->Children.push_back(Variable_Declaration());
-    if(is_error)return nullptr;
+    Add_Child(node,Variable_Declaration());
 
     if(Match(ASSIGN))
     {
-        node->Children.push_back(new ASTNode(AST_ASSIGN,Previous_Token()));
-        node->Children.push_back(Expression());
-        if(is_error)return nullptr;
+        Add_Child(node,new ASTNode(AST_ASSIGN,Previous_Token()));
+        Add_Child(node,Expression());
     }  
 
-    if(Match(SEMICOLON))node->Children.push_back(new ASTNode(AST_SEMICOLON,Previous_Token()));        
+    if(Match(SEMICOLON))Add_Child(node,new ASTNode(AST_SEMICOLON,Previous_Token()));        
     else Parse_Error("Semicolon ; loss.");
 
     return node;
@@ -128,14 +145,48 @@ ASTNode* Parser::Variable_Declaration()
 
     if(Match(INT))
     {
-        node->Children.push_back(new ASTNode(AST_INT,Previous_Token()));
+        Add_Child(node,new ASTNode(AST_INT,Previous_Token()));
         if(Match(ID))
         {
-            node->Children.push_back(new ASTNode(AST_ID,Previous_Token()));
+            Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
         }
         else Parse_Error("Identifier loss.");
     }
     else Parse_Error("Keyword int loss.");
+
+    return node;
+}
+
+
+
+ASTNode* Parser::If_Statement()
+{
+    WhoAmI("If_Statement");
+    
+    ASTNode* node=new ASTNode(IF_STATEMENT);
+
+    if(Match(IF))
+    {
+        Add_Child(node,new ASTNode(AST_IF,Previous_Token()));
+        if(Match(LEFT_PAREN))
+        {
+            Add_Child(node,new ASTNode(AST_LEFT_PAREN,Previous_Token()));
+            Add_Child(node,Expression());
+            if(Match(RIGHT_PAREN))
+            {
+                Add_Child(node,new ASTNode(AST_RIGHT_PAREN,Previous_Token()));
+                Add_Child(node,Statement());
+                if(Match(ELSE))
+                {   
+                    Add_Child(node,new ASTNode(AST_ELSE,Previous_Token()));
+                    Add_Child(node,Statement());
+                }
+            }
+            else Parse_Error("Right paren ) loss.");
+        }
+        else Parse_Error("Left paren ( loss.");
+    }
+    else Parse_Error("Keyword if loss.");
 
     return node;
 }
@@ -148,8 +199,57 @@ ASTNode* Parser::Expression()
 
     ASTNode* node=new ASTNode(EXPRESSION);
 
-    node->Children.push_back(PlusMinus_Expression());
+    Add_Child(node,Equality_Expression());
     
+    return node;
+}
+
+ASTNode* Parser::Equality_Expression()
+{
+    WhoAmI("Equality_Expression");
+
+    ASTNode* node=new ASTNode(EQUALITY_EXPRESSION);
+
+    Add_Child(node,Relational_Expression());
+
+    while(Match(EQUAL)||Match(NOT_EQUAL))
+    {
+        if(Previous_Token().type==EQUAL)
+            Add_Child(node,new ASTNode(AST_EQUAL,Previous_Token()));
+        else if(Previous_Token().type==NOT_EQUAL)
+            Add_Child(node,new ASTNode(AST_NOT_EQUAL,Previous_Token()));
+         
+        Add_Child(node,Relational_Expression()); 
+    }
+
+    return node;
+}
+
+ASTNode* Parser::Relational_Expression()
+{
+    WhoAmI("Relational_Expression");
+
+    ASTNode* node=new ASTNode(RELATIONAL_EXPRESSION);
+
+    Add_Child(node,PlusMinus_Expression());
+
+    while(Match(LESS)||Match(LESS_EQUAL)||Match(GREATER)||Match(GREATER_EQUAL))
+    {
+        switch(Previous_Token().type)
+        {
+            case LESS:
+                Add_Child(node,new ASTNode(AST_LESS,Previous_Token()));break;
+            case LESS_EQUAL:
+                Add_Child(node,new ASTNode(AST_LESS_EQUAL,Previous_Token()));break;
+            case GREATER:
+                Add_Child(node,new ASTNode(AST_GREATER,Previous_Token()));break;
+            case GREATER_EQUAL:
+                Add_Child(node,new ASTNode(AST_GREATER_EQUAL,Previous_Token()));break;  
+        }
+        
+        Add_Child(node,PlusMinus_Expression());
+    }
+
     return node;
 }
 
@@ -159,17 +259,17 @@ ASTNode* Parser::PlusMinus_Expression()
 
     ASTNode* node=new ASTNode(PLUSMINUS_EXPRESSION);
 
-    node->Children.push_back(MulDiv_Expression());
+    Add_Child(node,MulDiv_Expression());
    
-    while(!is_error&&(Match(PLUS)||Match(MINUS)))
+    while(Match(PLUS)||Match(MINUS))
     {
         if(Previous_Token().type==PLUS)
         {
-            node->Children.push_back(new ASTNode(AST_PLUS,Previous_Token()));
+            Add_Child(node,new ASTNode(AST_PLUS,Previous_Token()));
         }
-        else if(Previous_Token().type==MINUS)node->Children.push_back(new ASTNode(AST_MINUS,Previous_Token()));
+        else if(Previous_Token().type==MINUS)Add_Child(node,new ASTNode(AST_MINUS,Previous_Token()));
 
-        node->Children.push_back(MulDiv_Expression());
+        Add_Child(node,MulDiv_Expression());
     }
 
     return node;
@@ -181,17 +281,17 @@ ASTNode* Parser::MulDiv_Expression()
 
     ASTNode* node= new ASTNode(MULDIV_EXPRESSION);
 
-    node->Children.push_back(Unary_Expression());
+    Add_Child(node,Unary_Expression());
 
-    while(!is_error&&(Match(STAR)||Match(SLASH)))
+    while(Match(STAR)||Match(SLASH))
     {
         if(Previous_Token().type==STAR)
         {
-            node->Children.push_back(new ASTNode(AST_STAR,Previous_Token()));
+            Add_Child(node,new ASTNode(AST_STAR,Previous_Token()));
         }
-        else  if(Previous_Token().type==SLASH)node->Children.push_back(new ASTNode(AST_SLASH,Previous_Token()));
+        else  if(Previous_Token().type==SLASH)Add_Child(node,new ASTNode(AST_SLASH,Previous_Token()));
 
-        node->Children.push_back(Unary_Expression());
+        Add_Child(node,Unary_Expression());
     }
 
     return node;
@@ -207,13 +307,13 @@ ASTNode* Parser::Unary_Expression()
     {   
         if(Previous_Token().type==PLUS)
         {
-            node->Children.push_back(new ASTNode(AST_PLUS,Previous_Token()));
+            Add_Child(node,new ASTNode(AST_PLUS,Previous_Token()));
         }
-        else if(Previous_Token().type==MINUS)node->Children.push_back(new ASTNode(AST_MINUS,Previous_Token()));
+        else if(Previous_Token().type==MINUS)Add_Child(node,new ASTNode(AST_MINUS,Previous_Token()));
 
-        node->Children.push_back(Unary_Expression());
+        Add_Child(node,Unary_Expression());
     }
-    else node->Children.push_back(Primary_Expression());
+    else Add_Child(node,Primary_Expression());
     
     return node;
 }
@@ -224,8 +324,8 @@ ASTNode* Parser::Primary_Expression()
 
     ASTNode* node=new ASTNode(PRIMARY_EXPRESSION);
 
-    if(Match(CONSTANT_INT))node->Children.push_back(new ASTNode(AST_CONSTANT_INT,Previous_Token()));
-    else if(Match(ID))node->Children.push_back(new ASTNode(AST_ID,Previous_Token()));
+    if(Match(CONSTANT_INT))Add_Child(node,new ASTNode(AST_CONSTANT_INT,Previous_Token()));
+    else if(Match(ID))Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
     else Parse_Error("Primary character loss.");
 
     return node;
@@ -235,8 +335,8 @@ ASTNode* Parser::Primary_Expression()
 
 void Parser::Parse_Error(string error_message)
 {
-    is_error=true;
     cout<< "Parse Error: Line "<<tokens[current].line<<": "<<error_message<<endl;
+    exit(2);
 }
 
 
@@ -265,6 +365,11 @@ bool Parser::Peek(TokenType expected)
 Token Parser::Previous_Token()
 {
     return tokens[current-1];
+}
+
+void Parser::Add_Child(ASTNode* root,ASTNode* child)
+{
+    root->Children.push_back(child);
 }
 
 void Parser::WhoAmI(string name)

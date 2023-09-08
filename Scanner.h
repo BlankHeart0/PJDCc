@@ -12,9 +12,7 @@ public:
     int line;
     vector<Token>tokens;
 
-    bool is_error;
-
-    Scanner():start(0),current(0),line(1),is_error(false){}
+    Scanner():start(0),current(0),line(1){}
 
     void Scan();
 
@@ -30,7 +28,9 @@ public:
     bool Is_Digit(char c);
     bool Is_AlphaUnderline(char c);
     bool Is_DigitAlphaUnderline(char c);
-
+    
+    bool Match(char expected);
+    
 
     void Tokens_PrintTable();
 };

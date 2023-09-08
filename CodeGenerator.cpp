@@ -56,16 +56,32 @@ void CodeGenerator::CodeGenerate_Statement(ASTNode* root)
                 CodeGenerate_Variable_Definition(root->Children[i]);break;
             case ASSIGNMENT_STATEMENT:
                 CodeGenerate_Assignment_Statement(root->Children[i]);break;
+            case COMPOUND_STATEMENT:
+                CodeGenerate_Compound_Statement(root->Children[i]);break;
+            case IF_STATEMENT:
+                CodeGenerate_If_Statement(root->Children[i]);break;
         }
     }
 }
+
+void CodeGenerator::CodeGenerate_Compound_Statement(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Compound_Statement");
+
+    for(int i=1;i<root->Children.size()-1;i++)
+    {
+        CodeGenerate_Statement(root->Children[i]);
+    }
+}
+
+
 
 void CodeGenerator::CodeGenerate_Print_Statement(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Print_Statement");
 
-    int print_ri=CodeGenerate_Expression(root->Children[1]);
-    Print(print_ri);
+    int expression_ri=CodeGenerate_Expression(root->Children[1]);
+    Print(expression_ri);
 }
 
 void CodeGenerator::CodeGenerate_Assignment_Statement(ASTNode* root)
@@ -83,6 +99,8 @@ void CodeGenerator::CodeGenerate_Assignment_Statement(ASTNode* root)
 
 void CodeGenerator::CodeGenerate_Variable_Definition(ASTNode* root)
 {
+    WhoAmI("CodeGenerate_Variable_Definition");
+
     string identifier=CodeGenerate_Variable_Declaration(FirstChild(root));
     
     if(root->Children[1]->type==AST_ASSIGN)
@@ -94,6 +112,8 @@ void CodeGenerator::CodeGenerate_Variable_Definition(ASTNode* root)
     
 string CodeGenerator::CodeGenerate_Variable_Declaration(ASTNode* root)
 {
+    WhoAmI("CodeGenerate_Variable_Declaration");
+
     string identifier=root->Children[1]->lexeme;
     if(!ST.Symbol_Exist(identifier))
     {
@@ -105,12 +125,76 @@ string CodeGenerator::CodeGenerate_Variable_Declaration(ASTNode* root)
     return identifier; 
 }
 
+void CodeGenerator::CodeGenerate_If_Statement(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_If_Statement");
+
+    int expression_ri=CodeGenerate_Expression(root->Children[2]);
+
+    CompareZero(expression_ri);
+    int lable1=NewLable();
+    Jump("je",lable1);
+
+    CodeGenerate_Statement(root->Children[4]);
+    
+    //have else 
+    if(root->Children.size()>5&&root->Children[5]->type==AST_ELSE)
+    {
+        int lable2=NewLable();
+        Jump("jmp",lable2);
+        LablePrint(lable1);
+
+        CodeGenerate_Statement(root->Children[6]);
+
+        LablePrint(lable2);
+    }
+    else LablePrint(lable1);
+}
+
+
 
 int CodeGenerator::CodeGenerate_Expression(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Expression");
 
-    return CodeGenerate_PlusMinus_Expression(FirstChild(root));
+    return CodeGenerate_Equality_Expression(FirstChild(root));
+}
+
+int CodeGenerator::CodeGenerate_Equality_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Equality_Expression");
+
+    int result_ri=CodeGenerate_Relational_Expression(FirstChild(root));
+
+    for(int i=1;i<root->Children.size();i+=2)
+    {
+        int temp_ri=CodeGenerate_Relational_Expression(root->Children[i+1]);
+        if(root->Children[i]->type==AST_EQUAL)result_ri=Equal(result_ri,temp_ri);
+        else if(root->Children[i]->type==AST_NOT_EQUAL)result_ri=NotEqual(result_ri,temp_ri);
+    }
+
+    return result_ri;
+}
+
+int CodeGenerator::CodeGenerate_Relational_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Relational_Expression");
+
+    int result_ri=CodeGenerate_PlusMinus_Expression(FirstChild(root));
+
+    for(int i=1;i<root->Children.size();i+=2)
+    {
+        int temp_ri=CodeGenerate_PlusMinus_Expression(root->Children[i+1]);
+        switch(root->Children[i]->type)
+        {
+            case AST_LESS:result_ri=Less(result_ri,temp_ri);break;
+            case AST_LESS_EQUAL:result_ri=LessEqual(result_ri,temp_ri);break;
+            case AST_GREATER:result_ri=Greater(result_ri,temp_ri);break;
+            case AST_GREATER_EQUAL:result_ri=GreaterEqual(result_ri,temp_ri);break;
+        }
+    }
+
+    return result_ri;
 }
 
 int CodeGenerator::CodeGenerate_PlusMinus_Expression(ASTNode* root)
@@ -155,6 +239,7 @@ int CodeGenerator::CodeGenerate_Unary_Expression(ASTNode* root)
 int CodeGenerator::CodeGenerate_Primary_Expression(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Primary_Expression");
+    
     if(FirstChild(root)->type==AST_CONSTANT_INT)return Load(FirstChild(root)->literal);
     else if(FirstChild(root)->type==AST_ID)
     {
@@ -206,7 +291,7 @@ int CodeGenerator::Load(string identifier)
 void CodeGenerator::Store(int r_i,string identifier)
 {
     OutFile<<"\tmov\t["<<identifier<<"], "<<RC.Name(r_i)<<endl;
-    //++
+    //Release the right value
     RC.Free(r_i);
 }
 
@@ -267,16 +352,79 @@ void CodeGenerator::Print(int r_i)
 
 
 
+int CodeGenerator::Compare(int r1_i,int r2_i,string setx)
+{
+    OutFile<<"\tcmp\t"<<RC.Name(r1_i)<<", "<<RC.Name(r2_i)<<endl;
+    OutFile<<"\t"<<setx<<"\t"<<RC.Name(r1_i)<<'b'<<endl;
+    OutFile<<"\tand\t"<<RC.Name(r1_i)<<", 255"<<endl;
+
+    RC.Free(r2_i);
+    return r1_i;
+}
+
+int CodeGenerator::Equal(int r1_i,int r2_i)
+{
+    return Compare(r1_i,r2_i,"sete");
+}
+
+int CodeGenerator::NotEqual(int r1_i,int r2_i)
+{
+    return Compare(r1_i,r2_i,"setne");
+}
+
+int CodeGenerator::Less(int r1_i,int r2_i)
+{
+    return Compare(r1_i,r2_i,"setl");
+} 
+
+int CodeGenerator::LessEqual(int r1_i,int r2_i)
+{
+    return Compare(r1_i,r2_i,"setle");
+}
+
+int CodeGenerator::Greater(int r1_i,int r2_i)
+{
+    return Compare(r1_i,r2_i,"setg");
+}
+
+int CodeGenerator::GreaterEqual(int r1_i,int r2_i)
+{
+    return Compare(r1_i,r2_i,"setge");
+}
+
+void CodeGenerator::CompareZero(int r_i)
+{
+    OutFile<<"\tcmp\t"<<RC.Name(r_i)<<", 0"<<endl;
+}
+
+
+int CodeGenerator::NewLable()
+{
+    return ++LableNumber;
+}
+  
+void CodeGenerator::LablePrint(int lable_number)
+{
+    OutFile<<"L"<<lable_number<<":"<<endl;
+}
+
+void CodeGenerator::Jump(string jump,int lable_numbr)
+{
+    OutFile<<"\t"<<jump<<"\t"<<"L"<<lable_numbr<<endl;
+}
+
+
+
 void CodeGenerator::CodeGenerate_Error(string error_message,ASTNode* root)
 {
-    is_error=true;
     cout<< "CodeGenerate Error: Line "<<root->line<<": "<<error_message<<endl;
+    exit(4);
 }
 
 void CodeGenerator::CodeGenerate_Error(string error_message)
 {
-    is_error=true;
     cout<< "CodeGenerate Error: "<<": "<<error_message<<endl;
+    exit(4);
 }
 
 void CodeGenerator::WhoAmI(string name)

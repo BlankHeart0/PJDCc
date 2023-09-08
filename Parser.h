@@ -10,16 +10,16 @@ public:
     int current;
     AST ast;
 
-    bool is_error;
     bool DEBUG;
 
-    Parser():current(0),is_error(false),DEBUG(false){}
+    Parser():current(0),DEBUG(false){}
 
     void Parse();
 
     ASTNode* Translation_Unit();
 
     ASTNode* Statement();
+    ASTNode* Compound_Statement();
 
     ASTNode* Print_Statement();
     ASTNode* Assignment_Statement();
@@ -27,7 +27,11 @@ public:
     ASTNode* Variable_Definition();
     ASTNode* Variable_Declaration();
 
+    ASTNode* If_Statement();
+
     ASTNode* Expression();
+    ASTNode* Equality_Expression();
+    ASTNode* Relational_Expression();
     ASTNode* PlusMinus_Expression();
     ASTNode* MulDiv_Expression();
     ASTNode* Unary_Expression();
@@ -40,6 +44,7 @@ public:
     bool Peek(TokenType expected);
 
     Token Previous_Token();
-
+    void Add_Child(ASTNode* root,ASTNode* child);
+    
     void WhoAmI(string name);
 };

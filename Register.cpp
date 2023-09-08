@@ -6,6 +6,9 @@ RegisterController::RegisterController()
     Register_Table.push_back(Register("r9",true));
     Register_Table.push_back(Register("r10",true));
     Register_Table.push_back(Register("r11",true));
+    
+    Register_Table.push_back(Register("r12",true));
+    Register_Table.push_back(Register("r13",true));
 }
 
 int RegisterController::Alloc()
@@ -60,4 +63,5 @@ string RegisterController::Name(int register_i)
 void RegisterController::RegisterController_Error(string error_message)
 {
     cout<< "Register Controller Error : "<<error_message<<endl;
+    exit(3);
 }

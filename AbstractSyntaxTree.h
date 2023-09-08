@@ -14,13 +14,20 @@ enum ASTNodeType
     //Keyword
     AST_INT,
     AST_PRINT,
+    AST_IF,AST_ELSE,
 
     //Separator
     AST_SEMICOLON, //;
+    AST_LEFT_PAREN,AST_RIGHT_PAREN, // ( )
+    AST_LEFT_BARCE,AST_RIGHT_BRACE, // { }
 
     //Operator
     AST_PLUS, AST_MINUS, AST_STAR, AST_SLASH, // + - * /
     AST_ASSIGN, // =
+    AST_EQUAL, AST_NOT_EQUAL, // == !=
+    AST_LESS, AST_LESS_EQUAL, // < <=
+    AST_GREATER, AST_GREATER_EQUAL, //> >=
+    AST_NOT, // !
 
     //Constant
     AST_CONSTANT_INT,
@@ -34,6 +41,9 @@ enum ASTNodeType
     TRANSLATION_UNIT,
 
     STATEMENT,
+    COMPOUND_STATEMENT,
+    IF_STATEMENT,
+
     PRINT_STATEMENT,
     ASSIGNMENT_STATEMENT,
 
@@ -41,7 +51,13 @@ enum ASTNodeType
     VARIABLE_DECLARATION,
 
     EXPRESSION,
-    PLUSMINUS_EXPRESSION,MULDIV_EXPRESSION,UNARY_EXPRESSION,PRIMARY_EXPRESSION 
+    EQUALITY_EXPRESSION,
+    RELATIONAL_EXPRESSION,
+
+    PLUSMINUS_EXPRESSION,
+    MULDIV_EXPRESSION,
+    UNARY_EXPRESSION,
+    PRIMARY_EXPRESSION 
 };
 
 static vector<string>ASTNodeType_text
@@ -51,13 +67,20 @@ static vector<string>ASTNodeType_text
     //Keyword
     "AST_INT",
     "AST_PRINT",
+    "AST_IF","AST_ELSE",
 
     //Separator
     "AST_SEMICOLON", //;
-    
+    "AST_LEFT_PAREN","AST_RIGHT_PAREN", // ( )
+    "AST_LEFT_BARCE","AST_RIGHT_BRACE", // { }
+
     //Operator
     "AST_PLUS", "AST_MINUS", "AST_STAR", "AST_SLASH", // + - * /
     "AST_ASSIGN", // =
+    "AST_EQUAL", "AST_NOT_EQUAL", // == !=
+    "AST_LESS", "AST_LESS_EQUAL", // < <=
+    "AST_GREATER", "AST_GREATER_EQUAL", //> >=
+    "AST_NOT", // !
 
     //Constant
     "AST_CONSTANT_INT",
@@ -71,6 +94,9 @@ static vector<string>ASTNodeType_text
     "TRANSLATION_UNIT",
 
     "STATEMENT",
+    "COMPOUND_STATEMENT",
+    "IF_STATEMENT",
+    
     "PRINT_STATEMENT",
     "ASSIGNMENT_STATEMENT",
 
@@ -78,7 +104,13 @@ static vector<string>ASTNodeType_text
     "VARIABLE_DECLARATION",
 
     "EXPRESSION",
-    "PLUSMINUS_EXPRESSION","MULDIV_EXPRESSION","UNARY_EXPRESSION","PRIMARY_EXPRESSION" 
+    "EQUALITY_EXPRESSION",
+    "RELATIONAL_EXPRESSION",
+    
+    "PLUSMINUS_EXPRESSION",
+    "MULDIV_EXPRESSION",
+    "UNARY_EXPRESSION",
+    "PRIMARY_EXPRESSION" 
 };
 
 

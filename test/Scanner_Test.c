@@ -1,7 +1,9 @@
-print 2 + 3 * 5 - 8 / 3;
-
-int a=28;
-
-int b;
-
-print a*b/2;
+{
+  int i; int j;
+  i=6; j=12;
+  if (i < j) {
+    print i;
+  } else {
+    print j;
+  }
+}

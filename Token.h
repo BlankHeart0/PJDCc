@@ -11,13 +11,20 @@ enum TokenType
     //Keyword
     INT,
     PRINT,
+    IF,ELSE,
 
     //Separator
     SEMICOLON, // ;
+    LEFT_PAREN,RIGHT_PAREN, // ( )
+    LEFT_BRACE,RIGHT_BRACE, // { }
 
     //Operator
     PLUS, MINUS, STAR, SLASH, // + - * /
     ASSIGN, // =
+    EQUAL, NOT_EQUAL, // == !=
+    LESS, LESS_EQUAL, // < <=
+    GREATER, GREATER_EQUAL, //> >=
+    NOT, // !
 
     //Constant
     CONSTANT_INT, 
@@ -33,13 +40,20 @@ static vector<string>TokenType_text
     //Keyword
     "INT",
     "PRINT",
+    "IF","ELSE",
 
     //Separator
     "SEMICOLON", //;
-    "ASSIGN", // =
+    "LEFT_PAREN","RIGHT_PAREN", // ( )
+    "LEFT_BRACE","RIGHT_BRACE", // { }
 
     //Operator
     "PLUS", "MINUS", "STAR", "SLASH", // + - * /
+    "ASSIGN", // =
+    "EQUAL", "NOT_EQUAL", // == !=
+    "LESS", "LESS_EQUAL", // < <=
+    "GREATER", "GREATER_EQUAL", //> >=
+    "NOT", // !
 
     //Constant
     "CONSTANT_INT", 
@@ -52,7 +66,10 @@ static vector<string>TokenType_text
 
 static unordered_map<string,TokenType>Keyword_map
 {
-    {"print",PRINT},{"int",INT}
+    {"int",INT},
+    {"print",PRINT},
+    {"if",IF},{"else",ELSE}
+    
 };
 
 class Token

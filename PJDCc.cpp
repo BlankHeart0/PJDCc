@@ -69,19 +69,18 @@ void PJDCc::Compile(string path)
     //Scan
     S.source=this->source;
     S.Scan();
-    if(!S.is_error)S.Tokens_PrintTable();
-    else return;
+    S.Tokens_PrintTable();
 
     //Parse
     P.tokens=S.tokens;
     P.Parse();
-    if(!P.is_error)cout<<"--- Parse Successfully! ---"<<endl;
-    else return;
+    cout<<"--- Parse Successfully! ---"<<endl;
 
     //Genernate
     C.ast=P.ast;
-    C.CodeGenerate("./test/CodeGen_Test/Variable.asm");
-    if(!C.is_error)cout<<"--- Compile Successfully! ---"<<endl;
+    C.CodeGenerate("./test/CodeGen_Test/If.asm");
+    
+    cout<<endl<<"--- Compile Successfully! ---"<<endl;
 
 }   
 
@@ -90,11 +89,17 @@ int main()
 {
     PJDCc pjdcc;
 
-    // pjdcc.Compile("./test/Scanner_Test_Variable.c");
-    // pjdcc.Compile("./test/Parser_Test_Variable.c");
+    //pjdcc.Compile("./test/Scanner_Test.c");
+    //pjdcc.Compile("./test/Parser_Test.c");
+
+
+    //CodeGen
+    //pjdcc.Compile("./test/CodeGen_Test/test.c");
 
     //pjdcc.Compile("./test/CodeGen_Test/Calculator.c");
-    pjdcc.Compile("./test/CodeGen_Test/Variable.c");
+    //pjdcc.Compile("./test/CodeGen_Test/Variable.c");
+    //pjdcc.Compile("./test/CodeGen_Test/Compare.c");
+    pjdcc.Compile("./test/CodeGen_Test/If.c");
 
     return 0;
 }

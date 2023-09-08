@@ -13,13 +13,38 @@ void Scanner::Scan()
         switch(source[current++])
         {
             //one character
+            case '(':Add_Token(LEFT_PAREN);break;
+            case ')':Add_Token(RIGHT_PAREN);break;
+            case '{':Add_Token(LEFT_BRACE);break;
+            case '}':Add_Token(RIGHT_BRACE);break;
+            
             case ';':Add_Token(SEMICOLON);break;
             case '+':Add_Token(PLUS);break;
             case '-':Add_Token(MINUS);break;
             case '*':Add_Token(STAR);break;
-            case '/':Add_Token(SLASH);break;
-            case '=':Add_Token(ASSIGN);break;
+
+            //two character
+            case '=':Add_Token(Match('=')?EQUAL:ASSIGN);break;
+            case '!':Add_Token(Match('=')?NOT_EQUAL:NOT);break;
+            case '<':Add_Token(Match('=')?LESS_EQUAL:LESS);break;
+            case '>':Add_Token(Match('=')?GREATER_EQUAL:GREATER);break;
             
+            //Annotation
+            case '/':
+                if(Match('/'))while(!Is_AtEnd()&&source[current]!='\n')current++;
+                else if(Match('*'))
+                {
+                    while(!Is_AtEnd()&&(source[current]!='/'||source[current-1]!='*'))
+                    {
+                        if(source[current]=='\n')line++;
+                        current++;
+                    }
+                    if(Is_AtEnd())Scan_Error("Incomplete annotation.");
+                    else current++;
+                }
+                else Add_Token(SLASH);
+                break;
+
             //Blank
             case ' ':case '\r':case '\t':break;
             case '\n':line++;break;
@@ -66,8 +91,8 @@ void Scanner::Scan_IdentifierKeyword()
 
 void Scanner::Scan_Error(string error_message)
 {
-    is_error=true;
     cout<<"Scan Error: Line "<<line<<": "<<error_message<<endl;
+    exit(1);
 }
 
 
@@ -105,6 +130,14 @@ bool Scanner::Is_DigitAlphaUnderline(char c)
 {
 	return Is_Digit(c) || Is_AlphaUnderline(c);
 }
+
+bool Scanner::Match(char expected)
+{
+    if(Is_AtEnd()||source[current]!=expected)return false;
+    current++;
+    return true;
+}
+
 
 
 void Scanner::Tokens_PrintTable()
