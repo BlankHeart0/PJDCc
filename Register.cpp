@@ -7,8 +7,8 @@ RegisterController::RegisterController()
     Register_Table.push_back(Register("r10",true));
     Register_Table.push_back(Register("r11",true));
     
-    Register_Table.push_back(Register("r12",true));
-    Register_Table.push_back(Register("r13",true));
+    //Register_Table.push_back(Register("r12",true));
+    //Register_Table.push_back(Register("r13",true));
 }
 
 int RegisterController::Alloc()
@@ -54,9 +54,30 @@ void RegisterController::FreeAll()
 
 string RegisterController::Name(int register_i)
 {
-    if(register_i>=0&&register_i<Register_Table.size())return Register_Table[register_i].name;
+    return Name(register_i,8);
+}
 
-    return "Error!";
+string RegisterController::Name(int register_i,int byte)
+{
+    string name;
+
+    if(register_i>=0&&register_i<Register_Table.size())
+    {
+        switch(byte)
+        {
+            case 8:
+                name=Register_Table[register_i].name;break;
+            case 4:
+                name=Register_Table[register_i].name+"d";break;
+            case 2:
+                name=Register_Table[register_i].name+"w";break;
+            case 1:
+                name=Register_Table[register_i].name+"b";break;
+        }
+    }
+    else RegisterController_Error("Can not visit this register.");
+    
+    return name;
 }
 
 

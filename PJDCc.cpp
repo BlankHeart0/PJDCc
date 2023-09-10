@@ -78,7 +78,7 @@ void PJDCc::Compile(string path)
 
     //Genernate
     CG.ast=P.ast;
-    CG.CodeGenerate("./test/CodeGen_Test/While.asm");
+    CG.CodeGenerate("./test/CodeGen_Test/Function.asm");
     
     cout<<endl<<"--- Compile Successfully! ---"<<endl;
 
@@ -100,8 +100,9 @@ int main()
     //pjdcc.Compile("./test/CodeGen_Test/Variable.c");
     //pjdcc.Compile("./test/CodeGen_Test/Compare.c");
     //pjdcc.Compile("./test/CodeGen_Test/If.c");
-    pjdcc.Compile("./test/CodeGen_Test/While.c");
-
-
+    //pjdcc.Compile("./test/CodeGen_Test/While.c");
+    
+    pjdcc.Compile("./test/CodeGen_Test/Function.c");
+    
     return 0;
 }

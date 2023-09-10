@@ -9,13 +9,14 @@ using namespace std;
 enum TokenType
 {
     //Keyword
-    INT,
+    VOID,INT,CHAR,LONG,
     PRINT,
     IF,ELSE,
     WHILE,DO,
+    RETURN,
 
     //Separator
-    SEMICOLON, // ;
+    SEMICOLON,COMMA, // ; ,
     LEFT_PAREN,RIGHT_PAREN, // ( )
     LEFT_BRACE,RIGHT_BRACE, // { }
 
@@ -39,13 +40,14 @@ enum TokenType
 static vector<string>TokenType_text
 {
     //Keyword
-    "INT",
+    "VOID","INT","CHAR","LONG",
     "PRINT",
     "IF","ELSE",
     "WHILE","DO",
+    "RETURN",
 
     //Separator
-    "SEMICOLON", // ;
+    "SEMICOLON","COMMA", // ; ,
     "LEFT_PAREN","RIGHT_PAREN", // ( )
     "LEFT_BRACE","RIGHT_BRACE", // { }
 
@@ -68,10 +70,11 @@ static vector<string>TokenType_text
 
 static unordered_map<string,TokenType>Keyword_map
 {
-    {"int",INT},
+    {"void",VOID},{"int",INT},{"char",CHAR},{"long",LONG},
     {"print",PRINT},
     {"if",IF},{"else",ELSE},
-    {"while",WHILE},{"do",DO}
+    {"while",WHILE},{"do",DO},
+    {"return",RETURN}
 
 };
 

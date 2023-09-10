@@ -1,15 +1,15 @@
-{ int i;
-  i=1;
-  while (i <= 10) {
-    print i;
-    i= i + 1;
-  }
+long fred()
+{
+  return 20;
 }
 
-int t=0;
-do
+int main()
 {
-  if(t>=5)print t;
-  else print 0;
-  t++;
-} while (t<10);
+  int result;
+  print 10;
+  result=fred(15);
+  print result;
+  print fred(15)+10;
+  
+  return 0;
+}

@@ -1,1 +1,6 @@
-1. , expression don't support
+1. , expression 
+2. break continue
+3. for
+4. type_compatible
+5. -xx 
+6. sign problem

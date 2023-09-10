@@ -1,31 +1,41 @@
-<Translation_Unit> ::= {<Statement>}CODE_EOF
+<Translation_Unit> ::= {<Function_Definition>}CODE_EOF
 
-<Statement> ::= <Print_Statement> | <Variable_Definition> | <Assignment_Statement> | <Compound_Statement> 
-                | <If_Statement> | <Iteration_Statement>
+<Function_Definition> ::= <Function_Type> IDENTIFIER "(" ")" <Compound_Statement>
+<Function_Type> ::= VOID | INT | CHAR | LONG
+
+
+#Statement
+<Statement> ::= <Print_Statement> | <Variable_Definition> | <Compound_Statement> | <If_Statement> | <Iteration_Statement> | 
+              | <Expression_Statement> | <Return_Statement>
 
 <Compound_Statement> ::= "{"{<Statement>}"}"
 
 <Print_Statement> ::= PRINT <Expression>";"
 
-<Assignment_Statement> ::= IDENTIFIER"="<Expression>";"
-
 <Variable_Definition> ::= <Variable_Declaration>["="<Expression>]";"
-<Variable_Declaration> ::= INT IDENTIFIER
- 
+<Variable_Declaration> ::= <Variable_Type> IDENTIFIER
+<Variable_Type> ::= INT | CHAR | LONG
+
 <If_Statement> ::= IF"("<Expression>")"<Statement>[ELSE<Statement>]
 
 <Iteration_Statement> ::= <While_Statement> | <DoWhile_Statement>
 <While_Statement> ::= WHILE"("<Expression>")"<Statement>
 <DoWhile_Statement> ::= DO<Statement>WHILE"("<Expression>")"";"
 
+<Expression_Statement> ::= [<Expression>]";"
+
+<Return_Statement> ::= RETURN [<Expression>] ";"
 
 
-<Expression> ::= <Equality_Expression>
+#Expression
+<Expression> ::= <Assignment_Expression>{","<Assignment_Expression>}
+<Assignment_Expression> ::= [IDENTIFIER"="]<Equality_Expression>
 
 <Equality_Expression> ::= <Relational_Expression>{("==" | "!=")<Relational_Expression>}
 <Relational_Expression> ::= <PlusMinus_Expression>{("<" | "<=" | ">" | ">=")<PlusMinus_Expression>}
 
 <PlusMinus_Expression> ::= <MulDiv_Expression>{("+" | "-")<MulDiv_Expression>}
 <MulDiv_Expression> ::= <Unary_Expression>{("*" | "/")<Unary_Expression>}
-<Unary_Expression> ::= <Primary_Expression> | (("+" | "-")<Unary_Expression>)
-<Primary_Expression> ::= CONSTANT_INT | IDENTIFIER
+<Unary_Expression> ::= <Primary_Expression> | #(("+" | "-")<Unary_Expression>)
+<Primary_Expression> ::= <FunctionCall_Expression> | CONSTANT_INT | IDENTIFIER
+<FunctionCall_Expression> ::= IDENTIFIER"("<Expression>")"

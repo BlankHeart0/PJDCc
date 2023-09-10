@@ -9,7 +9,7 @@ void CodeGenerator::CodeGenerate(string path)
         return;
     }
 
-    RC.FreeAll();
+    register_controller.FreeAll();
 
     cout<<endl<<"--- CodeGenerate Begin ---"<<endl;
 
@@ -27,7 +27,6 @@ void CodeGenerator::CodeGenerate_Head()
     OutFile<<"section .text"<<endl;
     OutFile<<"\tglobal main"<<endl;
     OutFile<<"\textern printf"<<endl<<endl;
-    OutFile<<"main:"<<endl;
 }
 
 
@@ -38,8 +37,51 @@ void CodeGenerator::CodeGenerate_Translation_Unit(ASTNode* root)
 
     for(int i=0;i<root->Children.size();i++)
     {
-        CodeGenerate_Statement(root->Children[i]);
+        CodeGenerate_Function_Definition(root->Children[i]);
     }
+}
+
+
+
+void CodeGenerator::CodeGenerate_Function_Definition(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Function_Definition");
+
+    FunctionType type=CodeGenerate_Function_Type(FirstChild(root));
+    string identifier=root->Children[1]->lexeme;
+
+    if(!symbol_table.function_table.Function_Exist(identifier))
+    {   
+        int end_lable=NewLable();
+        symbol_table.function_table.Function_Add(type,identifier,vector<Parameter>(),end_lable);
+        
+        NowInFunction=identifier;
+
+        FunctionHead(root->Children[1]->lexeme);
+
+        CodeGenerate_Compound_Statement(root->Children[4]);
+        //Todo
+        FunctionTail();
+    }
+    else CodeGenerate_Error("The function "+identifier+" is redefined.",root->Children[1]);
+
+}
+
+FunctionType CodeGenerator::CodeGenerate_Function_Type(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Function_Type");
+
+    FunctionType ftype;
+
+    switch(FirstChild(root)->type)
+    {   
+        case AST_VOID:ftype=F_VOID;break;
+        case AST_INT:ftype=F_INT;break;
+        case AST_CHAR:ftype=F_CHAR;break;
+        case AST_LONG:ftype=F_LONG;break;
+    }
+
+    return ftype;
 }
 
 
@@ -54,14 +96,16 @@ void CodeGenerator::CodeGenerate_Statement(ASTNode* root)
             CodeGenerate_Print_Statement(FirstChild(root));break;
         case VARIABLE_DEFINITION:
             CodeGenerate_Variable_Definition(FirstChild(root));break;
-        case ASSIGNMENT_STATEMENT:
-            CodeGenerate_Assignment_Statement(FirstChild(root));break;
         case COMPOUND_STATEMENT:
             CodeGenerate_Compound_Statement(FirstChild(root));break;
         case IF_STATEMENT:
             CodeGenerate_If_Statement(FirstChild(root));break;
         case ITERATION_STATEMENT:
             CodeGenerate_Iteration_Statement(FirstChild(root));break;
+        case EXPRESSION_STATEMENT:
+            CodeGenerate_Expression_Statement(FirstChild(root));break;
+        case RETURN_STATEMENT:
+            CodeGenerate_Return_Statement(FirstChild(root));break;
     }
 }
 
@@ -85,18 +129,7 @@ void CodeGenerator::CodeGenerate_Print_Statement(ASTNode* root)
     Print(expression_ri);
 }
 
-void CodeGenerator::CodeGenerate_Assignment_Statement(ASTNode* root)
-{
-    WhoAmI("CodeGenerate_Assignment_Statement");
 
-    string identifier=FirstChild(root)->lexeme;
-    if(ST.Symbol_Exist(identifier))
-    {
-        int exp_i=CodeGenerate_Expression(root->Children[2]);
-        Store(exp_i,identifier);
-    }
-    else CodeGenerate_Error("The identifier "+identifier+" is not defined.",FirstChild(root));
-}
 
 void CodeGenerator::CodeGenerate_Variable_Definition(ASTNode* root)
 {
@@ -115,15 +148,33 @@ string CodeGenerator::CodeGenerate_Variable_Declaration(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Variable_Declaration");
 
+    VariableType type=CodeGenerate_Variable_Type(FirstChild(root));
     string identifier=root->Children[1]->lexeme;
-    if(!ST.Symbol_Exist(identifier))
+
+    if(!symbol_table.variable_table.Variable_Exist(identifier))
     {
-        ST.Symbol_Add(identifier);
+        symbol_table.variable_table.Variable_Add(type,identifier);
         CreateVar(identifier);
     }
-    else CodeGenerate_Error("The identifier "+identifier+" is redefined.",root->Children[1]);
+    else CodeGenerate_Error("The variable "+identifier+" is redefined.",root->Children[1]);
     
     return identifier; 
+}
+
+VariableType CodeGenerator::CodeGenerate_Variable_Type(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Variable_Type");
+
+    VariableType vtype;
+
+    switch(FirstChild(root)->type)
+    {
+        case AST_INT:vtype=V_INT;break;
+        case AST_CHAR:vtype=V_CHAR;break;
+        case AST_LONG:vtype=V_LONG;break;
+    }
+
+    return vtype;
 }
 
 
@@ -206,11 +257,77 @@ void CodeGenerator::CodeGenerate_DoWhile_Statement(ASTNode* root)
 
 
 
+void CodeGenerator::CodeGenerate_Expression_Statement(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Expression_Statement");
+
+    if(FirstChild(root)->type==EXPRESSION)
+    {
+        int expression_ri=CodeGenerate_Expression(FirstChild(root));
+        register_controller.Free(expression_ri);
+    }
+}
+
+
+
+void CodeGenerator::CodeGenerate_Return_Statement(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Return_Statement");
+
+    int expression_ri=-1;
+
+//type check
+    if(symbol_table.function_table.Function_Visit(NowInFunction).type==F_VOID)
+    {
+        if(root->Children[1]->type==EXPRESSION)
+            CodeGenerate_Error("Return value does not match function type.",FirstChild(root));
+    }
+    else
+    {
+        if(root->Children[1]->type==AST_SEMICOLON)
+            CodeGenerate_Error("Return value does not match function type.",FirstChild(root));
+        else expression_ri=CodeGenerate_Expression(root->Children[1]);
+    }
+
+    Return(expression_ri,NowInFunction);
+
+}
+
+
+
 int CodeGenerator::CodeGenerate_Expression(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Expression");
 
-    return CodeGenerate_Equality_Expression(FirstChild(root));
+    int result_ri=CodeGenerate_Assignment_Expression(FirstChild(root));
+
+    for(int i=1;i<root->Children.size();i+=2)
+    {
+        register_controller.Free(result_ri);
+        result_ri=CodeGenerate_Assignment_Expression(root->Children[i+1]);
+    }
+    return result_ri;
+}
+
+int CodeGenerator::CodeGenerate_Assignment_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Assignment_Expression");
+
+    if(FirstChild(root)->type==AST_ID)
+    {
+        string identifier=FirstChild(root)->lexeme;
+        if(symbol_table.variable_table.Variable_Exist(identifier))
+        {
+            int expression_ri=CodeGenerate_Equality_Expression(root->Children[2]);
+            Store(expression_ri,identifier);
+            return Load(identifier);
+        }
+        else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
+    }
+    
+    else return  CodeGenerate_Equality_Expression(FirstChild(root));
+
+    return -1;
 }
 
 int CodeGenerator::CodeGenerate_Equality_Expression(ASTNode* root)
@@ -293,23 +410,32 @@ int CodeGenerator::CodeGenerate_Primary_Expression(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Primary_Expression");
     
-    if(FirstChild(root)->type==AST_CONSTANT_INT)return Load(FirstChild(root)->literal);
+    if(FirstChild(root)->type==FUNCTIONCALL_EXPRESSION)return CodeGenerate_FunctionCall_Expression(FirstChild(root));
+    else if(FirstChild(root)->type==AST_CONSTANT_INT)return Load(FirstChild(root)->literal);
     else if(FirstChild(root)->type==AST_ID)
     {
         string identifier=FirstChild(root)->lexeme;
-        if(ST.Symbol_Exist(identifier))return Load(identifier);
-        else CodeGenerate_Error("The identifier "+identifier+" is not defined.",FirstChild(root));
+        if(symbol_table.variable_table.Variable_Exist(identifier))return Load(identifier);
+        else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
     }
+
     return -1;
 }
 
+int CodeGenerator::CodeGenerate_FunctionCall_Expression(ASTNode* root)
+{
+    string identifier=FirstChild(root)->lexeme;
+    int expression_ri=CodeGenerate_Expression(root->Children[2]);
+
+    return FunctionCall(expression_ri,identifier);
+}
 
 
 void CodeGenerator::CodeGenerate_Tail()
 {
-    OutFile<<endl<<"exit:"<<endl;
-    OutFile<<"\tmov\trax, 0"<<endl;
-    OutFile<<"\tret"<<endl<<endl;
+    //OutFile<<endl<<"exit:"<<endl;
+    //OutFile<<"\tmov\trax, 0"<<endl;
+    //OutFile<<"\tret"<<endl<<endl;
 
     OutFile<<"section .data"<<endl;
     OutFile<<"\tformat: db \"%d\",0XA,0"<<endl;
@@ -327,91 +453,120 @@ ASTNode* CodeGenerator::FirstChild(ASTNode* root)
 
 int CodeGenerator::Load(int value)
 {
-    int register_i=RC.Alloc();
+    int register_i=register_controller.Alloc();
 
-    OutFile<<"\tmov\t"<<RC.Name(register_i)<<", "<<value<<endl;
+    OutFile<<"\tmov\t"<<register_controller.Name(register_i)<<", "<<value<<endl;
     return register_i;
 }
 
 int CodeGenerator::Load(string identifier)
 {
-    int register_i=RC.Alloc();
+    int register_i=register_controller.Alloc();
 
-    OutFile<<"\tmov\t"<<RC.Name(register_i)<<", ["<<identifier<<"]"<<endl;
+    switch(symbol_table.variable_table.Variable_Visit(identifier).type)
+    {
+        case V_INT:
+            OutFile<<"\txor\t"<<register_controller.Name(register_i,8)<<", "<<register_controller.Name(register_i,8)<<endl;
+            OutFile<<"\tmov\t"<<register_controller.Name(register_i,4)<<", dword ["<<identifier<<"]"<<endl;
+            break;
+        case V_CHAR:
+            OutFile<<"\tmovzx\t"<<register_controller.Name(register_i,8)<<", byte ["<<identifier<<"]"<<endl;
+            break;
+        case V_LONG:
+            OutFile<<"\tmov\t"<<register_controller.Name(register_i,8)<<", ["<<identifier<<"]"<<endl;
+            break;
+    }
+
     return register_i;
 }
 
 void CodeGenerator::Store(int r_i,string identifier)
 {
-    OutFile<<"\tmov\t["<<identifier<<"], "<<RC.Name(r_i)<<endl;
+    switch(symbol_table.variable_table.Variable_Visit(identifier).type)
+    {
+        case V_INT:
+            OutFile<<"\tmov\t["<<identifier<<"], "<<register_controller.Name(r_i,4)<<endl;break;
+        case V_CHAR:
+            OutFile<<"\tmov\t["<<identifier<<"], "<<register_controller.Name(r_i,1)<<endl;break;
+        case V_LONG:
+            OutFile<<"\tmov\t["<<identifier<<"], "<<register_controller.Name(r_i,8)<<endl;break;
+    }   
     //Release the right value
-    RC.Free(r_i);
+    register_controller.Free(r_i);
 }
 
 void CodeGenerator::CreateVar(string identifier)
 {
-    OutFile<<"\tcommon\t"<<identifier<<"  8:8"<<endl;
+    switch(symbol_table.variable_table.Variable_Visit(identifier).type)
+    {
+        case V_INT:
+            OutFile<<"\tcommon\t"<<identifier<<"  4:4"<<endl;break;
+        case V_CHAR:
+            OutFile<<"\tcommon\t"<<identifier<<"  1:1"<<endl;break;
+        case V_LONG:
+            OutFile<<"\tcommon\t"<<identifier<<"  8:8"<<endl;break;
+    }
 }
 
 
 
 int CodeGenerator::Add(int r1_i,int r2_i)
 {
-    OutFile<<"\tadd\t"<<RC.Name(r1_i)<<", "<<RC.Name(r2_i)<<endl;
+    OutFile<<"\tadd\t"<<register_controller.Name(r1_i)<<", "<<register_controller.Name(r2_i)<<endl;
     
-    RC.Free(r2_i);
+    register_controller.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Sub(int r1_i,int r2_i)
 {
-    OutFile<<"\tsub\t"<<RC.Name(r1_i)<<", "<<RC.Name(r2_i)<<endl;
+    OutFile<<"\tsub\t"<<register_controller.Name(r1_i)<<", "<<register_controller.Name(r2_i)<<endl;
     
-    RC.Free(r2_i);
+    register_controller.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Mul(int r1_i,int r2_i)
 {
-    OutFile<<"\timul\t"<<RC.Name(r1_i)<<", "<<RC.Name(r2_i)<<endl;
+    OutFile<<"\timul\t"<<register_controller.Name(r1_i)<<", "<<register_controller.Name(r2_i)<<endl;
 
-    RC.Free(r2_i);
+    register_controller.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Div(int r1_i,int r2_i)
 {
-    OutFile<<"\tmov\trax, "<<RC.Name(r1_i)<<endl;
+    OutFile<<"\tmov\trax, "<<register_controller.Name(r1_i)<<endl;
     OutFile<<"\tcqo"<<endl;
-    OutFile<<"\tidiv\t"<<RC.Name(r2_i)<<endl;
-    OutFile<<"\tmov\t"<<RC.Name(r1_i)<<", rax"<<endl;
+    OutFile<<"\tidiv\t"<<register_controller.Name(r2_i)<<endl;
+    OutFile<<"\tmov\t"<<register_controller.Name(r1_i)<<", rax"<<endl;
 
-    RC.Free(r2_i);
+    register_controller.Free(r2_i);
     return r1_i;
 }
 
 void CodeGenerator::Print(int r_i)
 {
-    OutFile<<"\tpush\trbp"<<endl;
+    //OutFile<<"\tpush\trbp"<<endl;
 
     OutFile<<"\tmov\trdi, format"<<endl;
-    OutFile<<"\tmov\trsi, "<<RC.Name(r_i)<<endl;
+    OutFile<<"\tmov\trsi, "<<register_controller.Name(r_i)<<endl;
     OutFile<<"\tmov\trax, 0"<<endl;
     OutFile<<"\tcall\tprintf"<<endl;
 
-    OutFile<<"\tpop\trbp"<<endl;
-    RC.Free(r_i);
+    //OutFile<<"\tpop\trbp"<<endl;
+    register_controller.Free(r_i);
 }
 
 
 
 int CodeGenerator::Compare(int r1_i,int r2_i,string setx)
 {
-    OutFile<<"\tcmp\t"<<RC.Name(r1_i)<<", "<<RC.Name(r2_i)<<endl;
-    OutFile<<"\t"<<setx<<"\t"<<RC.Name(r1_i)<<'b'<<endl;
-    OutFile<<"\tand\t"<<RC.Name(r1_i)<<", 255"<<endl;
+    OutFile<<"\tcmp\t"<<register_controller.Name(r1_i)<<", "<<register_controller.Name(r2_i)<<endl;
+    OutFile<<"\t"<<setx<<"\t"<<register_controller.Name(r1_i)<<'b'<<endl;
+    OutFile<<"\tand\t"<<register_controller.Name(r1_i)<<", 255"<<endl;
 
-    RC.Free(r2_i);
+    register_controller.Free(r2_i);
     return r1_i;
 }
 
@@ -447,7 +602,9 @@ int CodeGenerator::GreaterEqual(int r1_i,int r2_i)
 
 void CodeGenerator::CompareZero(int r_i)
 {
-    OutFile<<"\tcmp\t"<<RC.Name(r_i)<<", 0"<<endl;
+    OutFile<<"\tcmp\t"<<register_controller.Name(r_i)<<", 0"<<endl;
+//Todo
+    register_controller.Free(r_i);
 }
 
 
@@ -468,16 +625,66 @@ void CodeGenerator::Jump(string jump,int lable_numbr)
 
 
 
+void CodeGenerator::FunctionHead(string name)
+{
+    OutFile<<name<<":"<<endl;
+    OutFile<<"\tpush\trbp"<<endl;
+    OutFile<<"\tmov\trbp, rsp"<<endl;
+}
+
+void CodeGenerator::FunctionTail()
+{
+    LablePrint(symbol_table.function_table.Function_Visit(NowInFunction).end_lable);
+    OutFile<<"\tpop\trbp"<<endl;
+    OutFile<<"\tret"<<endl<<endl;
+}
+
+int CodeGenerator::FunctionCall(int r_i,string identifier)
+{
+    int out_ri=register_controller.Alloc();
+
+    OutFile<<"\tmov\trdi, "<<register_controller.Name(r_i)<<endl;
+    OutFile<<"\tcall\t"<<identifier<<endl;
+    OutFile<<"\tmov\t"<<register_controller.Name(out_ri)<<", rax"<<endl;
+
+    register_controller.Free(r_i);
+
+    return out_ri;
+}
+
+void CodeGenerator::Return(int r_i,string identifier)
+{
+    switch(symbol_table.function_table.Function_Visit(identifier).type)
+    {
+        case F_VOID:break;
+        case F_INT:
+            OutFile<<"\tmov\teax, "<<register_controller.Name(r_i,4)<<endl;
+            break;
+        case F_CHAR:
+            OutFile<<"\tmovzx\teax, "<<register_controller.Name(r_i,1)<<endl;
+            break;
+        case F_LONG:
+            OutFile<<"\tmov\trax, "<<register_controller.Name(r_i,8)<<endl;
+            break;
+    }
+
+    Jump("jmp",symbol_table.function_table.Function_Visit(identifier).end_lable);
+
+    register_controller.Free(r_i);
+}
+
+
+
 void CodeGenerator::CodeGenerate_Error(string error_message,ASTNode* root)
 {
     cout<< "CodeGenerate Error: Line "<<root->line<<": "<<error_message<<endl;
-    exit(4);
+    exit(5);
 }
 
 void CodeGenerator::CodeGenerate_Error(string error_message)
 {
     cout<< "CodeGenerate Error: "<<": "<<error_message<<endl;
-    exit(4);
+    exit(5);
 }
 
 void CodeGenerator::WhoAmI(string name)

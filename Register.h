@@ -26,5 +26,7 @@ public:
     void FreeAll();
 
     string Name(int register_i);
+    string Name(int register_i,int byte);
+    
     void RegisterController_Error(string error_message);
 };
