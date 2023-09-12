@@ -1,27 +1,27 @@
 #include "SymbolTable.h"
 
-void VariableTable::Variable_Add(VariableType type,string identifier)
+void VariableTable::Add(Type type,string identifier)
 {
-    if(!Variable_Exist(identifier))
+    if(!Exist(identifier))
     {
         table.insert(pair<string,Variable>(identifier,Variable(type,identifier)));
     }
-    else VariableTable_Error("add",identifier);
+    else Error("add",identifier);
 }
 
-bool VariableTable::Variable_Exist(string identifier)
+bool VariableTable::Exist(string identifier)
 {
     if(table.find(identifier)==table.end())return false;
     return true;
 }
 
-Variable VariableTable::Variable_Visit(string identifier)
+Variable VariableTable::Visit(string identifier)
 {
-    if(!Variable_Exist(identifier))VariableTable_Error("visit",identifier);
+    if(!Exist(identifier))Error("visit",identifier);
     return table[identifier];
 }
 
-void VariableTable::VariableTable_Error(string error_message,string identifier)
+void VariableTable::Error(string error_message,string identifier)
 {
     cout<< "Variable table Error: "<<error_message<<" "<<identifier<<endl;
     exit(4);
@@ -29,28 +29,28 @@ void VariableTable::VariableTable_Error(string error_message,string identifier)
 
 
 
-void FunctionTable::Function_Add(FunctionType type,string identifier,vector<Parameter> parameter_list,int end_lable)
+void FunctionTable::Add(Type type,string identifier,vector<Parameter> parameter_list,int end_lable)
 {
-    if(!Function_Exist(identifier))
+    if(!Exist(identifier))
     {
         table.insert(pair<string,Function>(identifier,Function(type,identifier,parameter_list,end_lable)));
     }
-    else FunctionTable_Error("add",identifier);
+    else Error("add",identifier);
 }
 
-bool FunctionTable::Function_Exist(string identifier)
+bool FunctionTable::Exist(string identifier)
 {
     if(table.find(identifier)==table.end())return false;
     return true;
 }
 
-Function FunctionTable::Function_Visit(string identifier)
+Function FunctionTable::Visit(string identifier)
 {
-    if(!Function_Exist(identifier))FunctionTable_Error("visit",identifier);
+    if(!Exist(identifier))Error("visit",identifier);
     return table[identifier];
 }
 
-void FunctionTable::FunctionTable_Error(string error_message,string identifier)
+void FunctionTable::Error(string error_message,string identifier)
 {
     cout<< "Function table Error: "<<error_message<<" "<<identifier<<endl;
     exit(4);

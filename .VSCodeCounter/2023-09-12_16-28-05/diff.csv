@@ -1,0 +1,6 @@
+"filename", "language", "C++", "nasm", "comment", "blank", "total"
+"/home/blankheart0/PJDCc/CodeGenerator.cpp", "C++", -10, 0, 8, 18, 16
+"/home/blankheart0/PJDCc/CodeGenerator.h", "C++", 0, 0, 6, 17, 23
+"/home/blankheart0/PJDCc/PJDCc.cpp", "C++", 1, 0, -1, 0, 0
+"/home/blankheart0/PJDCc/test/CodeGen_Test/Function.asm", "nasm", 0, 6, 0, 1, 7
+"Total", "-", -9, 6, 13, 36, 46

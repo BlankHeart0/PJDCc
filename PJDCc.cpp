@@ -74,11 +74,12 @@ void PJDCc::Compile(string path)
     //Parse
     P.tokens=S.tokens;
     P.Parse();
-    cout<<"--- Parse Successfully! ---"<<endl;
+    P.ast.AST_Print();
 
     //Genernate
     CG.ast=P.ast;
     CG.CodeGenerate("./test/CodeGen_Test/Function.asm");
+    
     
     cout<<endl<<"--- Compile Successfully! ---"<<endl;
 
@@ -89,8 +90,7 @@ int main()
 {
     PJDCc pjdcc;
 
-    //pjdcc.Compile("./test/Scanner_Test.c");
-    //pjdcc.Compile("./test/Parser_Test.c");
+    //pjdcc.Compile("./test/Frontend_Test.c");
 
 
     //CodeGen

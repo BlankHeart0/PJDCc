@@ -1,0 +1,8 @@
+"filename", "language", "TXT", "C", "nasm", "C++", "comment", "blank", "total"
+"/home/blankheart0/PJDCc/Interpreter.cpp", "C++", 0, 0, 0, -81, 0, -19, -100
+"/home/blankheart0/PJDCc/Interpreter.h", "C++", 0, 0, 0, -17, -1, -7, -25
+"/home/blankheart0/PJDCc/Library/printint.c", "C", 0, 5, 0, 0, 0, 1, 6
+"/home/blankheart0/PJDCc/Note.txt", "TXT", 1, 0, 0, 0, 0, 0, 1
+"/home/blankheart0/PJDCc/Target.txt", "TXT", 11, 0, 0, 0, 0, 2, 13
+"/home/blankheart0/PJDCc/test/CodeGen_Test/Function.asm", "nasm", 0, 0, -3, 0, 0, 0, -3
+"Total", "-", 12, 5, -3, -98, -1, -23, -108

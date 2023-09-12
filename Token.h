@@ -9,7 +9,7 @@ using namespace std;
 enum TokenType
 {
     //Keyword
-    VOID,INT,CHAR,LONG,
+    VOID,CHAR,INT,LONG,
     PRINT,
     IF,ELSE,
     WHILE,DO,
@@ -40,7 +40,7 @@ enum TokenType
 static vector<string>TokenType_text
 {
     //Keyword
-    "VOID","INT","CHAR","LONG",
+    "VOID","CHAR","INT","LONG",
     "PRINT",
     "IF","ELSE",
     "WHILE","DO",
@@ -70,13 +70,14 @@ static vector<string>TokenType_text
 
 static unordered_map<string,TokenType>Keyword_map
 {
-    {"void",VOID},{"int",INT},{"char",CHAR},{"long",LONG},
+    {"void",VOID},{"char",CHAR},{"int",INT},{"long",LONG},
     {"print",PRINT},
     {"if",IF},{"else",ELSE},
     {"while",WHILE},{"do",DO},
     {"return",RETURN}
-
 };
+
+
 
 class Token
 {

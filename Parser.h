@@ -12,56 +12,71 @@ public:
 
     bool DEBUG;
 
-    Parser():current(0),DEBUG(true){}
+    Parser():current(0),DEBUG(false){}
 
     void Parse();
 
-    ASTNode* Translation_Unit();
 
-    ASTNode* Function_Definition();
-    ASTNode* Function_Type();
-
-    ASTNode* Statement();
-    ASTNode* Compound_Statement();
-
-    ASTNode* Print_Statement();
-
-    ASTNode* Variable_Definition();
-    ASTNode* Variable_Declaration();
-    ASTNode* Variable_Type();
-
-    ASTNode* If_Statement();
-
-    ASTNode* Iteration_Statement();
-    ASTNode* While_Statement();
-    ASTNode* DoWhile_Statement();
-
-    ASTNode* Expression_Statement();
-
-    ASTNode* Return_Statement();
+// Begin
+    ASTNode* Parse_Translation_Unit();
 
 
-    ASTNode* Expression();
-    ASTNode* Assignment_Expression();
-    ASTNode* Equality_Expression();
-    ASTNode* Relational_Expression();
-    ASTNode* PlusMinus_Expression();
-    ASTNode* MulDiv_Expression();
-    ASTNode* Unary_Expression();
-    ASTNode* Primary_Expression();
-    ASTNode* FunctionCall_Expression();
+// Definition, Declaration
+    ASTNode* Parse_Type();
+    ASTNode* Parse_Function_Definition();
 
-    void Parse_Error(string error_message);
+    ASTNode* Parse_Variable_Definition();
+    ASTNode* Parse_Variable_Declaration();
 
-    bool Is_AtEnd();
+
+// Statement
+    ASTNode* Parse_Statement(); 
+    
+    ASTNode* Parse_Print_Statement();
+
+    ASTNode* Parse_Compound_Statement();
+
+    ASTNode* Parse_If_Statement();
+
+    ASTNode* Parse_Iteration_Statement();
+    ASTNode* Parse_While_Statement();
+    ASTNode* Parse_DoWhile_Statement();
+
+    ASTNode* Parse_Return_Statement();
+
+    ASTNode* Parse_Expression_Statement();
+
+
+// Expression  
+    ASTNode* Parse_Expression();
+    ASTNode* Parse_Assignment_Expression();
+
+    ASTNode* Parse_Equality_Expression();
+    ASTNode* Parse_Relational_Expression();
+
+    ASTNode* Parse_PlusMinus_Expression();
+    ASTNode* Parse_MulDiv_Expression();
+
+    ASTNode* Parse_Unary_Expression();
+    ASTNode* Parse_Primary_Expression();
+
+    ASTNode* Parse_FunctionCall_Expression();
+
+    
+//Tools
     bool Match(TokenType expected);
+    void Match_Semicolon(ASTNode* root);
+    
     bool Peek(TokenType expected);    
     bool Peek(TokenType expected,int n);
-    bool Peek_VariableType();
+    bool Peek_Type();
 
     Token Previous_Token();
+
     void Add_Child(ASTNode* root,ASTNode* child);
-    void Match_Semicolon(ASTNode* root);
+
+    bool Is_AtEnd();
 
     void WhoAmI(string name);
+    void Parse_Error(string error_message);
 };

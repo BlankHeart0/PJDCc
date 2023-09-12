@@ -1,8 +1,0 @@
-"filename", "language", "C++", "C", "nasm", "comment", "blank", "total"
-"/home/blankheart0/PJDCc/PJDCc.cpp", "C++", 3, 0, 0, -3, 0, 0
-"/home/blankheart0/PJDCc/Parser.h", "C++", 0, 0, 0, 0, 1, 1
-"/home/blankheart0/PJDCc/SymbolTable.cpp", "C++", 34, 0, 0, 0, 8, 42
-"/home/blankheart0/PJDCc/SymbolTable.h", "C++", 38, 0, 0, 0, 6, 44
-"/home/blankheart0/PJDCc/test/CodeGen_Test/Function.asm", "nasm", 0, 0, 49, 0, 0, 49
-"/home/blankheart0/PJDCc/test/CodeGen_Test/Function.c", "C", 0, 13, 0, -13, 1, 1
-"Total", "-", 75, 13, 49, -16, 16, 137

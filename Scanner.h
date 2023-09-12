@@ -6,11 +6,14 @@
 class Scanner
 {
 public:
+
     string source;
+    vector<Token>tokens;
+
     int start;
     int current;
     int line;
-    vector<Token>tokens;
+    
 
     Scanner():start(0),current(0),line(1){}
 
@@ -19,7 +22,8 @@ public:
     void Scan_Int();
     void Scan_IdentifierKeyword();
 
-    void Scan_Error(string error_message);
+//Tools
+    bool Match(char expected);
 
     void Add_Token(TokenType type,int literal);
     void Add_Token(TokenType type);
@@ -29,8 +33,8 @@ public:
     bool Is_AlphaUnderline(char c);
     bool Is_DigitAlphaUnderline(char c);
     
-    bool Match(char expected);
     
+    void Scan_Error(string error_message);
 
     void Tokens_PrintTable();
 };

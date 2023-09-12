@@ -9,10 +9,10 @@ using namespace std;
 
 enum ASTNodeType
 {
-    //Terminal
+//Terminal
 
     //Keyword
-    AST_VOID,AST_INT,AST_CHAR,AST_LONG,
+    AST_VOID,AST_CHAR,AST_INT,AST_LONG,
     AST_PRINT,
     AST_IF,AST_ELSE,
     AST_WHILE,AST_DO,
@@ -28,7 +28,7 @@ enum ASTNodeType
     AST_ASSIGN, // =
     AST_EQUAL, AST_NOT_EQUAL, // == !=
     AST_LESS, AST_LESS_EQUAL, // < <=
-    AST_GREATER, AST_GREATER_EQUAL, //> >=
+    AST_GREATER, AST_GREATER_EQUAL, // > >=
     AST_NOT, // !
 
     //Constant
@@ -38,32 +38,39 @@ enum ASTNodeType
 	AST_ID,
 
 
-    //Nonterminal
+//Nonterminal
 
+    // Begin
     TRANSLATION_UNIT,
 
+
+    // Definition, Declaration
+    TYPE,
     FUNCTION_DEFINITION,
-    FUNCTION_TYPE,
-
-    STATEMENT,
-    COMPOUND_STATEMENT,
- 
-    PRINT_STATEMENT,
-
+    
     VARIABLE_DEFINITION,
     VARIABLE_DECLARATION,
-    VARIABLE_TYPE,
+    
 
+    // Statement
+    STATEMENT,
+    
+    PRINT_STATEMENT,
+    
+    COMPOUND_STATEMENT,
+ 
     IF_STATEMENT,
 
     ITERATION_STATEMENT,
     WHILE_STATEMENT,
     DOWHILE_STATEMENT,
 
-    EXPRESSION_STATEMENT,
-
     RETURN_STATEMENT,
 
+    EXPRESSION_STATEMENT,
+
+   
+    // Expression  
     EXPRESSION,
     ASSIGNMENT_EXPRESSION,
 
@@ -72,17 +79,19 @@ enum ASTNodeType
 
     PLUSMINUS_EXPRESSION,
     MULDIV_EXPRESSION,
+
     UNARY_EXPRESSION,
     PRIMARY_EXPRESSION,
+
     FUNCTIONCALL_EXPRESSION 
 };
 
 static vector<string>ASTNodeType_text
 {
-    //Terminal
+//Terminal
 
     //Keyword
-    "AST_VOID","AST_INT","AST_CHAR","AST_LONG",
+    "AST_VOID","AST_CHAR","AST_INT","AST_LONG",
     "AST_PRINT",
     "AST_IF","AST_ELSE",
     "AST_WHILE","AST_DO",
@@ -98,7 +107,7 @@ static vector<string>ASTNodeType_text
     "AST_ASSIGN", // =
     "AST_EQUAL", "AST_NOT_EQUAL", // == !=
     "AST_LESS", "AST_LESS_EQUAL", // < <=
-    "AST_GREATER", "AST_GREATER_EQUAL", //> >=
+    "AST_GREATER", "AST_GREATER_EQUAL", // > >=
     "AST_NOT", // !
 
     //Constant
@@ -108,43 +117,52 @@ static vector<string>ASTNodeType_text
 	"AST_ID",
 
 
-    //Nonterminal
+//Nonterminal
 
+    // Begin
     "TRANSLATION_UNIT",
 
+
+    // Definition, Declaration
+    "TYPE",
     "FUNCTION_DEFINITION",
-    "FUNCTION_TYPE",
-
-    "STATEMENT",
-    "COMPOUND_STATEMENT",
     
-    "PRINT_STATEMENT",
-
     "VARIABLE_DEFINITION",
     "VARIABLE_DECLARATION",
-    "VARIABLE_TYPE",
-
-    "IF_STATEMENT",
     
+
+    // Statement
+    "STATEMENT",
+    
+    "PRINT_STATEMENT",
+    
+    "COMPOUND_STATEMENT",
+ 
+    "IF_STATEMENT",
+
     "ITERATION_STATEMENT",
     "WHILE_STATEMENT",
     "DOWHILE_STATEMENT",
 
-    "EXPRESSION_STATEMENT",
-
     "RETURN_STATEMENT",
 
+    "EXPRESSION_STATEMENT",
+
+   
+    // Expression  
     "EXPRESSION",
     "ASSIGNMENT_EXPRESSION",
 
     "EQUALITY_EXPRESSION",
     "RELATIONAL_EXPRESSION",
-    
+
     "PLUSMINUS_EXPRESSION",
     "MULDIV_EXPRESSION",
+
     "UNARY_EXPRESSION",
     "PRIMARY_EXPRESSION",
-    "FUNCTIONCALL_EXPRESSION"
+    
+    "FUNCTIONCALL_EXPRESSION" 
 };
 
 

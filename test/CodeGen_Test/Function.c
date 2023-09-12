@@ -38,10 +38,10 @@ long fred()
 int main()
 {
   int result;
-  print 10;
+  printint(10);
   result=fred(15);
-  print result;
-  print fred(15)+10;
+  printint(result);
+  printint(fred(15)+10);
   
-  return 0;
+  return 1;
 }

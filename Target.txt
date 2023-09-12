@@ -1,0 +1,13 @@
+Type:
+Easy Type:
+    void char int long 
+Complex Type:
+    struct union enum
+Pointer&Array:
+    All Type's 1 dimension Pointer and Array
+
+Statement:
+    if else while do-while for 
+
+Function:
+    recursion

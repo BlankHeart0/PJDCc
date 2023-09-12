@@ -1,6 +1,6 @@
 section .text
 	global main
-	extern printf
+	extern printint
 
 fred:
 	push	rbp
@@ -29,10 +29,9 @@ main:
 	mov	rbp, rsp
 	common	result  4:4
 	mov	r8, 10
-	mov	rdi, format
-	mov	rsi, r8
-	mov	rax, 0
-	call	printf
+	mov	rdi, r8
+	call	printint
+	mov	r9, rax
 	mov	r8, 15
 	mov	rdi, r8
 	call	fred
@@ -42,26 +41,22 @@ main:
 	mov	r8d, dword [result]
 	xor	r8, r8
 	mov	r8d, dword [result]
-	mov	rdi, format
-	mov	rsi, r8
-	mov	rax, 0
-	call	printf
+	mov	rdi, r8
+	call	printint
+	mov	r9, rax
 	mov	r8, 15
 	mov	rdi, r8
 	call	fred
 	mov	r9, rax
 	mov	r8, 10
 	add	r9, r8
-	mov	rdi, format
-	mov	rsi, r9
-	mov	rax, 0
-	call	printf
-	mov	r8, 0
+	mov	rdi, r9
+	call	printint
+	mov	r8, rax
+	mov	r8, 1
 	mov	eax, r8d
 	jmp	L2
 L2:
 	pop	rbp
 	ret
 
-section .data
-	format: db "%d",0XA,0

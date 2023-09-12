@@ -1,20 +1,25 @@
+
+# Begin
 <Translation_Unit> ::= {<Function_Definition>}CODE_EOF
 
-<Function_Definition> ::= <Function_Type> IDENTIFIER "(" ")" <Compound_Statement>
-<Function_Type> ::= VOID | INT | CHAR | LONG
 
 
-#Statement
-<Statement> ::= <Print_Statement> | <Variable_Definition> | <Compound_Statement> | <If_Statement> | <Iteration_Statement> | 
-              | <Expression_Statement> | <Return_Statement>
+# Definition, Declaration
+<Type> ::= VOID | CHAR | INT | LONG
+<Function_Definition> ::= <Type> IDENTIFIER "(" ")" <Compound_Statement>
 
-<Compound_Statement> ::= "{"{<Statement>}"}"
+<Variable_Definition> ::= <Variable_Declaration>["="<Expression>]";"
+<Variable_Declaration> ::= <Type> IDENTIFIER
+
+
+
+# Statement
+<Statement> ::= <Print_Statement> | <Compound_Statement> | <Variable_Definition> | <If_Statement> | <Iteration_Statement> | 
+              | <Return_Statement> | <Expression_Statement>
 
 <Print_Statement> ::= PRINT <Expression>";"
 
-<Variable_Definition> ::= <Variable_Declaration>["="<Expression>]";"
-<Variable_Declaration> ::= <Variable_Type> IDENTIFIER
-<Variable_Type> ::= INT | CHAR | LONG
+<Compound_Statement> ::= "{"{<Statement>}"}"
 
 <If_Statement> ::= IF"("<Expression>")"<Statement>[ELSE<Statement>]
 
@@ -22,12 +27,13 @@
 <While_Statement> ::= WHILE"("<Expression>")"<Statement>
 <DoWhile_Statement> ::= DO<Statement>WHILE"("<Expression>")"";"
 
-<Expression_Statement> ::= [<Expression>]";"
-
 <Return_Statement> ::= RETURN [<Expression>] ";"
 
+<Expression_Statement> ::= [<Expression>]";"
 
-#Expression
+
+
+# Expression
 <Expression> ::= <Assignment_Expression>{","<Assignment_Expression>}
 <Assignment_Expression> ::= [IDENTIFIER"="]<Equality_Expression>
 
@@ -36,6 +42,8 @@
 
 <PlusMinus_Expression> ::= <MulDiv_Expression>{("+" | "-")<MulDiv_Expression>}
 <MulDiv_Expression> ::= <Unary_Expression>{("*" | "/")<Unary_Expression>}
+
 <Unary_Expression> ::= <Primary_Expression> | #(("+" | "-")<Unary_Expression>)
 <Primary_Expression> ::= <FunctionCall_Expression> | CONSTANT_INT | IDENTIFIER
+
 <FunctionCall_Expression> ::= IDENTIFIER"("<Expression>")"

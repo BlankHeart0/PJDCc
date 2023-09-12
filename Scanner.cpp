@@ -18,8 +18,8 @@ void Scanner::Scan()
             case '{':Add_Token(LEFT_BRACE);break;
             case '}':Add_Token(RIGHT_BRACE);break;
             case ',':Add_Token(COMMA);break;
-
             case ';':Add_Token(SEMICOLON);break;
+
             case '+':Add_Token(PLUS);break;
             case '-':Add_Token(MINUS);break;
             case '*':Add_Token(STAR);break;
@@ -90,10 +90,13 @@ void Scanner::Scan_IdentifierKeyword()
 }
 
 
-void Scanner::Scan_Error(string error_message)
+
+//Tools
+bool Scanner::Match(char expected)
 {
-    cout<<"Scan Error: Line "<<line<<": "<<error_message<<endl;
-    exit(1);
+    if(Is_AtEnd()||source[current]!=expected)return false;
+    current++;
+    return true;
 }
 
 
@@ -132,11 +135,12 @@ bool Scanner::Is_DigitAlphaUnderline(char c)
 	return Is_Digit(c) || Is_AlphaUnderline(c);
 }
 
-bool Scanner::Match(char expected)
+
+
+void Scanner::Scan_Error(string error_message)
 {
-    if(Is_AtEnd()||source[current]!=expected)return false;
-    current++;
-    return true;
+    cout<<"Scan Error: Line "<<line<<": "<<error_message<<endl;
+    exit(1);
 }
 
 

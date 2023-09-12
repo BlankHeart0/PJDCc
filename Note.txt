@@ -4,3 +4,7 @@
 4. type_compatible
 5. -xx 
 6. sign problem
+7. atleast one return
+8. a=b=c=1;
+9. error management
+10. must return ???

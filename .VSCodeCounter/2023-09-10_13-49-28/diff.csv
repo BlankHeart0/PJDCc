@@ -1,8 +1,0 @@
-"filename", "language", "C++", "C", "comment", "blank", "total"
-"/home/blankheart0/PJDCc/CodeGenerator.cpp", "C++", -1, 0, 1, 0, 0
-"/home/blankheart0/PJDCc/PJDCc.cpp", "C++", -3, 0, 3, 0, 0
-"/home/blankheart0/PJDCc/Parser.cpp", "C++", 52, 0, 10, 28, 90
-"/home/blankheart0/PJDCc/Parser.h", "C++", 2, 0, 0, -1, 1
-"/home/blankheart0/PJDCc/Scanner.cpp", "C++", 1, 0, 0, 0, 1
-"/home/blankheart0/PJDCc/test/Parser_Test.c", "C", 0, -5, 18, 3, 16
-"Total", "-", 51, -5, 32, 30, 108

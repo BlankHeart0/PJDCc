@@ -14,19 +14,23 @@ public:
     Register(string Name,bool Free):name(Name),free(Free){}
 };
 
-class RegisterController
+
+
+class RegisterManager
 {
 public:
     vector<Register>Register_Table;
 
-    RegisterController();
+    RegisterManager();
 
+//Alloc and Free
     int Alloc();
     void Free(int register_i);
     void FreeAll();
 
+//Visit
     string Name(int register_i);
     string Name(int register_i,int byte);
     
-    void RegisterController_Error(string error_message);
+    void Register_Error(string error_message);
 };
