@@ -8,3 +8,6 @@
 8. a=b=c=1;
 9. error management
 10. must return ???
+11. unsafe ptr ,not enough check
+12. multiple variable declaration
+13. ptr 1 dimension?

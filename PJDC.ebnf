@@ -1,6 +1,6 @@
 
 # Begin
-<Translation_Unit> ::= {<Function_Definition>}CODE_EOF
+<Translation_Unit> ::= {<Function_Definition> | <Variable_Definition>}CODE_EOF
 
 
 
@@ -9,7 +9,7 @@
 <Function_Definition> ::= <Type> IDENTIFIER "(" ")" <Compound_Statement>
 
 <Variable_Definition> ::= <Variable_Declaration>["="<Expression>]";"
-<Variable_Declaration> ::= <Type> IDENTIFIER
+<Variable_Declaration> ::= <Type>["*"] IDENTIFIER
 
 
 
@@ -43,7 +43,11 @@
 <PlusMinus_Expression> ::= <MulDiv_Expression>{("+" | "-")<MulDiv_Expression>}
 <MulDiv_Expression> ::= <Unary_Expression>{("*" | "/")<Unary_Expression>}
 
-<Unary_Expression> ::= <Primary_Expression> | #(("+" | "-")<Unary_Expression>)
-<Primary_Expression> ::= <FunctionCall_Expression> | CONSTANT_INT | IDENTIFIER
+<Unary_Expression> ::= <Primary_Expression> 
+<Primary_Expression> ::= <FunctionCall_Expression> | <Address_Expression> | <Dreference_Expression>
+                        | CONSTANT_INT | IDENTIFIER
 
 <FunctionCall_Expression> ::= IDENTIFIER"("<Expression>")"
+
+<Address_Expression> ::="&"IDENTIFIER [("+ "| "-") CONSTANT_INT]
+<Dreference_Expression> ::="*" ( IDENTIFIER | "(" IDENTIFIER [("+" | "-") CONSTANT_INT] ")" )

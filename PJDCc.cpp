@@ -71,14 +71,14 @@ void PJDCc::Compile(string path)
     S.Scan();
     S.Tokens_PrintTable();
 
-    //Parse
+    // //Parse
     P.tokens=S.tokens;
     P.Parse();
     P.ast.AST_Print();
 
     //Genernate
     CG.ast=P.ast;
-    CG.CodeGenerate("./test/CodeGen_Test/Function.asm");
+    CG.CodeGenerate("./test/CodeGen_Test/Pointer.asm");
     
     
     cout<<endl<<"--- Compile Successfully! ---"<<endl;
@@ -101,8 +101,9 @@ int main()
     //pjdcc.Compile("./test/CodeGen_Test/Compare.c");
     //pjdcc.Compile("./test/CodeGen_Test/If.c");
     //pjdcc.Compile("./test/CodeGen_Test/While.c");
-    
-    pjdcc.Compile("./test/CodeGen_Test/Function.c");
+    //pjdcc.Compile("./test/CodeGen_Test/Function.c");
+
+    pjdcc.Compile("./test/CodeGen_Test/Pointer.c");
     
     return 0;
 }

@@ -62,6 +62,9 @@ public:
 
     ASTNode* Parse_FunctionCall_Expression();
 
+    ASTNode* Parse_Address_Expression();
+    ASTNode* Parse_Dreference_Expression();
+
     
 //Tools
     bool Match(TokenType expected);

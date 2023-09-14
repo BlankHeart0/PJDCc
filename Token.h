@@ -9,24 +9,27 @@ using namespace std;
 enum TokenType
 {
     //Keyword
-    VOID,CHAR,INT,LONG,
+    VOID, CHAR, INT, LONG,
     PRINT,
-    IF,ELSE,
-    WHILE,DO,
+    IF, ELSE,
+    WHILE, DO,
     RETURN,
 
     //Separator
-    SEMICOLON,COMMA, // ; ,
-    LEFT_PAREN,RIGHT_PAREN, // ( )
-    LEFT_BRACE,RIGHT_BRACE, // { }
+    SEMICOLON, COMMA, // ; ,
+    LEFT_PAREN, RIGHT_PAREN, // ( )
+    LEFT_BRACE, RIGHT_BRACE, // { }
 
     //Operator
     PLUS, MINUS, STAR, SLASH, // + - * /
     ASSIGN, // =
+
     EQUAL, NOT_EQUAL, // == !=
     LESS, LESS_EQUAL, // < <=
     GREATER, GREATER_EQUAL, // > >=
-    NOT, // !
+    NOT, AND, OR,// ! && ||
+
+    AMPERSAND, // &
 
     //Constant
     CONSTANT_INT, 
@@ -40,24 +43,27 @@ enum TokenType
 static vector<string>TokenType_text
 {
     //Keyword
-    "VOID","CHAR","INT","LONG",
+    "VOID", "CHAR", "INT", "LONG",
     "PRINT",
-    "IF","ELSE",
-    "WHILE","DO",
+    "IF", "ELSE",
+    "WHILE", "DO",
     "RETURN",
 
     //Separator
-    "SEMICOLON","COMMA", // ; ,
-    "LEFT_PAREN","RIGHT_PAREN", // ( )
-    "LEFT_BRACE","RIGHT_BRACE", // { }
+    "SEMICOLON", "COMMA", // ; ,
+    "LEFT_PAREN", "RIGHT_PAREN", // ( )
+    "LEFT_BRACE", "RIGHT_BRACE", // { }
 
     //Operator
     "PLUS", "MINUS", "STAR", "SLASH", // + - * /
     "ASSIGN", // =
+    
     "EQUAL", "NOT_EQUAL", // == !=
     "LESS", "LESS_EQUAL", // < <=
     "GREATER", "GREATER_EQUAL", // > >=
-    "NOT", // !
+    "NOT", "AND", "OR",// ! && ||
+
+    "AMPERSAND", // &
 
     //Constant
     "CONSTANT_INT", 

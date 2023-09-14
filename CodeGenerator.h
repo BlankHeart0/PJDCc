@@ -76,7 +76,9 @@ public:
 
     int CodeGenerate_FunctionCall_Expression(ASTNode* root);
 
-    
+    int CodeGenerate_Address_Expression(ASTNode* root);
+    int CodeGenerate_Dreference_Expression(ASTNode* root);
+
 
     
 //Atomic instruction
@@ -86,6 +88,9 @@ public:
     void Store(int r_i,string identifier);
     
     void CreateVar(string identifier);
+
+    int Address(string identifier);
+    int Dereference(int r_i,Type ptr_type);
 
     int Comma(int r1_i,int r2_i);
 
@@ -107,6 +112,8 @@ public:
     int Mul(int r1_i,int r2_i);
     int Div(int r1_i,int r2_i);
     
+    int ShiftLeft(int r_i,int value);
+
     void FunctionHead(string identifier);
     void FunctionTail(string identifier);
     int FunctionCall(int r_i,string identifier);
@@ -116,6 +123,11 @@ public:
 
 
 //Tools
+    Type Type_To_PtrType(Type type);
+
+    int Address_ScaleFactor(Type type);
+    int Dreference_ScaleFactor(Type ptr_type);
+
     ASTNode* FirstChild(ASTNode* root);
 
     void WhoAmI(string name);    

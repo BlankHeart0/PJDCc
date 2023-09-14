@@ -8,7 +8,8 @@ using namespace std;
 
 enum Type
 {
-    T_VOID, T_CHAR, T_INT, T_LONG
+    T_VOID,     T_CHAR,     T_INT,     T_LONG,
+                T_CHAR_PTR, T_INT_PTR, T_LONG_PTR
 };
 
 

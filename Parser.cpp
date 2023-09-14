@@ -20,8 +20,11 @@ ASTNode* Parser::Parse_Translation_Unit()
 
     ASTNode* node=new ASTNode(TRANSLATION_UNIT);
 
-    while(!Is_AtEnd())Add_Child(node,Parse_Function_Definition());
-    
+    while(!Is_AtEnd())
+    {
+        if(Peek(LEFT_PAREN,3))Add_Child(node,Parse_Function_Definition());
+        else Add_Child(node,Parse_Variable_Definition());
+    }
     return node;    
 }
 
@@ -100,6 +103,8 @@ ASTNode* Parser::Parse_Variable_Declaration()
     ASTNode* node=new ASTNode(VARIABLE_DECLARATION);
 
     Add_Child(node,Parse_Type());
+
+    if(Match(STAR))Add_Child(node,new ASTNode(AST_STAR,Previous_Token()));
 
     if(Match(ID))Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
     else Parse_Error("Variable identifier loss.");
@@ -454,17 +459,6 @@ ASTNode* Parser::Parse_Unary_Expression()
 
     ASTNode* node=new ASTNode(UNARY_EXPRESSION);
 
-    // if(Match(PLUS)||Match(MINUS))
-    // {   
-    //     if(Previous_Token().type==PLUS)
-    //     {
-    //         Add_Child(node,new ASTNode(AST_PLUS,Previous_Token()));
-    //     }
-    //     else if(Previous_Token().type==MINUS)Add_Child(node,new ASTNode(AST_MINUS,Previous_Token()));
-
-    //     Add_Child(node,Unary_Expression());
-    // }
-    // else 
     Add_Child(node,Parse_Primary_Expression());
     
     return node;
@@ -486,6 +480,9 @@ ASTNode* Parser::Parse_Primary_Expression()
             Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
         }
     }
+    else if(Peek(AMPERSAND))Add_Child(node,Parse_Address_Expression());
+    else if(Peek(STAR))Add_Child(node,Parse_Dreference_Expression());
+
     else Parse_Error("Primary character loss.");
 
     return node;
@@ -515,6 +512,83 @@ ASTNode* Parser::Parse_FunctionCall_Expression()
 
     return node;
 }
+
+
+
+ASTNode* Parser::Parse_Address_Expression()
+{
+    WhoAmI("Parse_Address_Expression");
+
+    ASTNode* node=new ASTNode(ADDRESS_EXPRESSION);
+
+    if(Match(AMPERSAND))
+    {
+        Add_Child(node,new ASTNode(AST_AMPERSAND,Previous_Token()));
+        if(Match(ID))
+        {
+            Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
+            if(Match(PLUS)||Match(MINUS))
+            {
+                if(Previous_Token().type==PLUS)
+                    Add_Child(node,new ASTNode(AST_PLUS,Previous_Token()));
+                else if(Previous_Token().type==MINUS)
+                    Add_Child(node,new ASTNode(AST_MINUS,Previous_Token()));
+                
+                if(Match(CONSTANT_INT))
+                    Add_Child(node,new ASTNode(AST_CONSTANT_INT,Previous_Token()));
+                else Parse_Error("Int value loss.");
+            }
+        }
+        else Parse_Error("Identifier loss.");
+    }
+    else Parse_Error("Ampersand & loss.");
+
+    return node;
+}
+
+ASTNode* Parser::Parse_Dreference_Expression()
+{
+    WhoAmI("Parse_Dreference_Expression");
+
+    ASTNode* node=new ASTNode(DREFERENCE_EXPRESSION);
+
+    if(Match(STAR))
+    {
+        Add_Child(node,new ASTNode(AST_STAR,Previous_Token()));
+        if(Match(ID))
+        {
+            Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
+        }
+        else if(Match(LEFT_PAREN))
+        {
+            Add_Child(node,new ASTNode(AST_LEFT_PAREN,Previous_Token()));
+            if(Match(ID))
+            {
+                Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
+                if(Match(PLUS)||Match(MINUS))
+                {
+                    if(Previous_Token().type==PLUS)
+                        Add_Child(node,new ASTNode(AST_PLUS,Previous_Token()));
+                    else if(Previous_Token().type==MINUS)
+                        Add_Child(node,new ASTNode(AST_MINUS,Previous_Token()));
+                
+                    if(Match(CONSTANT_INT))
+                        Add_Child(node,new ASTNode(AST_CONSTANT_INT,Previous_Token()));
+                    else Parse_Error("Int value loss.");
+
+                    if(Match(RIGHT_PAREN))Add_Child(node,new ASTNode(AST_RIGHT_PAREN,Previous_Token()));
+                    else Parse_Error("Right paren ) loss.");
+                }
+            }
+            else Parse_Error("Identifier loss.");
+        }
+        else Parse_Error("Identifier loss.");
+    }
+    else Parse_Error("Star * loss.");
+
+    return node;
+}
+
 
 
 

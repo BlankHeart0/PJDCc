@@ -29,6 +29,7 @@ void Scanner::Scan()
             case '!':Add_Token(Match('=')?NOT_EQUAL:NOT);break;
             case '<':Add_Token(Match('=')?LESS_EQUAL:LESS);break;
             case '>':Add_Token(Match('=')?GREATER_EQUAL:GREATER);break;
+            case '&':Add_Token(Match('&')?AND:AMPERSAND);break;
             
             //Annotation
             case '/':

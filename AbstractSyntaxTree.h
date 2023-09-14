@@ -12,16 +12,16 @@ enum ASTNodeType
 //Terminal
 
     //Keyword
-    AST_VOID,AST_CHAR,AST_INT,AST_LONG,
+    AST_VOID, AST_CHAR, AST_INT, AST_LONG,
     AST_PRINT,
-    AST_IF,AST_ELSE,
-    AST_WHILE,AST_DO,
+    AST_IF, AST_ELSE,
+    AST_WHILE, AST_DO,
     AST_RETURN,
 
     //Separator
-    AST_SEMICOLON,AST_COMMA, // ; ,
-    AST_LEFT_PAREN,AST_RIGHT_PAREN, // ( )
-    AST_LEFT_BARCE,AST_RIGHT_BRACE, // { }
+    AST_SEMICOLON, AST_COMMA, // ; ,
+    AST_LEFT_PAREN, AST_RIGHT_PAREN, // ( )
+    AST_LEFT_BARCE, AST_RIGHT_BRACE, // { }
 
     //Operator
     AST_PLUS, AST_MINUS, AST_STAR, AST_SLASH, // + - * /
@@ -29,7 +29,9 @@ enum ASTNodeType
     AST_EQUAL, AST_NOT_EQUAL, // == !=
     AST_LESS, AST_LESS_EQUAL, // < <=
     AST_GREATER, AST_GREATER_EQUAL, // > >=
-    AST_NOT, // !
+    AST_NOT, AST_AND, AST_OR,// ! && ||
+
+    AST_AMPERSAND, // &
 
     //Constant
     AST_CONSTANT_INT,
@@ -83,7 +85,11 @@ enum ASTNodeType
     UNARY_EXPRESSION,
     PRIMARY_EXPRESSION,
 
-    FUNCTIONCALL_EXPRESSION 
+    FUNCTIONCALL_EXPRESSION,
+
+    ADDRESS_EXPRESSION,
+    DREFERENCE_EXPRESSION 
+
 };
 
 static vector<string>ASTNodeType_text
@@ -91,16 +97,16 @@ static vector<string>ASTNodeType_text
 //Terminal
 
     //Keyword
-    "AST_VOID","AST_CHAR","AST_INT","AST_LONG",
+    "AST_VOID", "AST_CHAR", "AST_INT", "AST_LONG",
     "AST_PRINT",
-    "AST_IF","AST_ELSE",
-    "AST_WHILE","AST_DO",
+    "AST_IF", "AST_ELSE",
+    "AST_WHILE", "AST_DO",
     "AST_RETURN",
 
     //Separator
-    "AST_SEMICOLON","AST_COMMA", // ; ,
-    "AST_LEFT_PAREN","AST_RIGHT_PAREN", // ( )
-    "AST_LEFT_BARCE","AST_RIGHT_BRACE", // { }
+    "AST_SEMICOLON", "AST_COMMA", // ; ,
+    "AST_LEFT_PAREN", "AST_RIGHT_PAREN", // ( )
+    "AST_LEFT_BARCE", "AST_RIGHT_BRACE", // { }
 
     //Operator
     "AST_PLUS", "AST_MINUS", "AST_STAR", "AST_SLASH", // + - * /
@@ -108,7 +114,9 @@ static vector<string>ASTNodeType_text
     "AST_EQUAL", "AST_NOT_EQUAL", // == !=
     "AST_LESS", "AST_LESS_EQUAL", // < <=
     "AST_GREATER", "AST_GREATER_EQUAL", // > >=
-    "AST_NOT", // !
+    "AST_NOT", "AST_AND", "AST_OR",// ! && ||
+
+    "AST_AMPERSAND", // &
 
     //Constant
     "AST_CONSTANT_INT",
@@ -162,7 +170,11 @@ static vector<string>ASTNodeType_text
     "UNARY_EXPRESSION",
     "PRIMARY_EXPRESSION",
     
-    "FUNCTIONCALL_EXPRESSION" 
+    "FUNCTIONCALL_EXPRESSION",
+
+    "ADDRESS_EXPRESSION",
+    "DREFERENCE_EXPRESSION"  
+    
 };
 
 
