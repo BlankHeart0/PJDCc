@@ -7,8 +7,8 @@ RegisterManager::RegisterManager()
     Register_Table.push_back(Register("r10",true));
     Register_Table.push_back(Register("r11",true));
     
-    //Register_Table.push_back(Register("r12",true));
-    //Register_Table.push_back(Register("r13",true));
+    Register_Table.push_back(Register("r12",true));
+    Register_Table.push_back(Register("r13",true));
     FreeAll();
 }
 

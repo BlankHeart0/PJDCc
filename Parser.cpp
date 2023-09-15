@@ -23,6 +23,7 @@ ASTNode* Parser::Parse_Translation_Unit()
     while(!Is_AtEnd())
     {
         if(Peek(LEFT_PAREN,3))Add_Child(node,Parse_Function_Definition());
+        else if(Peek(LEFT_SQUARE,3))Add_Child(node,Parse_Array_Definition());
         else Add_Child(node,Parse_Variable_Definition());
     }
     return node;    
@@ -108,6 +109,41 @@ ASTNode* Parser::Parse_Variable_Declaration()
 
     if(Match(ID))Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
     else Parse_Error("Variable identifier loss.");
+
+    return node;
+}
+
+
+
+ASTNode* Parser::Parse_Array_Definition()
+{
+    WhoAmI("Parse_Array_Definition");
+
+    ASTNode* node=new ASTNode(ARRAY_DEFINITION);
+
+    Add_Child(node,Parse_Type());
+
+    if(Match(ID))
+    {
+        Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
+        if(Match(LEFT_SQUARE))
+        {
+            Add_Child(node,new ASTNode(AST_LEFT_SQUARE,Previous_Token()));
+            if(Match(CONSTANT_INT))
+            {
+                Add_Child(node,new ASTNode(AST_CONSTANT_INT,Previous_Token()));
+                if(Match(RIGHT_SQUARE))
+                {
+                    Add_Child(node,new ASTNode(AST_RIGHT_SQUARE,Previous_Token()));
+                    Match_Semicolon(node);
+                }
+                else Parse_Error("Right square ] loss.");
+            }
+            else Parse_Error("Array size loss.");
+        }
+        else Parse_Error("Left square [ loss.");
+    }
+    else Parse_Error("Array identifier loss.");
 
     return node;
 }
@@ -349,9 +385,31 @@ ASTNode* Parser::Parse_Assignment_Expression()
         Match(ASSIGN);Add_Child(node,new ASTNode(AST_ASSIGN,Previous_Token()));
     }
 
-   Add_Child(node,Parse_Equality_Expression());
+    else if(Peek(STAR)&&Peek(ID,2)&&Peek(ASSIGN,3))
+    {
+        Match(STAR);Add_Child(node,new ASTNode(AST_STAR,Previous_Token()));
+        Match(ID);Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
+        Match(ASSIGN);Add_Child(node,new ASTNode(AST_ASSIGN,Previous_Token()));
+    }
 
-   return node; 
+    else if(Peek(ID)&&Peek(LEFT_SQUARE,2))
+    {
+        int temp=current;
+        while(tokens[temp].type!=RIGHT_SQUARE)temp++;
+        if((temp+1<tokens.size()-1)&&tokens[temp+1].type==ASSIGN)
+        {
+            Match(ID);Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
+            Match(LEFT_SQUARE);Add_Child(node,new ASTNode(AST_LEFT_SQUARE,Previous_Token()));
+            Add_Child(node,Parse_Expression());
+            Match(RIGHT_SQUARE);Add_Child(node,new ASTNode(AST_RIGHT_SQUARE,Previous_Token()));
+            if(Match(ASSIGN))Add_Child(node,new ASTNode(AST_ASSIGN,Previous_Token()));
+            else Parse_Error("Assign character = loss.");
+        }
+    }
+
+    Add_Child(node,Parse_Equality_Expression());
+
+    return node; 
 }
 
 
@@ -474,6 +532,7 @@ ASTNode* Parser::Parse_Primary_Expression()
     else if(Peek(ID))
     {
         if(Peek(LEFT_PAREN,2))Add_Child(node,Parse_FunctionCall_Expression());
+        else if(Peek(LEFT_SQUARE,2))Add_Child(node,Parse_Array_Expression());
         else 
         {
             Match(ID);
@@ -589,6 +648,29 @@ ASTNode* Parser::Parse_Dreference_Expression()
     return node;
 }
 
+ASTNode* Parser::Parse_Array_Expression()
+{
+    WhoAmI("Parse_Array_Expression");
+
+    ASTNode* node=new ASTNode(ARRAY_EXPRESSION);
+
+    if(Match(ID))
+    {
+        Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
+        if(Match(LEFT_SQUARE))
+        {
+            Add_Child(node,new ASTNode(AST_LEFT_SQUARE,Previous_Token()));
+            Add_Child(node,Parse_Expression());
+            if(Match(RIGHT_SQUARE))Add_Child(node,new ASTNode(AST_RIGHT_SQUARE,Previous_Token()));
+            else Parse_Error("Right square ] loss.");
+        }
+        else Parse_Error("Left square [ loss.");
+    }
+    else Parse_Error("Identifier loss.");
+
+    return node;
+}
+ 
 
 
 

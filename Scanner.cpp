@@ -15,6 +15,8 @@ void Scanner::Scan()
             //one character
             case '(':Add_Token(LEFT_PAREN);break;
             case ')':Add_Token(RIGHT_PAREN);break;
+            case '[':Add_Token(LEFT_SQUARE);break;
+            case ']':Add_Token(RIGHT_SQUARE);break;
             case '{':Add_Token(LEFT_BRACE);break;
             case '}':Add_Token(RIGHT_BRACE);break;
             case ',':Add_Token(COMMA);break;

@@ -18,6 +18,7 @@ enum TokenType
     //Separator
     SEMICOLON, COMMA, // ; ,
     LEFT_PAREN, RIGHT_PAREN, // ( )
+    LEFT_SQUARE,RIGHT_SQUARE, // [ ]
     LEFT_BRACE, RIGHT_BRACE, // { }
 
     //Operator
@@ -52,6 +53,7 @@ static vector<string>TokenType_text
     //Separator
     "SEMICOLON", "COMMA", // ; ,
     "LEFT_PAREN", "RIGHT_PAREN", // ( )
+    "LEFT_SQUARE","RIGHT_SQUARE", // [ ]
     "LEFT_BRACE", "RIGHT_BRACE", // { }
 
     //Operator

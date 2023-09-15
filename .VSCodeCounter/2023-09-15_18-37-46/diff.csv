@@ -1,0 +1,17 @@
+"filename", "language", "C++", "TXT", "BNF", "C", "nasm", "comment", "blank", "total"
+"/home/blankheart0/PJDCc/AbstractSyntaxTree.h", "C++", 12, 0, 0, 0, 0, 0, 4, 16
+"/home/blankheart0/PJDCc/CodeGenerator.cpp", "C++", 191, 0, 0, 0, 0, 33, 52, 276
+"/home/blankheart0/PJDCc/CodeGenerator.h", "C++", 12, 0, 0, 0, 0, 0, 4, 16
+"/home/blankheart0/PJDCc/Note.txt", "TXT", 0, 3, 0, 0, 0, 0, 0, 3
+"/home/blankheart0/PJDCc/PJDC.ebnf", "BNF", 0, 0, 5, 0, 0, 0, 1, 6
+"/home/blankheart0/PJDCc/PJDCc.cpp", "C++", -1, 0, 0, 0, 0, 2, 0, 1
+"/home/blankheart0/PJDCc/Parser.cpp", "C++", 139, 0, 0, 0, 0, -10, 27, 156
+"/home/blankheart0/PJDCc/Parser.h", "C++", 4, 0, 0, 0, 0, 0, 1, 5
+"/home/blankheart0/PJDCc/Scanner.cpp", "C++", 3, 0, 0, 0, 0, 0, 0, 3
+"/home/blankheart0/PJDCc/SymbolTable.h", "C++", 1, 0, 0, 0, 0, 0, 0, 1
+"/home/blankheart0/PJDCc/Token.h", "C++", 4, 0, 0, 0, 0, 0, 4, 8
+"/home/blankheart0/PJDCc/test/CodeGen_Test/Function.asm", "nasm", 0, 0, 0, 0, -59, 0, -4, -63
+"/home/blankheart0/PJDCc/test/CodeGen_Test/Pointer.asm", "nasm", 0, 0, 0, 0, 49, 0, 7, 56
+"/home/blankheart0/PJDCc/test/CodeGen_Test/Pointer.c", "C", 0, 0, 0, 10, 0, 25, 14, 49
+"/home/blankheart0/PJDCc/test/Frontend_Test.c", "C", 0, 0, 0, -5, 0, 0, -1, -6
+"Total", "-", 365, 3, 5, 5, -10, 50, 109, 527

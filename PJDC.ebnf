@@ -1,6 +1,6 @@
 
 # Begin
-<Translation_Unit> ::= {<Function_Definition> | <Variable_Definition>}CODE_EOF
+<Translation_Unit> ::= {<Function_Definition> | <Variable_Definition> | <Array_Definition>}CODE_EOF
 
 
 
@@ -11,6 +11,7 @@
 <Variable_Definition> ::= <Variable_Declaration>["="<Expression>]";"
 <Variable_Declaration> ::= <Type>["*"] IDENTIFIER
 
+<Array_Definition> ::= <Type>IDENTIFIER"["CONSTANT_INT"]" ";"
 
 
 # Statement
@@ -35,7 +36,7 @@
 
 # Expression
 <Expression> ::= <Assignment_Expression>{","<Assignment_Expression>}
-<Assignment_Expression> ::= [IDENTIFIER"="]<Equality_Expression>
+<Assignment_Expression> ::= [(["*"]IDENTIFIER) | (IDENTIFIER"["<Expression>"]") "="]<Equality_Expression>
 
 <Equality_Expression> ::= <Relational_Expression>{("==" | "!=")<Relational_Expression>}
 <Relational_Expression> ::= <PlusMinus_Expression>{("<" | "<=" | ">" | ">=")<PlusMinus_Expression>}
@@ -44,10 +45,11 @@
 <MulDiv_Expression> ::= <Unary_Expression>{("*" | "/")<Unary_Expression>}
 
 <Unary_Expression> ::= <Primary_Expression> 
-<Primary_Expression> ::= <FunctionCall_Expression> | <Address_Expression> | <Dreference_Expression>
+<Primary_Expression> ::= <FunctionCall_Expression> | <Address_Expression> | <Dreference_Expression> | <Array_Expression> |
                         | CONSTANT_INT | IDENTIFIER
 
 <FunctionCall_Expression> ::= IDENTIFIER"("<Expression>")"
 
 <Address_Expression> ::="&"IDENTIFIER [("+ "| "-") CONSTANT_INT]
 <Dreference_Expression> ::="*" ( IDENTIFIER | "(" IDENTIFIER [("+" | "-") CONSTANT_INT] ")" )
+<Array_Expression> ::= IDENTIFIER"[" <Expression> "]"

@@ -23,7 +23,7 @@ public:
 
     bool DEBUG;
 
-    CodeGenerator():LableNumber(0),NowInFunction(""),DEBUG(false){}
+    CodeGenerator():LableNumber(0),NowInFunction(""),DEBUG(true){}
 
     void CodeGenerate(string path);
 
@@ -42,6 +42,7 @@ public:
     void CodeGenerate_Variable_Definition(ASTNode* root);
     string CodeGenerate_Variable_Declaration(ASTNode* root);
 
+    void CodeGenerate_Array_Definition(ASTNode* root);
 
 // Statement
     void CodeGenerate_Statement(ASTNode* root);
@@ -78,16 +79,19 @@ public:
 
     int CodeGenerate_Address_Expression(ASTNode* root);
     int CodeGenerate_Dreference_Expression(ASTNode* root);
-
+    int CodeGenerate_Array_Expression(ASTNode* root);
 
     
+
 //Atomic instruction
     int Load(int value);
     int Load(string identifier);
 
-    void Store(int r_i,string identifier);
-    
+    void Store(int r_i,string identifier,bool free);
+    void Store(int r1_i,int r2_i,Type type,bool free);
+
     void CreateVar(string identifier);
+    void CreateVar(string identifier,int size);
 
     int Address(string identifier);
     int Dereference(int r_i,Type ptr_type);

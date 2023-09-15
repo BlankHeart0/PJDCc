@@ -41,9 +41,11 @@ void CodeGenerator::CodeGenerate_Translation_Unit(ASTNode* root)
     WhoAmI("CodeGenerate_Translation_Unit");
 
     for(int i=0;i<root->Children.size();i++)
-    {
+    {cout<<i<<":"<<ASTNodeType_text[root->Children[i]->type]<<endl;
         if(root->Children[i]->type==FUNCTION_DEFINITION)
             CodeGenerate_Function_Definition(root->Children[i]);
+        else if(root->Children[i]->type==ARRAY_DEFINITION)
+            CodeGenerate_Array_Definition(root->Children[i]);
         else
             CodeGenerate_Variable_Definition(root->Children[i]);
     }
@@ -103,7 +105,7 @@ void CodeGenerator::CodeGenerate_Variable_Definition(ASTNode* root)
     if(root->Children[1]->type==AST_ASSIGN)
     {
         int expression_ri=CodeGenerate_Expression(root->Children[2]);
-        Store(expression_ri,identifier);
+        Store(expression_ri,identifier,true);
     }
 }
     
@@ -113,7 +115,7 @@ string CodeGenerator::CodeGenerate_Variable_Declaration(ASTNode* root)
 
     Type type=CodeGenerate_Type(FirstChild(root));
     //type check
-    if(type==T_VOID&&root->Children[1]->type!=AST_STAR)CodeGenerate_Error("Illegal variable type",root->Children[1]);
+    if(type==T_VOID)CodeGenerate_Error("Illegal variable type",root->Children[1]);
     
     string identifier;
     //type cast
@@ -132,6 +134,25 @@ string CodeGenerator::CodeGenerate_Variable_Declaration(ASTNode* root)
     else CodeGenerate_Error("The variable "+identifier+" is redefined.",root->Children[1]);
     
     return identifier; 
+}
+
+void CodeGenerator::CodeGenerate_Array_Definition(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Array_Definition");
+
+    Type type=CodeGenerate_Type(FirstChild(root));
+    if(type==T_VOID)CodeGenerate_Error("Illegal array type",root->Children[1]);
+
+    type=Type_To_PtrType(type);
+
+    string identifier=root->Children[1]->lexeme;
+    if(!variable_table.Exist(identifier))
+    {
+        variable_table.Add(type,identifier);
+        int size=root->Children[3]->literal;
+        CreateVar(identifier,size);
+    }
+    else CodeGenerate_Error("The variable "+identifier+" is redefined.",root->Children[1]);
 }
 
 
@@ -282,7 +303,6 @@ void CodeGenerator::CodeGenerate_Return_Statement(ASTNode* root)
     }
 
     Return(expression_ri,NowInFunction);
-
 }
 
 
@@ -296,6 +316,7 @@ void CodeGenerator::CodeGenerate_Expression_Statement(ASTNode* root)
         int expression_ri=CodeGenerate_Expression(FirstChild(root));
         
         //very very important
+        cout<<"*******"<<expression_ri<<endl;
         register_manager.Free(expression_ri);
     }
 }
@@ -321,18 +342,46 @@ int CodeGenerator::CodeGenerate_Assignment_Expression(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Assignment_Expression");
 
-    if(FirstChild(root)->type==AST_ID)
+    if(root->Children.size()==3&&root->Children[1]->type==AST_ASSIGN)
     {
         string identifier=FirstChild(root)->lexeme;
         if(variable_table.Exist(identifier))
         {
             int equality_expression_ri=CodeGenerate_Equality_Expression(root->Children[2]);
-            Store(equality_expression_ri,identifier);
-            return Load(identifier);
+            Store(equality_expression_ri,identifier,false);
+            return equality_expression_ri;
         }
         else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
     }
     
+    else if(root->Children.size()==4&&root->Children[2]->type==AST_ASSIGN)
+    {
+        string identifier=root->Children[1]->lexeme;
+        if(variable_table.Exist(identifier))
+        {
+            int equality_expression_ri=CodeGenerate_Equality_Expression(root->Children[3]);
+            Store(equality_expression_ri,Load(identifier),variable_table.Visit(identifier).type,false);
+            return equality_expression_ri;
+        }
+        else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
+    }
+
+    else if(root->Children.size()==6&&root->Children[4]->type==AST_ASSIGN)
+    {
+        string identifier=FirstChild(root)->lexeme;
+        if(variable_table.Exist(identifier))
+        {
+            int equality_expression_ri=CodeGenerate_Equality_Expression(root->Children[5]);
+            int offset_ri=CodeGenerate_Expression(root->Children[2]);
+            Type type=variable_table.Visit(identifier).type;
+            int scale_factor=Dreference_ScaleFactor(type);
+            Store(equality_expression_ri,Add(Address(identifier),ShiftLeft(offset_ri,scale_factor)),type,false);
+
+            return equality_expression_ri;
+        }
+        else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
+    }
+
     return  CodeGenerate_Equality_Expression(FirstChild(root));
 }
 
@@ -454,6 +503,7 @@ int CodeGenerator::CodeGenerate_Primary_Expression(ASTNode* root)
     
     else if(FirstChild(root)->type==ADDRESS_EXPRESSION)return CodeGenerate_Address_Expression(FirstChild(root));
     else if(FirstChild(root)->type==DREFERENCE_EXPRESSION)return CodeGenerate_Dreference_Expression(FirstChild(root));
+    else if(FirstChild(root)->type==ARRAY_EXPRESSION)return CodeGenerate_Array_Expression(FirstChild(root));
 
     else if(FirstChild(root)->type==AST_CONSTANT_INT)return Load(FirstChild(root)->literal);
     
@@ -516,7 +566,7 @@ int CodeGenerator::CodeGenerate_Dreference_Expression(ASTNode* root)
         string identifier=root->Children[2]->lexeme;
 
         if(!variable_table.Exist(identifier))
-        CodeGenerate_Error("The variable "+identifier+" is not defined.",root->Children[1]);
+            CodeGenerate_Error("The variable "+identifier+" is not defined.",root->Children[1]);
 
         int offset=root->Children[4]->literal;
 
@@ -539,6 +589,18 @@ int CodeGenerator::CodeGenerate_Dreference_Expression(ASTNode* root)
     return Dereference(Load(identifier),variable_table.Visit(identifier).type);
 }
 
+int CodeGenerator::CodeGenerate_Array_Expression(ASTNode* root)
+{
+    string identifier=FirstChild(root)->lexeme;
+    if(!variable_table.Exist(identifier))
+        CodeGenerate_Error("The variable "+identifier+" is not defined.",root->Children[1]);
+
+    int offset_ri=CodeGenerate_Expression(root->Children[2]);
+    Type type=variable_table.Visit(identifier).type;
+
+    int scale_factor=Dreference_ScaleFactor(type);
+    return Dereference(Add(Address(identifier),ShiftLeft(offset_ri,scale_factor)),type);
+}
 
 
 
@@ -578,7 +640,7 @@ int CodeGenerator::Load(string identifier)
 
 
 
-void CodeGenerator::Store(int r_i,string identifier)
+void CodeGenerator::Store(int r_i,string identifier,bool free)
 {
     switch(variable_table.Visit(identifier).type)
     {
@@ -593,25 +655,62 @@ void CodeGenerator::Store(int r_i,string identifier)
             CodeGenerate_Error("Store variable "+identifier+" error.");
     }   
 
-    register_manager.Free(r_i);
+    if(free)register_manager.Free(r_i);
+}
+
+void CodeGenerator::Store(int r1_i,int r2_i,Type type,bool free)
+{
+    switch(type)
+    {
+        case T_CHAR_PTR:
+            OutFile<<"\tmov\t["<<register_manager.Name(r2_i)<<"], "<<register_manager.Name(r1_i,1)<<endl;break;
+        case T_INT_PTR:
+            OutFile<<"\tmov\t["<<register_manager.Name(r2_i)<<"], "<<register_manager.Name(r1_i,4)<<endl;break;
+        case T_LONG_PTR:
+            OutFile<<"\tmov\t["<<register_manager.Name(r2_i)<<"], "<<register_manager.Name(r1_i,8)<<endl;break;
+        default:
+            CodeGenerate_Error("Store variable  error.");
+    }   
+    register_manager.Free(r2_i);
+    if(free)register_manager.Free(r1_i);
 }
 
 
 
 void CodeGenerator::CreateVar(string identifier)
 {
+    CreateVar(identifier,1);
+}
+
+void CodeGenerator::CreateVar(string identifier,int size)
+{
     OutFile<<"section\t.data"<<endl;
     OutFile<<"global\t"<<identifier<<endl;
 
-    switch(variable_table.Visit(identifier).type)
-    {        
-        case T_CHAR:
-            OutFile<<"\t"<<identifier<<":\tdb\t0"<<endl;break;
-        case T_INT:
-            OutFile<<"\t"<<identifier<<":\tdd\t0"<<endl;break;
-        case T_LONG: 
-        case T_CHAR_PTR: case T_INT_PTR: case T_LONG_PTR:
-             OutFile<<"\t"<<identifier<<":\tdq\t0"<<endl;break;
+    if(size==1)
+    {
+        switch(variable_table.Visit(identifier).type)
+        {        
+            case T_CHAR:
+                OutFile<<"\t"<<identifier<<":\tdb\t0"<<endl;break;
+            case T_INT:
+                OutFile<<"\t"<<identifier<<":\tdd\t0"<<endl;break;
+            case T_LONG: 
+            case T_CHAR_PTR: case T_INT_PTR: case T_LONG_PTR:
+                OutFile<<"\t"<<identifier<<":\tdq\t0"<<endl;break;
+        }
+    }
+    else if(size>1)
+    {
+        switch(variable_table.Visit(identifier).type)
+        {        
+            case T_CHAR_PTR:
+                OutFile<<"\t"<<identifier<<":\ttimes "<<size<<" db\t0"<<endl;break;
+            case T_INT_PTR:
+                OutFile<<"\t"<<identifier<<":\ttimes "<<size<<" dd\t0"<<endl;break;
+            case T_LONG_PTR:
+                OutFile<<"\t"<<identifier<<":\ttimes "<<size<<" dq\t0"<<endl;break;
+        }
     }
     OutFile<<endl;
 }
@@ -816,7 +915,8 @@ void CodeGenerator::Return(int r_i,string identifier)
 
     Jump("jmp",function_table.Visit(identifier).end_lable);
 
-    register_manager.Free(r_i);
+    if(function_table.Visit(identifier).type!=T_VOID)
+        register_manager.Free(r_i);
 }
 
 

@@ -28,6 +28,7 @@ public:
     ASTNode* Parse_Variable_Definition();
     ASTNode* Parse_Variable_Declaration();
 
+    ASTNode* Parse_Array_Definition();
 
 // Statement
     ASTNode* Parse_Statement(); 
@@ -64,7 +65,8 @@ public:
 
     ASTNode* Parse_Address_Expression();
     ASTNode* Parse_Dreference_Expression();
-
+    ASTNode* Parse_Array_Expression();
+    
     
 //Tools
     bool Match(TokenType expected);

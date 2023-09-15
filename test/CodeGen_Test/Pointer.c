@@ -12,10 +12,7 @@
 //   return 0;
 // }
 
-// void func()
-// {
-//   return ;
-// }
+
 
 long   a;
 long   b;
@@ -38,3 +35,15 @@ int main() {
 
   return 0;
 }
+
+// int   a;
+// int  *b;
+// char  c;
+// char *d;
+
+// int main()
+// {
+//   b= &a; *b= 15; printint(a);
+//   d= &c; *d= 16; printint(c);
+//   return 0 ;
+// }

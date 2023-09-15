@@ -21,6 +21,7 @@ enum ASTNodeType
     //Separator
     AST_SEMICOLON, AST_COMMA, // ; ,
     AST_LEFT_PAREN, AST_RIGHT_PAREN, // ( )
+    AST_LEFT_SQUARE,AST_RIGHT_SQUARE, // [ ]
     AST_LEFT_BARCE, AST_RIGHT_BRACE, // { }
 
     //Operator
@@ -53,6 +54,7 @@ enum ASTNodeType
     VARIABLE_DEFINITION,
     VARIABLE_DECLARATION,
     
+    ARRAY_DEFINITION,
 
     // Statement
     STATEMENT,
@@ -88,8 +90,8 @@ enum ASTNodeType
     FUNCTIONCALL_EXPRESSION,
 
     ADDRESS_EXPRESSION,
-    DREFERENCE_EXPRESSION 
-
+    DREFERENCE_EXPRESSION, 
+    ARRAY_EXPRESSION
 };
 
 static vector<string>ASTNodeType_text
@@ -106,6 +108,7 @@ static vector<string>ASTNodeType_text
     //Separator
     "AST_SEMICOLON", "AST_COMMA", // ; ,
     "AST_LEFT_PAREN", "AST_RIGHT_PAREN", // ( )
+    "AST_LEFT_SQUARE","AST_RIGHT_SQUARE", // [ ]
     "AST_LEFT_BARCE", "AST_RIGHT_BRACE", // { }
 
     //Operator
@@ -138,6 +141,7 @@ static vector<string>ASTNodeType_text
     "VARIABLE_DEFINITION",
     "VARIABLE_DECLARATION",
     
+    "ARRAY_DEFINITION",
 
     // Statement
     "STATEMENT",
@@ -173,8 +177,8 @@ static vector<string>ASTNodeType_text
     "FUNCTIONCALL_EXPRESSION",
 
     "ADDRESS_EXPRESSION",
-    "DREFERENCE_EXPRESSION"  
-    
+    "DREFERENCE_EXPRESSION",  
+    "ARRAY_EXPRESSION"
 };
 
 

@@ -1,0 +1,47 @@
+Date : 2023-09-15 18:37:46
+Directory : /home/blankheart0/PJDCc
+Total : 15 files,  368 codes, 50 comments, 109 blanks, all 527 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C++      |          9 |        365 |         25 |         92 |        482 |
+| BNF      |          1 |          5 |          0 |          1 |          6 |
+| C        |          2 |          5 |         25 |         13 |         43 |
+| TXT      |          1 |          3 |          0 |          0 |          3 |
+| nasm     |          2 |        -10 |          0 |          3 |         -7 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                   | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                      |         15 |        368 |         50 |        109 |        527 |
+| . (Files)                                              |         11 |        373 |         25 |         93 |        491 |
+| test                                                   |          4 |         -5 |         25 |         16 |         36 |
+| test (Files)                                           |          1 |         -5 |          0 |         -1 |         -6 |
+| test/CodeGen_Test                                      |          3 |          0 |         25 |         17 |         42 |
++--------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                               | language | code       | comment    | blank      | total      |
++--------------------------------------------------------+----------+------------+------------+------------+------------+
+| /home/blankheart0/PJDCc/AbstractSyntaxTree.h           | C++      |         12 |          0 |          4 |         16 |
+| /home/blankheart0/PJDCc/CodeGenerator.cpp              | C++      |        191 |         33 |         52 |        276 |
+| /home/blankheart0/PJDCc/CodeGenerator.h                | C++      |         12 |          0 |          4 |         16 |
+| /home/blankheart0/PJDCc/Note.txt                       | TXT      |          3 |          0 |          0 |          3 |
+| /home/blankheart0/PJDCc/PJDC.ebnf                      | BNF      |          5 |          0 |          1 |          6 |
+| /home/blankheart0/PJDCc/PJDCc.cpp                      | C++      |         -1 |          2 |          0 |          1 |
+| /home/blankheart0/PJDCc/Parser.cpp                     | C++      |        139 |        -10 |         27 |        156 |
+| /home/blankheart0/PJDCc/Parser.h                       | C++      |          4 |          0 |          1 |          5 |
+| /home/blankheart0/PJDCc/Scanner.cpp                    | C++      |          3 |          0 |          0 |          3 |
+| /home/blankheart0/PJDCc/SymbolTable.h                  | C++      |          1 |          0 |          0 |          1 |
+| /home/blankheart0/PJDCc/Token.h                        | C++      |          4 |          0 |          4 |          8 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Function.asm | nasm     |        -59 |          0 |         -4 |        -63 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Pointer.asm  | nasm     |         49 |          0 |          7 |         56 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Pointer.c    | C        |         10 |         25 |         14 |         49 |
+| /home/blankheart0/PJDCc/test/Frontend_Test.c           | C        |         -5 |          0 |         -1 |         -6 |
+| Total                                                  |          |        368 |         50 |        109 |        527 |
++--------------------------------------------------------+----------+------------+------------+------------+------------+
