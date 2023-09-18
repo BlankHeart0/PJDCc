@@ -1,9 +1,11 @@
-int a;
-int b[25];
+char  c;
+char *str= "Hello world\n";
 
 int main() {
-  b[3]= 12;
-  a= b[3];
-  printint(a);
-  return 0 ;
+  
+  c= '\n'; printint(c);
+
+  print_string(str);
+  
+  return 0;
 }

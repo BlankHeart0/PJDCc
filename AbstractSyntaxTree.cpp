@@ -6,7 +6,9 @@ void AST::AST_Print(ASTNode* root,int depth)
     
     cout<<ASTNodeType_text[root->type];
 
-    if(root->type==AST_CONSTANT_INT)cout<<" "<<root->literal<<" "<<root->line;
+    if(root->type==AST_CONSTANT_INT)cout<<" "<<root->literal_int<<" --line:"<<root->line;
+    else if(root->type==AST_CONSTANT_CHAR)cout<<" "<<root->literal_char<<" --line:"<<root->line;
+    else if(root->type==AST_CONSTANT_STRING)cout<<" "<<root->literal_string<<" --line:"<<root->line;
     else if(root->type==AST_ID)cout<<" "<<root->lexeme<<" "<<root->line;
 
     cout<<endl;

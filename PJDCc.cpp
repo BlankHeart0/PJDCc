@@ -78,7 +78,7 @@ void PJDCc::Compile(string path)
 
     //Genernate
     CG.ast=P.ast;
-    CG.CodeGenerate("./test/CodeGen_Test/Array.asm");
+    CG.CodeGenerate("./test/CodeGen_Test/Pointer.asm");
     
     
     cout<<endl<<"--- Compile Successfully! ---"<<endl;
@@ -102,9 +102,10 @@ int main()
     //pjdcc.Compile("./test/CodeGen_Test/If.c");
     //pjdcc.Compile("./test/CodeGen_Test/While.c");
     //pjdcc.Compile("./test/CodeGen_Test/Function.c");
-    //pjdcc.Compile("./test/CodeGen_Test/Pointer.c");
+    pjdcc.Compile("./test/CodeGen_Test/Pointer.c");
+    //pjdcc.Compile("./test/CodeGen_Test/Array.c");
     
-    pjdcc.Compile("./test/CodeGen_Test/Array.c");
+    //pjdcc.Compile("./test/CodeGen_Test/String.c");
     
     return 0;
 }

@@ -529,6 +529,8 @@ ASTNode* Parser::Parse_Primary_Expression()
     ASTNode* node=new ASTNode(PRIMARY_EXPRESSION);
 
     if(Match(CONSTANT_INT))Add_Child(node,new ASTNode(AST_CONSTANT_INT,Previous_Token()));
+    else if(Match(CONSTANT_CHAR))Add_Child(node,new ASTNode(AST_CONSTANT_CHAR,Previous_Token()));
+    else if(Match(CONSTANT_STRING))Add_Child(node,new ASTNode(AST_CONSTANT_STRING,Previous_Token()));
     else if(Peek(ID))
     {
         if(Peek(LEFT_PAREN,2))Add_Child(node,Parse_FunctionCall_Expression());

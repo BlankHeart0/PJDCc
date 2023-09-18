@@ -33,7 +33,7 @@ enum TokenType
     AMPERSAND, // &
 
     //Constant
-    CONSTANT_INT, 
+    CONSTANT_INT, CONSTANT_CHAR, CONSTANT_STRING,
 
     //Identifier
 	ID,
@@ -68,7 +68,7 @@ static vector<string>TokenType_text
     "AMPERSAND", // &
 
     //Constant
-    "CONSTANT_INT", 
+    "CONSTANT_INT", "CONSTANT_CHAR", "CONSTANT_STRING",
 
     //Identifier
 	"ID",
@@ -85,17 +85,36 @@ static unordered_map<string,TokenType>Keyword_map
     {"return",RETURN}
 };
 
-
+enum LiteralType
+{
+    L_INT,L_CHAR,L_STRING
+};
 
 class Token
 {
 public:
     TokenType type;
     string lexeme;
-    bool have_literal;
-    int literal;
     int line;
 
-    Token(TokenType Type,string Lexeme,bool Have_Literal,int Literal,int Line)
-        :type(Type),lexeme(Lexeme),have_literal(Have_Literal),literal(Literal),line(Line){}
+    bool literal_have;
+    LiteralType literal_type;
+    int literal_int;
+    char literal_char;
+    string literal_string;
+    
+    Token(TokenType Type,string Lexeme,int Line,bool Lhave)
+        :type(Type),lexeme(Lexeme),line(Line),literal_have(Lhave){}
+
+    Token(TokenType Type,string Lexeme,int Line,bool Lhave,LiteralType Ltype,int Lint)
+        :type(Type),lexeme(Lexeme),line(Line),
+        literal_have(Lhave),literal_type(Ltype),literal_int(Lint){}
+    
+    Token(TokenType Type,string Lexeme,int Line,bool Lhave,LiteralType Ltype,char Lchar)
+        :type(Type),lexeme(Lexeme),line(Line),
+        literal_have(Lhave),literal_type(Ltype),literal_char(Lchar){}
+
+    Token(TokenType Type,string Lexeme,int Line,bool Lhave,LiteralType Ltype,string Lstring)
+        :type(Type),lexeme(Lexeme),line(Line),
+        literal_have(Lhave),literal_type(Ltype),literal_string(Lstring){}
 };

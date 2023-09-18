@@ -20,13 +20,20 @@ public:
     void Scan();
 
     void Scan_Int();
+    void Scan_Char();
+	void Scan_String();
+	
     void Scan_IdentifierKeyword();
 
 //Tools
     bool Match(char expected);
 
-    void Add_Token(TokenType type,int literal);
+    char NextChar();
+
     void Add_Token(TokenType type);
+    void Add_Token(TokenType type,int literal_int);
+    void Add_Token(TokenType type,char literal_char);
+    void Add_Token(TokenType type,string literal_string);
 
     bool Is_AtEnd();
     bool Is_Digit(char c);

@@ -53,10 +53,17 @@ void Scanner::Scan()
             case ' ':case '\r':case '\t':break;
             case '\n':line++;break;
 
+			//Constant char
+			case '\'':Scan_Char(); break;
+
+			//Constant string
+			case '"':Scan_String(); break;
+
             default:
             //Constant int
                 if(Is_Digit(source[current-1]))Scan_Int();
-				//Identifier and Keyword
+				
+                //Identifier and Keyword
                 else if(Is_AlphaUnderline(source[current-1]))Scan_IdentifierKeyword();
                 else Scan_Error("Unexpected character.");
                 break;
@@ -64,7 +71,7 @@ void Scanner::Scan()
     }
 
     //Reach the end
-    tokens.push_back(Token(CODE_EOF,"",false,0,line));
+    tokens.push_back(Token(CODE_EOF,"",line,false));
 
     return;
 }
@@ -74,14 +81,39 @@ void Scanner::Scan()
 void Scanner::Scan_Int()
 {
     current--;
-    int value=0;
+    int value_int=0;
+
     while(!Is_AtEnd()&&Is_Digit(source[current]))
     {
-        value=value*10+source[current]-'0';
+        value_int=value_int*10+source[current]-'0';
         current++;
     }
-    Add_Token(CONSTANT_INT,value);
+
+    Add_Token(CONSTANT_INT,value_int);
 }
+
+void Scanner::Scan_Char()
+{
+    char value_char=NextChar();
+
+    if(Match('\''))Add_Token(CONSTANT_CHAR,value_char);
+	else Scan_Error("Incomplete char.");
+}
+
+void Scanner::Scan_String()
+{
+    string value_string;
+
+    while (!Is_AtEnd() &&source[current]!='\n'&&source[current] != '"')
+    {
+        value_string.push_back(NextChar());
+    }
+
+	if (Match('"')) Add_Token(CONSTANT_STRING,value_string);
+	else Scan_Error("Incomplete string.");
+}
+
+
 
 void Scanner::Scan_IdentifierKeyword()
 {
@@ -104,18 +136,54 @@ bool Scanner::Match(char expected)
 
 
 
-void Scanner::Add_Token(TokenType type,int literal)
+char Scanner::NextChar()
 {
-    string lexeme=source.substr(start,current-start);
-    tokens.push_back(Token(type,lexeme,true,literal,line));
+    if(Match('\\'))
+    {
+        if(Match('a'))return'\a';
+        else if(Match('b'))return'\b';
+        else if(Match('f'))return'\f';
+        else if(Match('n'))return'\n';
+        else if(Match('r'))return'\t';
+        else if(Match('t'))return'\t';
+        else if(Match('v'))return'\v';
+        else if(Match('\\'))return'\\';
+        else if(Match('\''))return'\'';
+        else if(Match('"'))return'"';
+        else if(Match('0'))return'\0';
+
+        else Scan_Error("Wrong escape character.");
+    }
+
+    //Ordinary character
+    return source[current++];
 }
+
+
 
 void Scanner::Add_Token(TokenType type)
 {
     string lexeme=source.substr(start,current-start);
-    tokens.push_back(Token(type,lexeme,false,0,line));
+    tokens.push_back(Token(type,lexeme,line,false));
 }
 
+void Scanner::Add_Token(TokenType type,int literal_int)
+{
+    string lexeme=source.substr(start,current-start);
+    tokens.push_back(Token(type,lexeme,line,true,L_INT,literal_int));
+}
+
+void Scanner::Add_Token(TokenType type,char literal_char)
+{
+    string lexeme=source.substr(start,current-start);
+    tokens.push_back(Token(type,lexeme,line,true,L_CHAR,literal_char));
+}
+
+void Scanner::Add_Token(TokenType type,string literal_string)
+{
+    string lexeme=source.substr(start,current-start);
+    tokens.push_back(Token(type,lexeme,line,true,L_STRING,literal_string));
+}
 
 
 bool Scanner::Is_AtEnd()
@@ -156,12 +224,14 @@ void Scanner::Tokens_PrintTable()
 		cout << "  " << token.line << "\t" << TokenType_text[token.type] << "\t";
 		if (TokenType_text[token.type].size() < 8)cout << "\t";
 		cout<< token.lexeme;
-		if (token.have_literal)
+		if (token.literal_have)
 		{
 			cout << "\t\t";
 			switch (token.type)
 			{
-				case CONSTANT_INT:cout << token.literal; break;
+				case CONSTANT_INT:cout << token.literal_int; break;
+                case CONSTANT_CHAR:cout << token.literal_char; break;
+				case CONSTANT_STRING:cout << token.literal_string; break;
 			}
 		}
 		else cout << "\t\tNULL";

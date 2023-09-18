@@ -3,11 +3,15 @@ Easy Type:
     void char int long 
 Complex Type:
     struct union enum
+    
+Constant:
+    int char string
+
 Pointer&Array:
     All Type's 1 dimension Pointer and Array
 
 Statement:
-    if else while do-while for 
+    if else while do-while for break continue
 
 Function:
     recursion

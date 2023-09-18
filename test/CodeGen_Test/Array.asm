@@ -1,4 +1,6 @@
-	extern printint
+	extern print_int
+	extern print_char
+	extern print_string
 
 section	.data
 global	array
@@ -184,6 +186,7 @@ L6:
 	mov	[i], r8d
 	jmp	L3
 L4:
+	jmp	L2
 L2:
 	pop	rbp
 	ret
@@ -219,7 +222,7 @@ L9:
 	add	r9, r8
 	movzx	r9, word [r9]
 	mov	rdi, r9
-	call	printint
+	call	print_int
 	mov	r8, rax
 	xor	r8, r8
 	mov	r8d, dword [i]
@@ -234,4 +237,6 @@ L10:
 L8:
 	pop	rbp
 	ret
+
+section .data
 

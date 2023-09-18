@@ -35,7 +35,8 @@ enum ASTNodeType
     AST_AMPERSAND, // &
 
     //Constant
-    AST_CONSTANT_INT,
+    AST_CONSTANT_INT, AST_CONSTANT_CHAR, AST_CONSTANT_STRING,
+
 
     //Identifier
 	AST_ID,
@@ -122,7 +123,7 @@ static vector<string>ASTNodeType_text
     "AST_AMPERSAND", // &
 
     //Constant
-    "AST_CONSTANT_INT",
+    "AST_CONSTANT_INT", "AST_CONSTANT_CHAR", "AST_CONSTANT_STRING",
 
     //Identifier
 	"AST_ID",
@@ -188,19 +189,29 @@ class ASTNode
 public:
     ASTNodeType type;
     string lexeme;
-    bool is_terminal;
-    int literal;
     int line;
 
+    bool is_terminal;
+
+    bool literal_have;
+    LiteralType literal_type;
+    int literal_int;
+    char literal_char;
+    string literal_string;
+    
     vector<ASTNode*>Children;
 
     ASTNode(ASTNodeType Type):
-        type(Type),lexeme(""),is_terminal(false),literal(0),line(-1){}
+        type(Type),lexeme(""),is_terminal(false){}
 
     ASTNode(ASTNodeType Type,Token Token):
-        type(Type),lexeme(Token.lexeme),is_terminal(true),literal(Token.literal),line(Token.line){}
+        type(Type),lexeme(Token.lexeme),is_terminal(true),line(Token.line)
+
+        ,literal_have(Token.literal_have),literal_type(Token.literal_type),
+        literal_int(Token.literal_int),literal_char(Token.literal_char),literal_string(Token.literal_string){}
 
 };
+
 
 class AST
 {

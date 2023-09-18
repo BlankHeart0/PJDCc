@@ -24,13 +24,15 @@ void CodeGenerator::CodeGenerate(string path)
 
 void CodeGenerator::CodeGenerate_Head()
 {
-    OutFile<<"\textern printint"<<endl<<endl;
+    OutFile<<"\textern print_int"<<endl;
+    OutFile<<"\textern print_char"<<endl;
+    OutFile<<"\textern print_string"<<endl<<endl;
 }
 
 void CodeGenerator::CodeGenerate_Tail()
 {
-    //OutFile<<"section .data"<<endl;
-    //OutFile<<"\tformat: db \"%d\",0XA,0"<<endl;
+    OutFile<<"section .data"<<endl;
+    OutFile<<TailData<<endl;
 }
 
 
@@ -149,7 +151,7 @@ void CodeGenerator::CodeGenerate_Array_Definition(ASTNode* root)
     if(!variable_table.Exist(identifier))
     {
         variable_table.Add(type,identifier);
-        int size=root->Children[3]->literal;
+        int size=root->Children[3]->literal_int;
         CreateVar(identifier,size);
     }
     else CodeGenerate_Error("The variable "+identifier+" is redefined.",root->Children[1]);
@@ -316,7 +318,6 @@ void CodeGenerator::CodeGenerate_Expression_Statement(ASTNode* root)
         int expression_ri=CodeGenerate_Expression(FirstChild(root));
         
         //very very important
-        cout<<"*******"<<expression_ri<<endl;
         register_manager.Free(expression_ri);
     }
 }
@@ -505,7 +506,10 @@ int CodeGenerator::CodeGenerate_Primary_Expression(ASTNode* root)
     else if(FirstChild(root)->type==DREFERENCE_EXPRESSION)return CodeGenerate_Dreference_Expression(FirstChild(root));
     else if(FirstChild(root)->type==ARRAY_EXPRESSION)return CodeGenerate_Array_Expression(FirstChild(root));
 
-    else if(FirstChild(root)->type==AST_CONSTANT_INT)return Load(FirstChild(root)->literal);
+    else if(FirstChild(root)->type==AST_CONSTANT_INT)return Load(FirstChild(root)->literal_int);
+    //BUG
+    else if(FirstChild(root)->type==AST_CONSTANT_CHAR)return Load((char)(FirstChild(root)->literal_char));
+    else if(FirstChild(root)->type==AST_CONSTANT_STRING)return CreateString(FirstChild(root)->literal_string);
     
     else if(FirstChild(root)->type==AST_ID)
     {
@@ -544,7 +548,7 @@ int CodeGenerator::CodeGenerate_Address_Expression(ASTNode* root)
     //offset
     if(root->Children.size()>2)
     {
-        int offset=root->Children[3]->literal;
+        int offset=root->Children[3]->literal_int;
     
         int r1_i=Address(identifier);
         int r2_i=Load(offset);
@@ -568,7 +572,7 @@ int CodeGenerator::CodeGenerate_Dreference_Expression(ASTNode* root)
         if(!variable_table.Exist(identifier))
             CodeGenerate_Error("The variable "+identifier+" is not defined.",root->Children[1]);
 
-        int offset=root->Children[4]->literal;
+        int offset=root->Children[4]->literal_int;
 
         int r1_i=Load(identifier);
         int r2_i=Load(offset);
@@ -628,9 +632,13 @@ int CodeGenerator::Load(string identifier)
             OutFile<<"\tmov\t"<<register_manager.Name(register_i,4)<<", dword ["<<identifier<<"]"<<endl;
             break;
         case T_LONG:
-        case T_CHAR_PTR: case T_INT_PTR: case T_LONG_PTR:
             OutFile<<"\tmov\t"<<register_manager.Name(register_i,8)<<", ["<<identifier<<"]"<<endl;
             break;
+//BUG
+        case T_CHAR_PTR: case T_INT_PTR: case T_LONG_PTR:
+            OutFile<<"\tmov\t"<<register_manager.Name(register_i,8)<<", "<<identifier<<endl;
+            break;
+            
         default:
             CodeGenerate_Error("Load variable "+identifier+" error.");
     }
@@ -713,6 +721,37 @@ void CodeGenerator::CreateVar(string identifier,int size)
         }
     }
     OutFile<<endl;
+}
+
+
+
+int CodeGenerator::CreateString(string literal_string)
+{
+    string string_name="Str"+to_string(NewStringNubmer());
+
+    TailData+="\t"+string_name+" db "+StringToIntlist(literal_string)+",0\n";
+    
+    int register_i=register_manager.Alloc();
+    
+    OutFile<<"\tmov\t"<<register_manager.Name(register_i)<<", "<<string_name<<endl;
+
+    return register_i;
+}
+
+string CodeGenerator::StringToIntlist(string liter_string)
+{
+    string int_list;
+    for(int i=0;i<liter_string.size();i++)
+    {
+        if(i>0)int_list.push_back(',');
+        int_list+=to_string((int)liter_string[i]);
+    }
+    return int_list;
+}
+
+int CodeGenerator::NewStringNubmer()
+{
+    return ++StringNumber;
 }
 
 

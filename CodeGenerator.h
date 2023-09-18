@@ -19,11 +19,15 @@ public:
     ofstream OutFile;
 
     int LableNumber;
+    int StringNumber;
     string NowInFunction;
+
+    string HeadInstruction;
+    string TailData;
 
     bool DEBUG;
 
-    CodeGenerator():LableNumber(0),NowInFunction(""),DEBUG(true){}
+    CodeGenerator():LableNumber(0),StringNumber(0),NowInFunction(""),DEBUG(true){}
 
     void CodeGenerate(string path);
 
@@ -92,6 +96,10 @@ public:
 
     void CreateVar(string identifier);
     void CreateVar(string identifier,int size);
+
+    int CreateString(string literal_string);
+    string StringToIntlist(string liter_string);
+    int NewStringNubmer();
 
     int Address(string identifier);
     int Dereference(int r_i,Type ptr_type);

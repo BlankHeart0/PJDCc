@@ -1,5 +1,4 @@
 int array[10];
-
 void Init()
 {
   array[0]=9;array[1]=5;array[2]=2;array[3]=8;array[4]=1;
@@ -25,6 +24,7 @@ void Bubble_Sort()
     }
     i=i+1;
   }
+  return;
 }
 
 int main()
@@ -35,7 +35,7 @@ int main()
   i=0;
   while(i<10)
   {
-    printint(array[i]);
+    print_int(array[i]);
     i=i+1;
   }
   return 0;

@@ -25,23 +25,23 @@
 //   }
 
 // }
-
-long fred()
-{
   int a;
   char b;
+long fred()
+{
+
   a=10;
   b=10;
   return a+b;
 }
-
+int result;
 int main()
 {
-  int result;
-  printint(10);
+  
+  print_int(10);
   result=fred(15);
-  printint(result);
-  printint(fred(15)+10);
+  print_int(result);
+  print_int(fred(15)+10);
   
   return 1;
 }

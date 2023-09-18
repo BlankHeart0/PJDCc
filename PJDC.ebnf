@@ -46,7 +46,7 @@
 
 <Unary_Expression> ::= <Primary_Expression> 
 <Primary_Expression> ::= <FunctionCall_Expression> | <Address_Expression> | <Dreference_Expression> | <Array_Expression> |
-                        | CONSTANT_INT | IDENTIFIER
+                        | CONSTANT_INT | CONSTANT_CHAR | CONSTANT_STRING | IDENTIFIER
 
 <FunctionCall_Expression> ::= IDENTIFIER"("<Expression>")"
 
