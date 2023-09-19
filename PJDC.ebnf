@@ -15,10 +15,8 @@
 
 
 # Statement
-<Statement> ::= <Print_Statement> | <Compound_Statement> | <Variable_Definition> | <If_Statement> | <Iteration_Statement> | 
+<Statement> ::= <Compound_Statement> | <Variable_Definition> | <If_Statement> | <Iteration_Statement> | 
               | <Return_Statement> | <Expression_Statement>
-
-<Print_Statement> ::= PRINT <Expression>";"
 
 <Compound_Statement> ::= "{"{<Statement>}"}"
 

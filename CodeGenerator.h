@@ -51,8 +51,6 @@ public:
 // Statement
     void CodeGenerate_Statement(ASTNode* root);
     
-    void CodeGenerate_Print_Statement(ASTNode* root);
-
     void CodeGenerate_Compound_Statement(ASTNode* root);
 
     void CodeGenerate_If_Statement(ASTNode* root);
@@ -131,11 +129,11 @@ public:
     int FunctionCall(int r_i,string identifier);
     void Return(int r_i,string identifier);
 
-    void Print(int r_i);
 
 
 //Tools
     Type Type_To_PtrType(Type type);
+    Type Type_To_ArrayType(Type type);
 
     int Address_ScaleFactor(Type type);
     int Dreference_ScaleFactor(Type ptr_type);

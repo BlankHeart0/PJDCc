@@ -157,33 +157,12 @@ ASTNode* Parser::Parse_Statement()
 
     ASTNode* node=new ASTNode(STATEMENT);
 
-    if(Peek(PRINT))Add_Child(node,Parse_Print_Statement());
-    else if(Peek(LEFT_BRACE))Add_Child(node,Parse_Compound_Statement());
+    if(Peek(LEFT_BRACE))Add_Child(node,Parse_Compound_Statement());
     else if(Peek_Type())Add_Child(node,Parse_Variable_Definition());
     else if(Peek(IF))Add_Child(node,Parse_If_Statement());
     else if(Peek(WHILE)||Peek(DO))Add_Child(node,Parse_Iteration_Statement());
     else if(Peek(RETURN))Add_Child(node,Parse_Return_Statement());
     else Add_Child(node,Parse_Expression_Statement());
-
-    return node;
-}
-
-
-
-ASTNode* Parser::Parse_Print_Statement()
-{
-    WhoAmI("Parse_Print_Statement");
-
-    ASTNode* node=new ASTNode(PRINT_STATEMENT);
-
-    if(Match(PRINT))
-    {
-        Add_Child(node,new ASTNode(AST_PRINT,Previous_Token()));
-        Add_Child(node,Parse_Expression());
-
-        Match_Semicolon(node);
-    }
-    else Parse_Error("Keyword print loss.");
 
     return node;
 }

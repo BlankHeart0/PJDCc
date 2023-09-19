@@ -41,7 +41,7 @@ main:
 	mov	r9, rax
 	mov	r8, a
 	mov	[a_ptr], r8
-	mov	r8, a_ptr
+	mov	r8, [a_ptr]
 	mov	r8, [r8]
 	mov	rdi, r8
 	call	print_int
@@ -51,14 +51,14 @@ main:
 	sal	r9, 3
 	add	r8, r9
 	mov	[a_ptr], r8
-	mov	r8, a_ptr
+	mov	r8, [a_ptr]
 	mov	r8, [r8]
 	mov	rdi, r8
 	call	print_int
 	mov	r9, rax
 	mov	r8, a
 	mov	[a_ptr], r8
-	mov	r8, a_ptr
+	mov	r8, [a_ptr]
 	mov	r9, 1
 	sal	r9, 3
 	add	r8, r9
@@ -72,7 +72,7 @@ main:
 	mov	r9, rax
 	mov	r8, b
 	mov	[b_ptr], r8
-	mov	r8, b_ptr
+	mov	r8, [b_ptr]
 	mov	r8, [r8]
 	mov	rdi, r8
 	call	print_int
@@ -82,14 +82,14 @@ main:
 	sal	r9, 3
 	sub	r8, r9
 	mov	[b_ptr], r8
-	mov	r8, b_ptr
+	mov	r8, [b_ptr]
 	mov	r8, [r8]
 	mov	rdi, r8
 	call	print_int
 	mov	r9, rax
 	mov	r8, b
 	mov	[b_ptr], r8
-	mov	r8, b_ptr
+	mov	r8, [b_ptr]
 	mov	r9, 1
 	sal	r9, 3
 	sub	r8, r9

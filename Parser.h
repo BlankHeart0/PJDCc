@@ -33,8 +33,6 @@ public:
 // Statement
     ASTNode* Parse_Statement(); 
     
-    ASTNode* Parse_Print_Statement();
-
     ASTNode* Parse_Compound_Statement();
 
     ASTNode* Parse_If_Statement();

@@ -10,7 +10,6 @@ enum TokenType
 {
     //Keyword
     VOID, CHAR, INT, LONG,
-    PRINT,
     IF, ELSE,
     WHILE, DO,
     RETURN,
@@ -45,7 +44,6 @@ static vector<string>TokenType_text
 {
     //Keyword
     "VOID", "CHAR", "INT", "LONG",
-    "PRINT",
     "IF", "ELSE",
     "WHILE", "DO",
     "RETURN",
@@ -79,7 +77,6 @@ static vector<string>TokenType_text
 static unordered_map<string,TokenType>Keyword_map
 {
     {"void",VOID},{"char",CHAR},{"int",INT},{"long",LONG},
-    {"print",PRINT},
     {"if",IF},{"else",ELSE},
     {"while",WHILE},{"do",DO},
     {"return",RETURN}

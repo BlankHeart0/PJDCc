@@ -59,9 +59,7 @@ enum ASTNodeType
 
     // Statement
     STATEMENT,
-    
-    PRINT_STATEMENT,
-    
+        
     COMPOUND_STATEMENT,
  
     IF_STATEMENT,
@@ -146,9 +144,7 @@ static vector<string>ASTNodeType_text
 
     // Statement
     "STATEMENT",
-    
-    "PRINT_STATEMENT",
-    
+        
     "COMPOUND_STATEMENT",
  
     "IF_STATEMENT",

@@ -1,0 +1,67 @@
+Date : 2023-09-19 12:32:17
+Directory : /home/blankheart0/PJDCc
+Total : 32 files,  2743 codes, 195 comments, 907 blanks, all 3845 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C++      |         14 |      2,086 |        133 |        788 |      3,007 |
+| nasm     |          5 |        475 |          0 |         37 |        512 |
+| C        |          8 |        113 |         58 |         42 |        213 |
+| BNF      |          1 |         28 |          4 |         21 |         53 |
+| TXT      |          2 |         26 |          0 |          4 |         30 |
+| Makefile |          1 |         14 |          0 |         14 |         28 |
+| Markdown |          1 |          1 |          0 |          1 |          2 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                   | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                      |         32 |      2,743 |        195 |        907 |      3,845 |
+| . (Files)                                              |         20 |      2,170 |        137 |        833 |      3,140 |
+| Library                                                |          1 |         13 |          0 |          3 |         16 |
+| test                                                   |         11 |        560 |         58 |         71 |        689 |
+| test (Files)                                           |          1 |          7 |          0 |          4 |         11 |
+| test/CodeGen_Test                                      |         10 |        553 |         58 |         67 |        678 |
++--------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                               | language | code       | comment    | blank      | total      |
++--------------------------------------------------------+----------+------------+------------+------------+------------+
+| /home/blankheart0/PJDCc/AbstractSyntaxTree.cpp         | C++      |         21 |          0 |          9 |         30 |
+| /home/blankheart0/PJDCc/AbstractSyntaxTree.h           | C++      |        127 |         22 |         72 |        221 |
+| /home/blankheart0/PJDCc/CodeGenerator.cpp              | C++      |        720 |         49 |        254 |      1,023 |
+| /home/blankheart0/PJDCc/CodeGenerator.h                | C++      |         89 |          6 |         51 |        146 |
+| /home/blankheart0/PJDCc/Library/print.c                | C        |         13 |          0 |          3 |         16 |
+| /home/blankheart0/PJDCc/Makefile                       | Makefile |         14 |          0 |         14 |         28 |
+| /home/blankheart0/PJDCc/Note.txt                       | TXT      |         13 |          0 |          0 |         13 |
+| /home/blankheart0/PJDCc/PJDC.ebnf                      | BNF      |         28 |          4 |         21 |         53 |
+| /home/blankheart0/PJDCc/PJDCc.cpp                      | C++      |         62 |         20 |         29 |        111 |
+| /home/blankheart0/PJDCc/Parser.cpp                     | C++      |        534 |          5 |        188 |        727 |
+| /home/blankheart0/PJDCc/Parser.h                       | C++      |         49 |          5 |         31 |         85 |
+| /home/blankheart0/PJDCc/Printf.asm                     | nasm     |         15 |          0 |          5 |         20 |
+| /home/blankheart0/PJDCc/README.md                      | Markdown |          1 |          0 |          1 |          2 |
+| /home/blankheart0/PJDCc/Register.cpp                   | C++      |         72 |          2 |         20 |         94 |
+| /home/blankheart0/PJDCc/Register.h                     | C++      |         23 |          2 |         11 |         36 |
+| /home/blankheart0/PJDCc/Scanner.cpp                    | C++      |        178 |         11 |         52 |        241 |
+| /home/blankheart0/PJDCc/Scanner.h                      | C++      |         30 |          1 |         17 |         48 |
+| /home/blankheart0/PJDCc/SymbolTable.cpp                | C++      |         47 |          0 |         10 |         57 |
+| /home/blankheart0/PJDCc/SymbolTable.h                  | C++      |         53 |          0 |         18 |         71 |
+| /home/blankheart0/PJDCc/Target.txt                     | TXT      |         13 |          0 |          4 |         17 |
+| /home/blankheart0/PJDCc/Token.h                        | C++      |         81 |         10 |         26 |        117 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Array.asm    | nasm     |        233 |          0 |         10 |        243 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Array.c      | C        |         39 |          0 |          3 |         42 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Function.asm | nasm     |         65 |          0 |          8 |         73 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Function.c   | C        |         17 |         21 |          9 |         47 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/If.c         | C        |         14 |         12 |          2 |         28 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Pointer.asm  | nasm     |        101 |          0 |          8 |        109 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/Pointer.c    | C        |         16 |         19 |         14 |         49 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/String.asm   | nasm     |         61 |          0 |          6 |         67 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/String.c     | C        |          7 |          6 |          6 |         19 |
+| /home/blankheart0/PJDCc/test/CodeGen_Test/test.c       | C        |          0 |          0 |          1 |          1 |
+| /home/blankheart0/PJDCc/test/Frontend_Test.c           | C        |          7 |          0 |          4 |         11 |
+| Total                                                  |          |      2,743 |        195 |        907 |      3,845 |
++--------------------------------------------------------+----------+------------+------------+------------+------------+
