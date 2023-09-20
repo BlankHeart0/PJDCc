@@ -27,7 +27,7 @@ public:
 
     bool DEBUG;
 
-    CodeGenerator():LableNumber(0),StringNumber(0),NowInFunction(""),DEBUG(true){}
+    CodeGenerator():LableNumber(0),StringNumber(0),NowInFunction(""),TailData(""),DEBUG(false){}
 
     void CodeGenerate(string path);
 
@@ -68,8 +68,17 @@ public:
     int CodeGenerate_Expression(ASTNode* root);
     int CodeGenerate_Assignment_Expression(ASTNode* root);
 
+    int CodeGenerate_LogicOr_Expression(ASTNode* root);
+    int CodeGenerate_LogicAnd_Expression(ASTNode* root);
+
+    int CodeGenerate_Or_Expression(ASTNode* root);
+    int CodeGenerate_Xor_Expression(ASTNode* root);
+    int CodeGenerate_And_Expression(ASTNode* root);
+
     int CodeGenerate_Equality_Expression(ASTNode* root);
     int CodeGenerate_Relational_Expression(ASTNode* root);
+
+    int CodeGenerate_Shift_Expression(ASTNode* root);
 
     int CodeGenerate_PlusMinus_Expression(ASTNode* root);
     int CodeGenerate_MulDiv_Expression(ASTNode* root);
@@ -82,6 +91,9 @@ public:
     int CodeGenerate_Address_Expression(ASTNode* root);
     int CodeGenerate_Dreference_Expression(ASTNode* root);
     int CodeGenerate_Array_Expression(ASTNode* root);
+
+    int CodeGenerate_IncDecPrefix_Expression(ASTNode* root);
+    int CodeGenerate_IncDecPostfix_Expression(ASTNode* root);
 
     
 
@@ -121,8 +133,21 @@ public:
     int Sub(int r1_i,int r2_i);
     int Mul(int r1_i,int r2_i);
     int Div(int r1_i,int r2_i);
-    
-    int ShiftLeft(int r_i,int value);
+    int Mod(int r1_i,int r2_i);
+
+    int And(int r1_i,int r2_i);
+    int Or(int r1_i,int r2_i);
+    int Xor(int r1_i,int r2_i);
+    int Invert(int r_i);
+    int Not(int r_i);
+    int Negate(int r_i);
+
+    int ShiftLeftConstant(int r1_i,int constant);
+    int ShiftLeft(int r1_i,int r2_i);
+    int ShiftRight(int r1_i,int r2_i);
+
+    int Inc(string identifier,string pre_post);
+    int Dec(string identifier,string pre_post);
 
     void FunctionHead(string identifier);
     void FunctionTail(string identifier);

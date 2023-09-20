@@ -98,13 +98,15 @@ int main()
 
 
     //CodeGen
+    
     //pjdcc.Compile("./test/CodeGen_Test/test.c");
 
 
     //pjdcc.Compile("./test/CodeGen_Test/Function.c");
     //pjdcc.Compile("./test/CodeGen_Test/Pointer.c");
     //pjdcc.Compile("./test/CodeGen_Test/Array.c");
-    pjdcc.Compile("./test/CodeGen_Test/String.c");
+    //pjdcc.Compile("./test/CodeGen_Test/String.c");
+    pjdcc.Compile("./test/CodeGen_Test/Operator.c");
     
     return 0;
 }

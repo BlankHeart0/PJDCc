@@ -21,15 +21,18 @@ enum TokenType
     LEFT_BRACE, RIGHT_BRACE, // { }
 
     //Operator
-    PLUS, MINUS, STAR, SLASH, // + - * /
+    PLUS, MINUS, STAR, SLASH, MOD, // + - * / %
+    INC, DEC, // ++ --
     ASSIGN, // =
+
+    LEFT_SHIFT, RIGHT_SHIFT, // << >>
 
     EQUAL, NOT_EQUAL, // == !=
     LESS, LESS_EQUAL, // < <=
     GREATER, GREATER_EQUAL, // > >=
     NOT, AND, OR,// ! && ||
 
-    AMPERSAND, // &
+    INVERT, AMPERSAND, BITOR, XOR, // ~ & | ^
 
     //Constant
     CONSTANT_INT, CONSTANT_CHAR, CONSTANT_STRING,
@@ -55,15 +58,18 @@ static vector<string>TokenType_text
     "LEFT_BRACE", "RIGHT_BRACE", // { }
 
     //Operator
-    "PLUS", "MINUS", "STAR", "SLASH", // + - * /
+    "PLUS", "MINUS", "STAR", "SLASH", "MOD", // + - * / %
+    "INC", "DEC", // ++ --
     "ASSIGN", // =
-    
+
+    "LEFT_SHIFT", "RIGHT_SHIFT", // << >>
+
     "EQUAL", "NOT_EQUAL", // == !=
     "LESS", "LESS_EQUAL", // < <=
     "GREATER", "GREATER_EQUAL", // > >=
     "NOT", "AND", "OR",// ! && ||
 
-    "AMPERSAND", // &
+    "INVERT", "AMPERSAND", "BITOR", "XOR", // ~ & | ^
 
     //Constant
     "CONSTANT_INT", "CONSTANT_CHAR", "CONSTANT_STRING",

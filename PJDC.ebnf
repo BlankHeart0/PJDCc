@@ -14,6 +14,7 @@
 <Array_Definition> ::= <Type>IDENTIFIER"["CONSTANT_INT"]" ";"
 
 
+
 # Statement
 <Statement> ::= <Compound_Statement> | <Variable_Definition> | <If_Statement> | <Iteration_Statement> | 
               | <Return_Statement> | <Expression_Statement>
@@ -34,20 +35,33 @@
 
 # Expression
 <Expression> ::= <Assignment_Expression>{","<Assignment_Expression>}
-<Assignment_Expression> ::= [(["*"]IDENTIFIER) | (IDENTIFIER"["<Expression>"]") "="]<Equality_Expression>
+<Assignment_Expression> ::= [(["*"]IDENTIFIER) | (IDENTIFIER"["<Expression>"]") "="]<LogicOr_Expression>
+
+<LogicOr_Expression> ::= <LogicAnd_Expression>{"||"<LogicAnd_Expression>}
+<LogicAnd_Expression> ::= <Or_Expression>{"&&"<Or_Expression>}
+
+<Or_Expression> ::= <Xor_Expression>{"|"<Xor_Expression>}
+<Xor_Expression> ::= <And_Expression>{"^"<And_Expression>}
+<And_Expression> ::= <Equality_Expression>{"&"<Equality_Expression>}
 
 <Equality_Expression> ::= <Relational_Expression>{("==" | "!=")<Relational_Expression>}
-<Relational_Expression> ::= <PlusMinus_Expression>{("<" | "<=" | ">" | ">=")<PlusMinus_Expression>}
+<Relational_Expression> ::= <Shift_Expression>{("<" | "<=" | ">" | ">=")<Shift_Expression>}
+
+<Shift_Expression> ::= <PlusMinus_Expression>{("<<" | ">>")<PlusMinus_Expression>}
 
 <PlusMinus_Expression> ::= <MulDiv_Expression>{("+" | "-")<MulDiv_Expression>}
-<MulDiv_Expression> ::= <Unary_Expression>{("*" | "/")<Unary_Expression>}
+<MulDiv_Expression> ::= <Unary_Expression>{("*" | "/" | "%")<Unary_Expression>}
 
-<Unary_Expression> ::= <Primary_Expression> 
+<Unary_Expression> ::= ["-" | "~" | "!"]<Primary_Expression> 
 <Primary_Expression> ::= <FunctionCall_Expression> | <Address_Expression> | <Dreference_Expression> | <Array_Expression> |
-                        | CONSTANT_INT | CONSTANT_CHAR | CONSTANT_STRING | IDENTIFIER
+                        | <IncDecPrefix_Expression> | <IncDecPostfix_Expression> | "("<Expression>")" |  
+                        | CONSTANT_INT | CONSTANT_CHAR | CONSTANT_STRING | IDENTIFIER  
 
 <FunctionCall_Expression> ::= IDENTIFIER"("<Expression>")"
 
 <Address_Expression> ::="&"IDENTIFIER [("+ "| "-") CONSTANT_INT]
 <Dreference_Expression> ::="*" ( IDENTIFIER | "(" IDENTIFIER [("+" | "-") CONSTANT_INT] ")" )
 <Array_Expression> ::= IDENTIFIER"[" <Expression> "]"
+
+<IncDecPrefix_Expression> ::= ("++" | "--")IDENTIFIER
+<IncDecPostfix_Expression> ::= IDENTIFIER("++" | "--")

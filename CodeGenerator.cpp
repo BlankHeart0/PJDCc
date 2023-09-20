@@ -25,14 +25,18 @@ void CodeGenerator::CodeGenerate(string path)
 void CodeGenerator::CodeGenerate_Head()
 {
     OutFile<<"\textern print_int"<<endl;
+    OutFile<<"\textern print_long"<<endl;
     OutFile<<"\textern print_char"<<endl;
     OutFile<<"\textern print_string"<<endl<<endl;
 }
 
 void CodeGenerator::CodeGenerate_Tail()
 {
-    OutFile<<"section .data"<<endl;
-    OutFile<<TailData<<endl;
+    if(TailData!="")
+    {
+        OutFile<<"section .data"<<endl;
+        OutFile<<TailData<<endl;
+    }
 }
 
 
@@ -43,7 +47,7 @@ void CodeGenerator::CodeGenerate_Translation_Unit(ASTNode* root)
     WhoAmI("CodeGenerate_Translation_Unit");
 
     for(int i=0;i<root->Children.size();i++)
-    {cout<<i<<":"<<ASTNodeType_text[root->Children[i]->type]<<endl;
+    {
         if(root->Children[i]->type==FUNCTION_DEFINITION)
             CodeGenerate_Function_Definition(root->Children[i]);
         else if(root->Children[i]->type==ARRAY_DEFINITION)
@@ -336,9 +340,9 @@ int CodeGenerator::CodeGenerate_Assignment_Expression(ASTNode* root)
         string identifier=FirstChild(root)->lexeme;
         if(variable_table.Exist(identifier))
         {
-            int equality_expression_ri=CodeGenerate_Equality_Expression(root->Children[2]);
-            Store(equality_expression_ri,identifier,false);
-            return equality_expression_ri;
+            int LogicOr_expression_ri=CodeGenerate_LogicOr_Expression(root->Children[2]);
+            Store(LogicOr_expression_ri,identifier,false);
+            return LogicOr_expression_ri;
         }
         else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
     }
@@ -348,10 +352,10 @@ int CodeGenerator::CodeGenerate_Assignment_Expression(ASTNode* root)
         string identifier=root->Children[1]->lexeme;
         if(variable_table.Exist(identifier))
         {
-            int equality_expression_ri=CodeGenerate_Equality_Expression(root->Children[3]);
+            int LogicOr_expression_ri=CodeGenerate_LogicOr_Expression(root->Children[3]);
             Type type=variable_table.Visit(identifier).type;
-            Store(equality_expression_ri,Load(identifier),type,false);
-            return equality_expression_ri;
+            Store(LogicOr_expression_ri,Load(identifier),type,false);
+            return LogicOr_expression_ri;
         }
         else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
     }
@@ -361,18 +365,97 @@ int CodeGenerator::CodeGenerate_Assignment_Expression(ASTNode* root)
         string identifier=FirstChild(root)->lexeme;
         if(variable_table.Exist(identifier))
         {
-            int equality_expression_ri=CodeGenerate_Equality_Expression(root->Children[5]);
+            int LogicOr_expression_ri=CodeGenerate_LogicOr_Expression(root->Children[5]);
             int offset_ri=CodeGenerate_Expression(root->Children[2]);
             Type type=variable_table.Visit(identifier).type;
             int scale_factor=Dreference_ScaleFactor(type);
-            Store(equality_expression_ri,Add(Address(identifier),ShiftLeft(offset_ri,scale_factor)),type,false);
+            Store(LogicOr_expression_ri,Add(Address(identifier),ShiftLeftConstant(offset_ri,scale_factor)),type,false);
 
-            return equality_expression_ri;
+            return LogicOr_expression_ri;
         }
         else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
     }
 
-    return  CodeGenerate_Equality_Expression(FirstChild(root));
+    return  CodeGenerate_LogicOr_Expression(FirstChild(root));
+}
+
+
+
+int CodeGenerator::CodeGenerate_LogicOr_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_LogicOr_Expression");
+
+    int result_ri=CodeGenerate_LogicAnd_Expression(FirstChild(root));
+
+    for(int i=1;i<root->Children.size();i+=2)
+    {
+        int temp_ri=CodeGenerate_LogicAnd_Expression(root->Children[i+1]);
+        result_ri=Or(result_ri,temp_ri);
+    }
+
+    return result_ri;
+}
+
+int CodeGenerator::CodeGenerate_LogicAnd_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_LogicAnd_Expression");
+
+    int result_ri=CodeGenerate_Or_Expression(FirstChild(root));
+
+    for(int i=1;i<root->Children.size();i+=2)
+    {
+        int temp_ri=CodeGenerate_Or_Expression(root->Children[i+1]);
+        result_ri=And(result_ri,temp_ri);
+    }
+
+    return result_ri;
+}
+
+
+
+int CodeGenerator::CodeGenerate_Or_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Or_Expression");
+
+    int result_ri=CodeGenerate_Xor_Expression(FirstChild(root));
+
+    for(int i=1;i<root->Children.size();i+=2)
+    {
+        int temp_ri=CodeGenerate_Xor_Expression(root->Children[i+1]);
+        result_ri=Or(result_ri,temp_ri);
+    }
+
+    return result_ri;
+}
+
+int CodeGenerator::CodeGenerate_Xor_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Xor_Expression");
+
+    int result_ri=CodeGenerate_And_Expression(FirstChild(root));
+
+    for(int i=1;i<root->Children.size();i+=2)
+    {
+        int temp_ri=CodeGenerate_And_Expression(root->Children[i+1]);
+        result_ri=Xor(result_ri,temp_ri);
+    }
+
+    return result_ri;
+}
+
+int CodeGenerator::CodeGenerate_And_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_And_Expression");
+
+    int result_ri=CodeGenerate_Equality_Expression(FirstChild(root));
+
+    for(int i=1;i<root->Children.size();i+=2)
+    {
+        int temp_ri=CodeGenerate_Equality_Expression(root->Children[i+1]);
+        result_ri=And(result_ri,temp_ri);
+    }
+
+    return result_ri;
 }
 
 
@@ -397,11 +480,11 @@ int CodeGenerator::CodeGenerate_Relational_Expression(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Relational_Expression");
 
-    int result_ri=CodeGenerate_PlusMinus_Expression(FirstChild(root));
+    int result_ri=CodeGenerate_Shift_Expression(FirstChild(root));
 
     for(int i=1;i<root->Children.size();i+=2)
     {
-        int temp_ri=CodeGenerate_PlusMinus_Expression(root->Children[i+1]);
+        int temp_ri=CodeGenerate_Shift_Expression(root->Children[i+1]);
         switch(root->Children[i]->type)
         {
             case AST_LESS:result_ri=Less(result_ri,temp_ri);break;
@@ -409,6 +492,25 @@ int CodeGenerator::CodeGenerate_Relational_Expression(ASTNode* root)
             case AST_GREATER:result_ri=Greater(result_ri,temp_ri);break;
             case AST_GREATER_EQUAL:result_ri=GreaterEqual(result_ri,temp_ri);break;
         }
+    }
+
+    return result_ri;
+}
+
+
+
+int CodeGenerator::CodeGenerate_Shift_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Shift_Expression");
+
+    int result_ri=CodeGenerate_PlusMinus_Expression(FirstChild(root));
+
+    for(int i=1;i<root->Children.size();i+=2)
+    {
+        int temp_ri=CodeGenerate_PlusMinus_Expression(root->Children[i+1]);
+
+        if(root->Children[i]->type==AST_LEFT_SHIFT)result_ri=ShiftLeft(result_ri,temp_ri);
+        else if(root->Children[i]->type==AST_RIGHT_SHIFT)result_ri=ShiftRight(result_ri,temp_ri);
     }
 
     return result_ri;
@@ -443,6 +545,7 @@ int CodeGenerator::CodeGenerate_MulDiv_Expression(ASTNode* root)
         int temp_ri=CodeGenerate_Unary_Expression(root->Children[i+1]);
         if(root->Children[i]->type==AST_STAR)result_ri=Mul(result_ri,temp_ri);
         else if(root->Children[i]->type==AST_SLASH)result_ri=Div(result_ri,temp_ri);
+        else if(root->Children[i]->type==AST_MOD)result_ri=Mod(result_ri,temp_ri);
     }
 
     return result_ri;
@@ -454,18 +557,41 @@ int CodeGenerator::CodeGenerate_Unary_Expression(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Unary_Expression");
 
-    return CodeGenerate_Primary_Expression(FirstChild(root));
+//no prefix
+    if(FirstChild(root)->type==PRIMARY_EXPRESSION)
+    {
+        return CodeGenerate_Primary_Expression(FirstChild(root));
+    }
+
+//have prefix
+    int result_ri=CodeGenerate_Primary_Expression(root->Children[1]);
+
+    switch(FirstChild(root)->type)
+    {
+        case AST_MINUS:
+            result_ri=Negate(result_ri);break;
+        case AST_INVERT:
+            result_ri=Invert(result_ri);break;
+        case AST_NOT:
+            result_ri=Not(result_ri);break;
+    }
+    return result_ri;
 }
-    
+
+
 int CodeGenerator::CodeGenerate_Primary_Expression(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Primary_Expression");
     
+
     if(FirstChild(root)->type==FUNCTIONCALL_EXPRESSION)return CodeGenerate_FunctionCall_Expression(FirstChild(root));
-    
+
     else if(FirstChild(root)->type==ADDRESS_EXPRESSION)return CodeGenerate_Address_Expression(FirstChild(root));
     else if(FirstChild(root)->type==DREFERENCE_EXPRESSION)return CodeGenerate_Dreference_Expression(FirstChild(root));
     else if(FirstChild(root)->type==ARRAY_EXPRESSION)return CodeGenerate_Array_Expression(FirstChild(root));
+
+    else if(FirstChild(root)->type==INCDECPREFIX_EXPRESSION)return CodeGenerate_IncDecPrefix_Expression(FirstChild(root));
+    else if(FirstChild(root)->type==INCDECPOSTFIX_EXPRESSION)return CodeGenerate_IncDecPostfix_Expression(FirstChild(root));
 
     else if(FirstChild(root)->type==AST_CONSTANT_INT)return Load(FirstChild(root)->literal_int);
     else if(FirstChild(root)->type==AST_CONSTANT_CHAR)return Load((char)(FirstChild(root)->literal_char));
@@ -485,6 +611,8 @@ int CodeGenerator::CodeGenerate_Primary_Expression(ASTNode* root)
 
 int CodeGenerator::CodeGenerate_FunctionCall_Expression(ASTNode* root)
 {
+    WhoAmI("CodeGenerate_FunctionCall_Expression");
+    
     string identifier=FirstChild(root)->lexeme;
 
 //don't check for now
@@ -500,6 +628,8 @@ int CodeGenerator::CodeGenerate_FunctionCall_Expression(ASTNode* root)
 
 int CodeGenerator::CodeGenerate_Address_Expression(ASTNode* root)
 {
+    WhoAmI("CodeGenerate_Address_Expression");
+
     string identifier=root->Children[1]->lexeme;
 
     if(!variable_table.Exist(identifier))
@@ -515,8 +645,8 @@ int CodeGenerator::CodeGenerate_Address_Expression(ASTNode* root)
 
         int scale_factor=Address_ScaleFactor(variable_table.Visit(identifier).type);
 
-        if(root->Children[2]->type==AST_PLUS)return Add(r1_i,ShiftLeft(r2_i,scale_factor));
-        else if(root->Children[2]->type==AST_MINUS)return Sub(r1_i,ShiftLeft(r2_i,scale_factor));
+        if(root->Children[2]->type==AST_PLUS)return Add(r1_i,ShiftLeftConstant(r2_i,scale_factor));
+        else if(root->Children[2]->type==AST_MINUS)return Sub(r1_i,ShiftLeftConstant(r2_i,scale_factor));
     }
 
     //no offset
@@ -525,6 +655,8 @@ int CodeGenerator::CodeGenerate_Address_Expression(ASTNode* root)
 
 int CodeGenerator::CodeGenerate_Dreference_Expression(ASTNode* root)
 {
+    WhoAmI("CodeGenerate_Dreference_Expression");
+
     if(root->Children.size()>2)
     {
         string identifier=root->Children[2]->lexeme;
@@ -540,8 +672,8 @@ int CodeGenerator::CodeGenerate_Dreference_Expression(ASTNode* root)
         int scale_factor=Dreference_ScaleFactor(variable_table.Visit(identifier).type);
 
         Type type=variable_table.Visit(identifier).type;
-        if(root->Children[3]->type==AST_PLUS)return Dereference(Add(r1_i,ShiftLeft(r2_i,scale_factor)),type);
-        else if(root->Children[3]->type==AST_MINUS)return Dereference(Sub(r1_i,ShiftLeft(r2_i,scale_factor)),type);;
+        if(root->Children[3]->type==AST_PLUS)return Dereference(Add(r1_i,ShiftLeftConstant(r2_i,scale_factor)),type);
+        else if(root->Children[3]->type==AST_MINUS)return Dereference(Sub(r1_i,ShiftLeftConstant(r2_i,scale_factor)),type);;
     }
 
     //no offset    
@@ -555,6 +687,8 @@ int CodeGenerator::CodeGenerate_Dreference_Expression(ASTNode* root)
 
 int CodeGenerator::CodeGenerate_Array_Expression(ASTNode* root)
 {
+    WhoAmI("CodeGenerate_Array_Expression");
+
     string identifier=FirstChild(root)->lexeme;
     if(!variable_table.Exist(identifier))
         CodeGenerate_Error("The variable "+identifier+" is not defined.",root->Children[1]);
@@ -563,10 +697,49 @@ int CodeGenerator::CodeGenerate_Array_Expression(ASTNode* root)
     Type type=variable_table.Visit(identifier).type;
 
     int scale_factor=Dreference_ScaleFactor(type);
-    return Dereference(Add(Address(identifier),ShiftLeft(offset_ri,scale_factor)),type);
+    return Dereference(Add(Address(identifier),ShiftLeftConstant(offset_ri,scale_factor)),type);
 }
 
 
+
+
+int CodeGenerator::CodeGenerator::CodeGenerate_IncDecPrefix_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_IncDecPrefix_Expression");
+
+    ASTNodeType op=FirstChild(root)->type;
+    string identifier=root->Children[1]->lexeme;
+    
+    int result_ri=-1;
+    
+    if(variable_table.Exist(identifier))
+    {
+        if(op==AST_INC)result_ri=Inc(identifier,"pre");
+        else if(op==AST_DEC)result_ri=Dec(identifier,"pre");
+    }
+    else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
+
+    return result_ri;
+}
+
+int CodeGenerator::CodeGenerate_IncDecPostfix_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_IncDecPostfix_Expression");
+
+    ASTNodeType op=root->Children[1]->type;
+    string identifier=FirstChild(root)->lexeme;
+    
+    int result_ri=-1;
+    
+    if(variable_table.Exist(identifier))
+    {
+        if(op==AST_INC)result_ri=Inc(identifier,"post");
+        else if(op==AST_DEC)result_ri=Dec(identifier,"post");
+    }
+    else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
+
+    return result_ri;
+}
 
 
 //Atomic instruction
@@ -603,6 +776,8 @@ int CodeGenerator::Load(string identifier)
             CodeGenerate_Error("Load variable "+identifier+" error.");
     }
 
+    //OutFile<<"\tmov\t"<<register_manager.Name(register_i,8)<<", ["<<identifier<<"]"<<endl;
+
     return register_i;
 }
 
@@ -621,7 +796,9 @@ void CodeGenerator::Store(int r_i,string identifier,bool free)
             OutFile<<"\tmov\t["<<identifier<<"], "<<register_manager.Name(r_i,8)<<endl;break;
         default:
             CodeGenerate_Error("Store variable "+identifier+" error.");
-    }   
+    }
+
+    //OutFile<<"\tmov\t["<<identifier<<"], "<<register_manager.Name(r_i,8)<<endl;
 
     if(free)register_manager.Free(r_i);
 }
@@ -760,7 +937,7 @@ int CodeGenerator::Comma(int r1_i,int r2_i)
 int CodeGenerator::Compare(int r1_i,int r2_i,string setx)
 {
     OutFile<<"\tcmp\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
-    OutFile<<"\t"<<setx<<"\t"<<register_manager.Name(r1_i)<<'b'<<endl;
+    OutFile<<"\t"<<setx<<"\t"<<register_manager.Name(r1_i,1)<<endl;
     OutFile<<"\tand\t"<<register_manager.Name(r1_i)<<", 255"<<endl;
 
     register_manager.Free(r2_i);
@@ -858,13 +1035,138 @@ int CodeGenerator::Div(int r1_i,int r2_i)
     return r1_i;
 }
 
-
-
-int CodeGenerator::ShiftLeft(int r_i,int value)
+int CodeGenerator::Mod(int r1_i,int r2_i)
 {
-    OutFile<<"\tsal\t"<<register_manager.Name(r_i)<<", "<<value<<endl;
+    OutFile<<"\tmov\trax, "<<register_manager.Name(r1_i)<<endl;
+    OutFile<<"\tcqo"<<endl;
+    OutFile<<"\tidiv\t"<<register_manager.Name(r2_i)<<endl;
+    OutFile<<"\tmov\t"<<register_manager.Name(r1_i)<<", rdx"<<endl;
+
+    register_manager.Free(r2_i);
+    return r1_i;
+}
+
+int CodeGenerator::And(int r1_i,int r2_i)
+{
+    OutFile<<"\tand\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
+
+    register_manager.Free(r2_i);
+    return r1_i;
+}
+
+int CodeGenerator::Or(int r1_i,int r2_i)
+{
+    OutFile<<"\tor\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
+
+    register_manager.Free(r2_i);
+    return r1_i;
+}
+
+int CodeGenerator::Xor(int r1_i,int r2_i)
+{
+    OutFile<<"\txor\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
+
+    register_manager.Free(r2_i);
+    return r1_i;
+}
+
+int CodeGenerator::Invert(int r_i)
+{
+    OutFile<<"\tnot\t"<<register_manager.Name(r_i)<<endl;
+    
     return r_i;
 }
+
+int CodeGenerator::Not(int r_i)
+{
+    OutFile<<"\ttest\t"<<register_manager.Name(r_i)<<", "<<register_manager.Name(r_i)<<endl;
+    OutFile<<"\tsete\t"<<register_manager.Name(r_i,1)<<endl;
+    OutFile<<"\tmovzx\t"<<register_manager.Name(r_i)<<", "<<register_manager.Name(r_i,1)<<endl;
+    
+    return r_i;
+}
+
+int CodeGenerator::Negate(int r_i)
+{
+    OutFile<<"\tneg\t"<<register_manager.Name(r_i)<<endl;
+    
+    return r_i;
+}
+
+
+
+int CodeGenerator::ShiftLeftConstant(int r_i,int constant)
+{
+    OutFile<<"\tsal\t"<<register_manager.Name(r_i)<<", "<<constant<<endl;
+    return r_i;
+}
+
+int CodeGenerator::ShiftLeft(int r1_i,int r2_i)
+{
+    OutFile<<"\tmov\tcl, "<<register_manager.Name(r2_i,1)<<endl;
+    OutFile<<"\tshl\t"<<register_manager.Name(r1_i)<<", cl"<<endl;
+
+    register_manager.Free(r2_i);
+    return r1_i;
+}
+
+int CodeGenerator::ShiftRight(int r1_i,int r2_i)
+{
+    OutFile<<"\tmov\tcl, "<<register_manager.Name(r2_i,1)<<endl;
+    OutFile<<"\tshr\t"<<register_manager.Name(r1_i)<<", cl"<<endl;
+
+    register_manager.Free(r2_i);
+    return r1_i;
+}
+
+
+
+int CodeGenerator::Inc(string identifier,string pre_post)
+{
+    int register_i=-1;
+
+    if(pre_post=="post")register_i=Load(identifier);
+
+    switch(variable_table.Visit(identifier).type)
+    {
+        case T_CHAR:
+            OutFile<<"\tinc\tbyte ["<<identifier<<"]"<<endl;break;
+        case T_INT:
+            OutFile<<"\tinc\tdword ["<<identifier<<"]"<<endl;break;
+        case T_LONG:
+            OutFile<<"\tinc\tqword ["<<identifier<<"]"<<endl;break;
+        default:
+            CodeGenerate_Error("Can not inc this type.");break;
+    }
+
+    if(pre_post=="pre")register_i=Load(identifier);
+
+    return register_i;
+}
+
+int CodeGenerator::Dec(string identifier,string pre_post)
+{
+    int register_i=-1;
+
+    if(pre_post=="post")register_i=Load(identifier);
+
+    switch(variable_table.Visit(identifier).type)
+    {
+        case T_CHAR:
+            OutFile<<"\tdec\tbyte ["<<identifier<<"]"<<endl;break;
+        case T_INT:
+            OutFile<<"\tdec\tdword ["<<identifier<<"]"<<endl;break;
+        case T_LONG:
+            OutFile<<"\tdec\tqword ["<<identifier<<"]"<<endl;break;
+        default:
+            CodeGenerate_Error("Can not dec this type.");break;
+    }
+
+    if(pre_post=="pre")register_i=Load(identifier);
+
+    return register_i;
+}
+
 
 
 

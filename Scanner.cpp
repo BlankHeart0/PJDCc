@@ -22,17 +22,23 @@ void Scanner::Scan()
             case ',':Add_Token(COMMA);break;
             case ';':Add_Token(SEMICOLON);break;
 
-            case '+':Add_Token(PLUS);break;
-            case '-':Add_Token(MINUS);break;
+            case '+':Add_Token(Match('+')?INC:PLUS);break;
+            case '-':Add_Token(Match('-')?DEC:MINUS);break;
             case '*':Add_Token(STAR);break;
+            case '%':Add_Token(MOD);break;
 
+            case '~':Add_Token(INVERT);break;
+            case '^':Add_Token(XOR);break;
+            
             //two character
             case '=':Add_Token(Match('=')?EQUAL:ASSIGN);break;
             case '!':Add_Token(Match('=')?NOT_EQUAL:NOT);break;
-            case '<':Add_Token(Match('=')?LESS_EQUAL:LESS);break;
-            case '>':Add_Token(Match('=')?GREATER_EQUAL:GREATER);break;
-            case '&':Add_Token(Match('&')?AND:AMPERSAND);break;
+            case '<':Add_Token(Match('=')?LESS_EQUAL:   Match('<')?LEFT_SHIFT:  LESS);break;
+            case '>':Add_Token(Match('=')?GREATER_EQUAL:Match('>')?RIGHT_SHIFT: GREATER);break;
             
+            case '&':Add_Token(Match('&')?AND:AMPERSAND);break;
+            case '|':Add_Token(Match('|')?OR:BITOR);break;
+
             //Annotation
             case '/':
                 if(Match('/'))while(!Is_AtEnd()&&source[current]!='\n')current++;

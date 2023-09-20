@@ -1,8 +1,13 @@
 #include <stdio.h>
 
-void print_int(long x)
+void print_int(int x)
 {
-    printf ("%ld\n",x);
+    printf ("%d\n",x);
+}
+
+void print_long(long x)
+{
+    printf("%ld\n",x);
 }
 
 void print_char(char c)

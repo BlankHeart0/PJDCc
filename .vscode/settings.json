@@ -11,6 +11,8 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "*.tcc": "cpp",
-        "random": "c"
+        "random": "c",
+        "string_view": "cpp",
+        "initializer_list": "cpp"
     }
 }

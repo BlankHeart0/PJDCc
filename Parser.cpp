@@ -386,9 +386,96 @@ ASTNode* Parser::Parse_Assignment_Expression()
         }
     }
 
-    Add_Child(node,Parse_Equality_Expression());
+    Add_Child(node,Parse_LogicOr_Expression());
 
     return node; 
+}
+
+
+
+ASTNode* Parser::Parse_LogicOr_Expression()
+{
+    WhoAmI("Parse_LogicOr_Expression");
+
+    ASTNode* node=new ASTNode(LOGICOR_EXPRESSION);
+
+    Add_Child(node,Parse_LogicAnd_Expression());
+
+    while(Match(OR))
+    {
+        Add_Child(node,new ASTNode(AST_OR,Previous_Token()));
+        Add_Child(node,Parse_LogicAnd_Expression());
+    }
+
+    return node;
+}
+
+ASTNode* Parser::Parse_LogicAnd_Expression()
+{
+    WhoAmI("Parse_LogicAnd_Expression");
+
+    ASTNode* node=new ASTNode(LOGICAND_EXPRESSION);
+
+    Add_Child(node,Parse_Or_Expression());
+
+    while(Match(AND))
+    {
+        Add_Child(node,new ASTNode(AST_AND,Previous_Token()));
+        Add_Child(node,Parse_Or_Expression());
+    }
+
+    return node;
+}
+
+ASTNode* Parser::Parse_Or_Expression()
+{
+    WhoAmI("Parse_Or_Expression");
+
+    ASTNode* node=new ASTNode(OR_EXPRESSION);
+
+    Add_Child(node,Parse_Xor_Expression());
+
+    while(Match(BITOR))
+    {
+        Add_Child(node,new ASTNode(AST_BITOR,Previous_Token()));
+        Add_Child(node,Parse_Xor_Expression());
+    }
+
+    return node;
+}
+
+ASTNode* Parser::Parse_Xor_Expression()
+{
+    WhoAmI("Parse_Xor_Expression");
+
+    ASTNode* node=new ASTNode(XOR_EXPRESSION);
+
+    Add_Child(node,Parse_And_Expression());
+
+    while(Match(XOR))
+    {
+        Add_Child(node,new ASTNode(AST_XOR,Previous_Token()));
+        Add_Child(node,Parse_And_Expression());
+    }
+
+    return node;
+}
+
+ASTNode* Parser::Parse_And_Expression()
+{
+    WhoAmI("Parse_And_Expression");
+
+    ASTNode* node=new ASTNode(AND_EXPRESSION);
+
+    Add_Child(node,Parse_Equality_Expression());
+
+    while(Match(AMPERSAND))
+    {
+        Add_Child(node,new ASTNode(AST_AMPERSAND,Previous_Token()));
+        Add_Child(node,Parse_Equality_Expression());
+    }
+
+    return node;
 }
 
 
@@ -404,9 +491,13 @@ ASTNode* Parser::Parse_Equality_Expression()
     while(Match(EQUAL)||Match(NOT_EQUAL))
     {
         if(Previous_Token().type==EQUAL)
+        {
             Add_Child(node,new ASTNode(AST_EQUAL,Previous_Token()));
+        }
         else if(Previous_Token().type==NOT_EQUAL)
+        {
             Add_Child(node,new ASTNode(AST_NOT_EQUAL,Previous_Token()));
+        }
          
         Add_Child(node,Parse_Relational_Expression()); 
     }
@@ -420,7 +511,7 @@ ASTNode* Parser::Parse_Relational_Expression()
 
     ASTNode* node=new ASTNode(RELATIONAL_EXPRESSION);
 
-    Add_Child(node,Parse_PlusMinus_Expression());
+    Add_Child(node,Parse_Shift_Expression());
 
     while(Match(LESS)||Match(LESS_EQUAL)||Match(GREATER)||Match(GREATER_EQUAL))
     {
@@ -436,7 +527,34 @@ ASTNode* Parser::Parse_Relational_Expression()
                 Add_Child(node,new ASTNode(AST_GREATER_EQUAL,Previous_Token()));break;  
         }
         
-        Add_Child(node,Parse_PlusMinus_Expression());
+        Add_Child(node,Parse_Shift_Expression());
+    }
+
+    return node;
+}
+
+
+
+ASTNode* Parser::Parse_Shift_Expression()
+{
+    WhoAmI("Parse_Shift_Expression");
+
+    ASTNode* node=new ASTNode(SHIFT_EXPRESSION);
+
+    Add_Child(node,Parse_PlusMinus_Expression());
+
+    while(Match(LEFT_SHIFT)||Match(RIGHT_SHIFT))
+    {
+        if(Previous_Token().type==LEFT_SHIFT)
+        {
+            Add_Child(node,new ASTNode(AST_LEFT_SHIFT,Previous_Token()));
+        }
+        else if(Previous_Token().type==RIGHT_SHIFT)
+        {
+            Add_Child(node,new ASTNode(AST_RIGHT_SHIFT,Previous_Token()));
+        }
+
+        Add_Child(node,Parse_PlusMinus_Expression());    
     }
 
     return node;
@@ -458,8 +576,10 @@ ASTNode* Parser::Parse_PlusMinus_Expression()
         {
             Add_Child(node,new ASTNode(AST_PLUS,Previous_Token()));
         }
-        else if(Previous_Token().type==MINUS)Add_Child(node,new ASTNode(AST_MINUS,Previous_Token()));
-
+        else if(Previous_Token().type==MINUS)
+        {
+            Add_Child(node,new ASTNode(AST_MINUS,Previous_Token()));
+        }
         Add_Child(node,Parse_MulDiv_Expression());
     }
 
@@ -474,13 +594,20 @@ ASTNode* Parser::Parse_MulDiv_Expression()
 
     Add_Child(node,Parse_Unary_Expression());
 
-    while(Match(STAR)||Match(SLASH))
+    while(Match(STAR)||Match(SLASH)||Match(MOD))
     {
         if(Previous_Token().type==STAR)
         {
             Add_Child(node,new ASTNode(AST_STAR,Previous_Token()));
         }
-        else  if(Previous_Token().type==SLASH)Add_Child(node,new ASTNode(AST_SLASH,Previous_Token()));
+        else if(Previous_Token().type==SLASH)
+        {
+            Add_Child(node,new ASTNode(AST_SLASH,Previous_Token()));
+        }
+        else if(Previous_Token().type==MOD)
+        {
+            Add_Child(node,new ASTNode(AST_MOD,Previous_Token()));
+        }
 
         Add_Child(node,Parse_Unary_Expression());
     }
@@ -496,8 +623,24 @@ ASTNode* Parser::Parse_Unary_Expression()
 
     ASTNode* node=new ASTNode(UNARY_EXPRESSION);
 
+    if(Match(MINUS)||Match(INVERT)||Match(NOT))
+    {
+        if(Previous_Token().type==MINUS)
+        {
+            Add_Child(node,new ASTNode(AST_MINUS,Previous_Token()));
+        }
+        else if(Previous_Token().type==INVERT)
+        {
+            Add_Child(node,new ASTNode(AST_INVERT,Previous_Token()));
+        }
+        else if(Previous_Token().type==NOT)
+        {
+            Add_Child(node,new ASTNode(AST_NOT,Previous_Token()));
+        }
+    }
+
     Add_Child(node,Parse_Primary_Expression());
-    
+
     return node;
 }
 
@@ -510,9 +653,20 @@ ASTNode* Parser::Parse_Primary_Expression()
     if(Match(CONSTANT_INT))Add_Child(node,new ASTNode(AST_CONSTANT_INT,Previous_Token()));
     else if(Match(CONSTANT_CHAR))Add_Child(node,new ASTNode(AST_CONSTANT_CHAR,Previous_Token()));
     else if(Match(CONSTANT_STRING))Add_Child(node,new ASTNode(AST_CONSTANT_STRING,Previous_Token()));
+    
+    else if(Match(LEFT_PAREN))
+    {
+        Add_Child(node,new ASTNode(AST_LEFT_PAREN,Previous_Token()));
+        Add_Child(node,Parse_Expression());
+        if(Match(RIGHT_PAREN))Add_Child(node,new ASTNode(AST_RIGHT_PAREN,Previous_Token()));
+        else Parse_Error("Right paren ) loss.");
+    }
+
     else if(Peek(ID))
     {
         if(Peek(LEFT_PAREN,2))Add_Child(node,Parse_FunctionCall_Expression());
+        else if(Peek(INC,2)||Peek(DEC,2))
+            Add_Child(node,Parse_IncDecPostfix_Expression());
         else if(Peek(LEFT_SQUARE,2))Add_Child(node,Parse_Array_Expression());
         else 
         {
@@ -520,8 +674,11 @@ ASTNode* Parser::Parse_Primary_Expression()
             Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
         }
     }
+
     else if(Peek(AMPERSAND))Add_Child(node,Parse_Address_Expression());
     else if(Peek(STAR))Add_Child(node,Parse_Dreference_Expression());
+    
+    else if(Peek(INC)||Peek(DEC))Add_Child(node,Parse_IncDecPrefix_Expression());
 
     else Parse_Error("Primary character loss.");
 
@@ -652,6 +809,77 @@ ASTNode* Parser::Parse_Array_Expression()
     return node;
 }
  
+
+
+ASTNode* Parser::Parse_IncDecPrefix_Expression()
+{
+    WhoAmI("Parse_IncDecPrefix_Expression");
+
+    ASTNode* node=new ASTNode(INCDECPREFIX_EXPRESSION);
+
+    if(Match(INC)||Match(DEC))
+    {
+        if(Previous_Token().type==INC)
+        {
+            Add_Child(node,new ASTNode(AST_INC,Previous_Token()));
+        }
+        else if(Previous_Token().type==DEC)
+        {
+            Add_Child(node,new ASTNode(AST_DEC,Previous_Token()));
+        }
+
+        if(Match(ID))Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
+        else Parse_Error("Identifier loss.");
+
+        // if(Match(LEFT_SQUARE))
+        // {
+        //     Add_Child(node,new ASTNode(AST_LEFT_SQUARE,Previous_Token()));
+        //     Add_Child(node,Parse_Expression());
+        //     if(Match(RIGHT_SQUARE))Add_Child(node,new ASTNode(AST_RIGHT_SQUARE,Previous_Token()));
+        //     else Parse_Error("Right square ] loss.");
+        // }
+    }
+    else Parse_Error("Inc ++ or Dec -- loss.");
+
+    return node;
+}
+
+ASTNode* Parser::Parse_IncDecPostfix_Expression()
+{
+    WhoAmI("Parse_IncDecPostfix_Expression");
+
+    ASTNode* node=new ASTNode(INCDECPOSTFIX_EXPRESSION);
+
+    if(Match(ID))
+    {
+        Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
+
+        // if(Match(LEFT_SQUARE))
+        // {
+        //     Add_Child(node,new ASTNode(AST_LEFT_SQUARE,Previous_Token()));
+        //     Add_Child(node,Parse_Expression());
+        //     if(Match(RIGHT_SQUARE))Add_Child(node,new ASTNode(AST_RIGHT_SQUARE,Previous_Token()));
+        //     else Parse_Error("Right square ] loss.");
+        // }
+
+        if(Match(INC)||Match(DEC))
+        {
+            if(Previous_Token().type==INC)
+            {
+                Add_Child(node,new ASTNode(AST_INC,Previous_Token()));
+            }
+            else if(Previous_Token().type==DEC)
+            {
+                Add_Child(node,new ASTNode(AST_DEC,Previous_Token()));
+            }
+        }
+        else Parse_Error("Inc ++ or Dec -- loss.");
+    }
+    else Parse_Error("Identifier loss.");
+
+    return node;
+}
+
 
 
 

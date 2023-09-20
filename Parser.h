@@ -12,7 +12,7 @@ public:
 
     bool DEBUG;
 
-    Parser():current(0),DEBUG(false){}
+    Parser():current(0),DEBUG(true){}
 
     void Parse();
 
@@ -50,8 +50,17 @@ public:
     ASTNode* Parse_Expression();
     ASTNode* Parse_Assignment_Expression();
 
+    ASTNode* Parse_LogicOr_Expression();
+    ASTNode* Parse_LogicAnd_Expression();
+
+    ASTNode* Parse_Or_Expression();
+    ASTNode* Parse_Xor_Expression();
+    ASTNode* Parse_And_Expression();
+
     ASTNode* Parse_Equality_Expression();
     ASTNode* Parse_Relational_Expression();
+
+    ASTNode* Parse_Shift_Expression();
 
     ASTNode* Parse_PlusMinus_Expression();
     ASTNode* Parse_MulDiv_Expression();
@@ -65,6 +74,8 @@ public:
     ASTNode* Parse_Dreference_Expression();
     ASTNode* Parse_Array_Expression();
     
+    ASTNode* Parse_IncDecPrefix_Expression();
+    ASTNode* Parse_IncDecPostfix_Expression();
     
 //Tools
     bool Match(TokenType expected);
