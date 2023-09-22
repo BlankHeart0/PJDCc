@@ -1,6 +1,6 @@
 
 # Begin
-<Translation_Unit> ::= {<Function_Definition> | <Variable_Definition> | <Array_Definition>}CODE_EOF
+<Translation_Unit> ::= {<Function_Definition> | <GlobalVariable_Definition> | <GlobalArray_Definition>}CODE_EOF
 
 
 
@@ -8,15 +8,17 @@
 <Type> ::= VOID | CHAR | INT | LONG
 <Function_Definition> ::= <Type> IDENTIFIER "(" ")" <Compound_Statement>
 
-<Variable_Definition> ::= <Variable_Declaration>["="<Expression>]";"
-<Variable_Declaration> ::= <Type>["*"] IDENTIFIER
+<GlobalVariable_Definition> ::= <Type>["*"] IDENTIFIER";"
+<GlobalArray_Definition> ::= <Type>IDENTIFIER"["CONSTANT_INT"]" ";"
 
-<Array_Definition> ::= <Type>IDENTIFIER"["CONSTANT_INT"]" ";"
+<LocalVariable_Definition> ::= <LocalVariable_Declaration>["="<Expression>]";"
+<LocalVariable_Declaration> ::= <Type>["*"] IDENTIFIER
+
 
 
 
 # Statement
-<Statement> ::= <Compound_Statement> | <Variable_Definition> | <If_Statement> | <Iteration_Statement> | 
+<Statement> ::= <Compound_Statement> | <LocalVariable_Definition> | <If_Statement> | <Iteration_Statement> | 
               | <Return_Statement> | <Expression_Statement>
 
 <Compound_Statement> ::= "{"{<Statement>}"}"

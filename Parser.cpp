@@ -23,8 +23,8 @@ ASTNode* Parser::Parse_Translation_Unit()
     while(!Is_AtEnd())
     {
         if(Peek(LEFT_PAREN,3))Add_Child(node,Parse_Function_Definition());
-        else if(Peek(LEFT_SQUARE,3))Add_Child(node,Parse_Array_Definition());
-        else Add_Child(node,Parse_Variable_Definition());
+        else if(Peek(LEFT_SQUARE,3))Add_Child(node,Parse_GlobalArray_Definition());
+        else Add_Child(node,Parse_GlobalVariable_Definition());
     }
     return node;    
 }
@@ -78,30 +78,11 @@ ASTNode* Parser::Parse_Function_Definition()
 
 
 
-ASTNode* Parser::Parse_Variable_Definition()
+ASTNode* Parser::Parse_GlobalVariable_Definition()
 {
-    WhoAmI("Parse_Variable_Definition");
+    WhoAmI("Parse_GlobalVariable_Definition");
 
-    ASTNode* node=new ASTNode(VARIABLE_DEFINITION);
-
-    Add_Child(node,Parse_Variable_Declaration());
-
-    if(Match(ASSIGN))
-    {
-        Add_Child(node,new ASTNode(AST_ASSIGN,Previous_Token()));
-        Add_Child(node,Parse_Expression());
-    }  
-
-    Match_Semicolon(node);
-
-    return node;
-}
-
-ASTNode* Parser::Parse_Variable_Declaration()
-{   
-    WhoAmI("Parse_Variable_Declaration");
-
-    ASTNode* node=new ASTNode(VARIABLE_DECLARATION);
+    ASTNode* node=new ASTNode(GLOBALVARIABLE_DEFINITION);
 
     Add_Child(node,Parse_Type());
 
@@ -110,16 +91,16 @@ ASTNode* Parser::Parse_Variable_Declaration()
     if(Match(ID))Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
     else Parse_Error("Variable identifier loss.");
 
+    Match_Semicolon(node);
+
     return node;
 }
 
-
-
-ASTNode* Parser::Parse_Array_Definition()
+ASTNode* Parser::Parse_GlobalArray_Definition()
 {
-    WhoAmI("Parse_Array_Definition");
+    WhoAmI("Parse_GlobalArray_Definition");
 
-    ASTNode* node=new ASTNode(ARRAY_DEFINITION);
+    ASTNode* node=new ASTNode(GLOBALARRAY_DEFINITION);
 
     Add_Child(node,Parse_Type());
 
@@ -150,6 +131,46 @@ ASTNode* Parser::Parse_Array_Definition()
 
 
 
+ASTNode* Parser::Parse_LocalVariable_Definition()
+{
+    WhoAmI("Parse_LocalVariable_Definition");
+
+    ASTNode* node=new ASTNode(LOCALVARIABLE_DEFINITION);
+
+    Add_Child(node,Parse_LocalVariable_Declaration());
+
+    if(Match(ASSIGN))
+    {
+        Add_Child(node,new ASTNode(AST_ASSIGN,Previous_Token()));
+        Add_Child(node,Parse_Expression());
+    }  
+
+    Match_Semicolon(node);
+
+    return node;
+}
+
+ASTNode* Parser::Parse_LocalVariable_Declaration()
+{   
+    WhoAmI("Parse_LocalVariable_Declaration");
+
+    ASTNode* node=new ASTNode(LOCALVARIABLE_DECLARATION);
+
+    Add_Child(node,Parse_Type());
+
+    if(Match(STAR))Add_Child(node,new ASTNode(AST_STAR,Previous_Token()));
+
+    if(Match(ID))Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
+    else Parse_Error("Variable identifier loss.");
+
+    return node;
+}
+
+
+
+
+
+
 // Statement
 ASTNode* Parser::Parse_Statement()
 {
@@ -158,7 +179,7 @@ ASTNode* Parser::Parse_Statement()
     ASTNode* node=new ASTNode(STATEMENT);
 
     if(Peek(LEFT_BRACE))Add_Child(node,Parse_Compound_Statement());
-    else if(Peek_Type())Add_Child(node,Parse_Variable_Definition());
+    else if(Peek_Type())Add_Child(node,Parse_LocalVariable_Definition());
     else if(Peek(IF))Add_Child(node,Parse_If_Statement());
     else if(Peek(WHILE)||Peek(DO))Add_Child(node,Parse_Iteration_Statement());
     else if(Peek(RETURN))Add_Child(node,Parse_Return_Statement());

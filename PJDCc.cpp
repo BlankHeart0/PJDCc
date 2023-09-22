@@ -71,7 +71,7 @@ void PJDCc::Compile(string path)
     S.Scan();
     S.Tokens_PrintTable();
 
-    // //Parse
+    //Parse
     P.tokens=S.tokens;
     P.Parse();
     P.ast.AST_Print();
@@ -98,7 +98,7 @@ int main()
 
 
     //CodeGen
-    
+
     //pjdcc.Compile("./test/CodeGen_Test/test.c");
 
 
@@ -106,7 +106,9 @@ int main()
     //pjdcc.Compile("./test/CodeGen_Test/Pointer.c");
     //pjdcc.Compile("./test/CodeGen_Test/Array.c");
     //pjdcc.Compile("./test/CodeGen_Test/String.c");
-    pjdcc.Compile("./test/CodeGen_Test/Operator.c");
+    //pjdcc.Compile("./test/CodeGen_Test/Operator.c");
+
+    pjdcc.Compile("./test/CodeGen_Test/Local.c");
     
     return 0;
 }

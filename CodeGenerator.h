@@ -13,7 +13,7 @@ public:
     AST ast;
 
     RegisterManager register_manager;
-    VariableTable variable_table;
+    VariableTable global_vartable;
     FunctionTable function_table;
 
     ofstream OutFile;
@@ -22,12 +22,12 @@ public:
     int StringNumber;
     string NowInFunction;
 
-    string HeadInstruction;
+    string HeadData;
     string TailData;
 
     bool DEBUG;
 
-    CodeGenerator():LableNumber(0),StringNumber(0),NowInFunction(""),TailData(""),DEBUG(false){}
+    CodeGenerator():LableNumber(0),StringNumber(0),NowInFunction(""),HeadData(""),TailData(""),DEBUG(false){}
 
     void CodeGenerate(string path);
 
@@ -43,10 +43,12 @@ public:
     Type CodeGenerate_Type(ASTNode* root);
     void CodeGenerate_Function_Definition(ASTNode* root);
 
-    void CodeGenerate_Variable_Definition(ASTNode* root);
-    string CodeGenerate_Variable_Declaration(ASTNode* root);
+    void CodeGenerate_GlobalVariable_Definition(ASTNode* root);
+    void CodeGenerate_GlobalArray_Definition(ASTNode* root);
 
-    void CodeGenerate_Array_Definition(ASTNode* root);
+    void CodeGenerate_LocalVariable_Definition(ASTNode* root);
+    string CodeGenerate_LocalVariable_Declaration(ASTNode* root);
+    
 
 // Statement
     void CodeGenerate_Statement(ASTNode* root);
@@ -98,20 +100,25 @@ public:
     
 
 //Atomic instruction
-    int Load(int value);
-    int Load(string identifier);
+    int Load(int constant_value);
+    int LoadGlobalVar(string identifier);
+    int LoadLocalVar(string identifier);
 
-    void Store(int r_i,string identifier,bool free);
+    void StoreGlobalVar(int r_i,string identifier,bool free);
+    void StoreLocalVar(int r_i,string identifier,bool free);
     void Store(int r1_i,int r2_i,Type type,bool free);
 
-    void CreateVar(string identifier);
-    void CreateVar(string identifier,int size);
+    void CreateGlobalVar(string identifier);
+    void CreateGlobalVar(string identifier,int size);
+    void CreateLocalVar(string identifier);
 
     int CreateString(string literal_string);
     string StringToIntlist(string liter_string);
     int NewStringNubmer();
 
-    int Address(string identifier);
+    int AddressGlobalVar(string identifier);
+    int AddressLocalVar(string identifier);
+
     int Dereference(int r_i,Type ptr_type);
 
     int Comma(int r1_i,int r2_i);
@@ -146,8 +153,11 @@ public:
     int ShiftLeft(int r1_i,int r2_i);
     int ShiftRight(int r1_i,int r2_i);
 
-    int Inc(string identifier,string pre_post);
-    int Dec(string identifier,string pre_post);
+    int IncGlobalVar(string identifier,string pre_post);
+    int IncLocalVar(string identifier,string pre_post);
+    
+    int DecGlobalVar(string identifier,string pre_post);
+    int DecLocalVar(string identifier,string pre_post);
 
     void FunctionHead(string identifier);
     void FunctionTail(string identifier);
@@ -157,16 +167,26 @@ public:
 
 
 //Tools
+    void Guarantee_Exist_GlobalVartable(string identifier,ASTNode* error_node);
+    void Guarantee_InExist_GlobalVartable(string identifier,ASTNode* error_node);
+    void Guarantee_Exist_LocalVartable(string identifier,ASTNode* error_node);
+    void Guarantee_InExist_LocalVartable(string identifier,ASTNode* error_node);
+
+    VariableTable& Local_Vartable();
+    Function& Now_Function();
+
     Type Type_To_PtrType(Type type);
     Type Type_To_ArrayType(Type type);
 
     int Address_ScaleFactor(Type type);
     int Dreference_ScaleFactor(Type ptr_type);
 
+    void Calculate_StackOffset(ASTNode* compound_node);
+
     ASTNode* FirstChild(ASTNode* root);
 
     void WhoAmI(string name);    
 
     void CodeGenerate_Error(string error_message);
-    void CodeGenerate_Error(string error_message,ASTNode* root);
+    void CodeGenerate_Error(string error_message,ASTNode* error_node);
 };

@@ -4,14 +4,14 @@
 	extern print_string
 
 section .data
-global	a
-	a:	dd	0
+global	d
+	d:	db	0
 
-global	b
-	b:	dd	0
+global	e
+	e:	dd	0
 
-global	c
-	c:	dd	0
+global	f
+	f:	dq	0
 
 
 section	.text
@@ -21,43 +21,40 @@ main:
 	mov	rbp, rsp
 	add	rsp, -16
 	mov	r8, 10
-	mov	dword [rbp+-4], r8d
-	mov	r8, 20
-	mov	dword [rbp+-4], r8d
-	mov	r8, 30
 	mov	byte [rbp+-4], r8b
-	xor	r8, r8
-	mov	r8d, dword [rbp+-4]
-	mov	rdi, r8
-	call	print_int
-	mov	r9, rax
-	xor	r8, r8
-	mov	r8d, dword [rbp+-4]
-	mov	rdi, r8
-	call	print_int
-	mov	r9, rax
+	mov	r8, 20
+	mov	dword [rbp+-8], r8d
+	mov	r8, 30
+	mov	qword [rbp+-16], r8
+	mov	r8, 40
+	mov	[d], r8b
+	mov	r8, 50
+	mov	[e], r8d
+	mov	r8, 60
+	mov	[f], r8
 	movzx	r8, byte [rbp+-4]
 	mov	rdi, r8
 	call	print_int
 	mov	r9, rax
-	mov	r8, 5
-	mov	[a], r8d
-	mov	r8, 15
-	mov	[b], r8d
-	mov	r8, 25
-	mov	[c], r8d
 	xor	r8, r8
-	mov	r8d, dword [a]
+	mov	r8d, dword [rbp+-8]
+	mov	rdi, r8
+	call	print_int
+	mov	r9, rax
+	mov	r8, [rbp+-16]
+	mov	rdi, r8
+	call	print_int
+	mov	r9, rax
+	movzx	r8, byte [d]
 	mov	rdi, r8
 	call	print_int
 	mov	r9, rax
 	xor	r8, r8
-	mov	r8d, dword [b]
+	mov	r8d, dword [e]
 	mov	rdi, r8
 	call	print_int
 	mov	r9, rax
-	xor	r8, r8
-	mov	r8d, dword [c]
+	mov	r8, [f]
 	mov	rdi, r8
 	call	print_int
 	mov	r9, rax
@@ -65,5 +62,7 @@ main:
 	mov	eax, r8d
 	jmp	L1
 L1:
-	add	rsp, 16	pop	rbp
+	add	rsp, 16
+	pop	rbp
 	ret
+

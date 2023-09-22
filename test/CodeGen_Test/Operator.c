@@ -1,17 +1,17 @@
-int a;
-int b;
-int c;
-int main() {
-  a= 42; b= 19;
-  print_int(a/b);
-  print_int(a%b);
-  print_int(a & b);
-  print_int(a | b);
-  print_int(a ^ b);
-  print_int(1 << 3);
-  print_int(63 >> 3);
-  return 0;
-}
+// int a;
+// int b;
+// int c;
+// int main() {
+//   a= 42; b= 19;
+//   print_int(a/b);
+//   print_int(a%b);
+//   print_int(a & b);
+//   print_int(a | b);
+//   print_int(a ^ b);
+//   print_int(1 << 3);
+//   print_int(63 >> 3);
+//   return 0;
+// }
 
 
 
@@ -55,23 +55,23 @@ int main() {
 //   return 0;
 // }
 
-// int a;
-// int main()
-// {
-//     a=0;
-//     print_int(a);
-//     print_int(a++);
+int a;
+int main()
+{
+    a=0;
+    print_int(a);
+    print_int(a++);
 
-//     print_int(a);
-//     print_int(a--);
+    print_int(a);
+    print_int(a--);
 
-//     print_int(a); 
-//     print_int(++a);
+    print_int(a); 
+    print_int(++a);
 
-//     print_int(a);
-//     print_int(--a);
+    print_int(a);
+    print_int(--a);
 
-//     print_int(a);
+    print_int(a);
 
-//     return 0;
-// }
+    return 0;
+}

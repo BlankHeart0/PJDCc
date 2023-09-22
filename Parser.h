@@ -25,11 +25,13 @@ public:
     ASTNode* Parse_Type();
     ASTNode* Parse_Function_Definition();
 
-    ASTNode* Parse_Variable_Definition();
-    ASTNode* Parse_Variable_Declaration();
+    ASTNode* Parse_GlobalVariable_Definition(); 
+    ASTNode* Parse_GlobalArray_Definition();
 
-    ASTNode* Parse_Array_Definition();
+    ASTNode* Parse_LocalVariable_Definition();   
+    ASTNode* Parse_LocalVariable_Declaration();
 
+   
 // Statement
     ASTNode* Parse_Statement(); 
     

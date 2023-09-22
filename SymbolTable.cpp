@@ -4,7 +4,16 @@ void VariableTable::Add(Type type,string identifier)
 {
     if(!Exist(identifier))
     {
-        table.insert(pair<string,Variable>(identifier,Variable(type,identifier)));
+        table.insert(pair<string,Variable>(identifier,Variable(type,identifier,S_MEMORY,0)));
+    }
+    else Error("add",identifier);
+}
+
+void VariableTable::Add(Type type,string identifier,int stack_offset)
+{
+    if(!Exist(identifier))
+    {
+        table.insert(pair<string,Variable>(identifier,Variable(type,identifier,S_STACK,stack_offset)));
     }
     else Error("add",identifier);
 }
@@ -15,7 +24,7 @@ bool VariableTable::Exist(string identifier)
     return true;
 }
 
-Variable VariableTable::Visit(string identifier)
+Variable& VariableTable::Visit(string identifier)
 {
     if(!Exist(identifier))Error("visit",identifier);
     return table[identifier];
@@ -44,7 +53,7 @@ bool FunctionTable::Exist(string identifier)
     return true;
 }
 
-Function FunctionTable::Visit(string identifier)
+Function& FunctionTable::Visit(string identifier)
 {
     if(!Exist(identifier))Error("visit",identifier);
     return table[identifier];

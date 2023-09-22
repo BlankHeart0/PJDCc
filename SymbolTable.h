@@ -13,6 +13,10 @@ enum Type
                 T_CHAR_ARRAY,   T_INT_ARRAY,    T_LONG_ARRAY
 };
 
+enum StorePositionType
+{
+    S_MEMORY,S_STACK
+};
 
 
 class Variable
@@ -20,9 +24,12 @@ class Variable
 public:
     Type type;
     string identifier;
-    
+    StorePositionType position;
+    int stack_offset;
+
     Variable(){}
-    Variable(Type T,string Identifier):type(T),identifier(Identifier){}
+    Variable(Type T,string Identifier,StorePositionType Position,int Stack_Offset):
+        type(T),identifier(Identifier),position(Position),stack_offset(Stack_Offset){}
 };
 
 class VariableTable
@@ -31,8 +38,9 @@ public:
     unordered_map<string,Variable>table;
 
     void Add(Type type,string identifier);
+    void Add(Type type,string identifier,int stack_offset);
     bool Exist(string identifier);
-    Variable Visit(string identifier);
+    Variable& Visit(string identifier);
 
     void Error(string error_message,string identifier);
 };
@@ -52,11 +60,15 @@ public:
     Type type;
     string identifier;
     vector<Parameter>parameter_list;
+    VariableTable local_vartable;
     int end_lable;
-    
+    int local_offset;
+    int stack_align_offset;
+
     Function(){}
     Function(Type T,string Identifier,vector<Parameter> Parameter_List,int End_Lable):
-        type(T),identifier(Identifier),parameter_list(Parameter_List),end_lable(End_Lable){}
+        type(T),identifier(Identifier),parameter_list(Parameter_List),end_lable(End_Lable),
+        local_offset(0),stack_align_offset(0){}
 };
 
 class FunctionTable
@@ -66,7 +78,7 @@ public:
 
     void Add(Type type,string identifier,vector<Parameter> parameter_list,int end_lable);
     bool Exist(string identifier);
-    Function Visit(string identifier);
+    Function& Visit(string identifier);
 
     void Error(string error_message,string identifier);
 };
