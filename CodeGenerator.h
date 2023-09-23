@@ -42,12 +42,13 @@ public:
 // Definition, Declaration    
     Type CodeGenerate_Type(ASTNode* root);
     void CodeGenerate_Function_Definition(ASTNode* root);
-
+    void CodeGenerate_Parameter_List(ASTNode* root);
+    
     void CodeGenerate_GlobalVariable_Definition(ASTNode* root);
     void CodeGenerate_GlobalArray_Definition(ASTNode* root);
 
     void CodeGenerate_LocalVariable_Definition(ASTNode* root);
-    string CodeGenerate_LocalVariable_Declaration(ASTNode* root);
+    string CodeGenerate_LocalVariable_Declaration(ASTNode* root,bool is_parameter);
     
 
 // Statement
@@ -110,7 +111,7 @@ public:
 
     void CreateGlobalVar(string identifier);
     void CreateGlobalVar(string identifier,int size);
-    void CreateLocalVar(string identifier);
+    int CreateLocalVar(Type type,string identifier,bool is_parameter);
 
     int CreateString(string literal_string);
     string StringToIntlist(string liter_string);
@@ -161,8 +162,11 @@ public:
 
     void FunctionHead(string identifier);
     void FunctionTail(string identifier);
-    int FunctionCall(int r_i,string identifier);
+    int FunctionCall(string identifier);
     void Return(int r_i,string identifier);
+    
+    void LoadParameter();
+    void StoreArgument(ASTNode* expression_node);
 
 
 

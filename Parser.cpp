@@ -56,12 +56,23 @@ ASTNode* Parser::Parse_Function_Definition()
     
     Add_Child(node,Parse_Type());
 
+    if(Match(SLASH))
+    {
+        Add_Child(node,new ASTNode(AST_SLASH,Previous_Token()));
+    }
+
     if(Match(ID))
     {
         Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
         if(Match(LEFT_PAREN))
         {
             Add_Child(node,new ASTNode(AST_LEFT_PAREN,Previous_Token()));
+            
+            if(Peek_Type())
+            {
+                Add_Child(node,Parse_Parameter_List());
+            }
+
             if(Match(RIGHT_PAREN))
             {
                 Add_Child(node,new ASTNode(AST_RIGHT_PAREN,Previous_Token()));
@@ -76,6 +87,22 @@ ASTNode* Parser::Parse_Function_Definition()
     return node;
 }
 
+ASTNode* Parser::Parse_Parameter_List()
+{
+    WhoAmI("Parse_Parameter_List");
+
+    ASTNode* node=new ASTNode(PARAMETER_LIST);
+
+    Add_Child(node,Parse_LocalVariable_Declaration());
+    
+    while(Match(COMMA))
+    {
+        Add_Child(node,new ASTNode(AST_COMMA,Previous_Token()));
+        Add_Child(node,Parse_LocalVariable_Declaration());
+    }
+    
+    return node;
+}
 
 
 ASTNode* Parser::Parse_GlobalVariable_Definition()
@@ -720,7 +747,9 @@ ASTNode* Parser::Parse_FunctionCall_Expression()
         if(Match(LEFT_PAREN))
         {
             Add_Child(node,new ASTNode(AST_LEFT_PAREN,Previous_Token()));
-            Add_Child(node,Parse_Expression());
+            
+            if(!Peek(RIGHT_PAREN))Add_Child(node,Parse_Expression());
+            
             if(Match(RIGHT_PAREN))Add_Child(node,new ASTNode(AST_RIGHT_PAREN,Previous_Token()));
             else Parse_Error("Right paren ) loss.");
         }

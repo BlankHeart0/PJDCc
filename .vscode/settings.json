@@ -13,6 +13,9 @@
         "*.tcc": "cpp",
         "random": "c",
         "string_view": "cpp",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "deque": "c",
+        "string": "c",
+        "unordered_map": "c"
     }
 }

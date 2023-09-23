@@ -19,7 +19,8 @@ public:
 class RegisterManager
 {
 public:
-    vector<Register>Register_Table;
+    vector<Register> General_Register_Table;
+    vector<vector<string>> Parameter_Register_Table;
 
     RegisterManager();
 
@@ -31,6 +32,9 @@ public:
 //Visit
     string Name(int register_i);
     string Name(int register_i,int byte);
-    
+
+    string Parameter_Register_Name(int register_i);
+    string Parameter_Register_Name(int register_i,int byte);
+
     void Register_Error(string error_message);
 };

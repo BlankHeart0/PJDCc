@@ -104,24 +104,53 @@ void CodeGenerator::CodeGenerate_Function_Definition(ASTNode* root)
     WhoAmI("CodeGenerate_Function_Definition");
 
     Type type=CodeGenerate_Type(FirstChild(root));
-    string identifier=root->Children[1]->lexeme;
+    string identifier;
+    int id_index=1;
+    if(root->Children[1]->type==AST_SLASH)
+    {
+        type=Type_To_PtrType(type);
+        id_index=2;
+    }
+    identifier=root->Children[id_index]->lexeme;
 
     if(!function_table.Exist(identifier))
     {   
         int end_lable=NewLable();
-        function_table.Add(type,identifier,vector<Parameter>(),end_lable);
-        
         NowInFunction=identifier;
+        function_table.Add(type,identifier,end_lable);
 
-        Calculate_StackOffset(root->Children[4]);
+        if(root->Children[id_index+2]->type==PARAMETER_LIST)
+        {
+            CodeGenerate_Parameter_List(root->Children[id_index+2]);
 
-        FunctionHead(NowInFunction);
-        
-        CodeGenerate_Compound_Statement(root->Children[4]);
-        
+            Calculate_StackOffset(root->Children[id_index+4]);
+            
+            FunctionHead(NowInFunction);
+            CodeGenerate_Compound_Statement(root->Children[id_index+4]);
+        }   
+        else
+        {
+            Calculate_StackOffset(root->Children[id_index+3]);
+
+            FunctionHead(NowInFunction);
+            CodeGenerate_Compound_Statement(root->Children[id_index+3]);
+            
+        }
+
         FunctionTail(NowInFunction);
+
     }
     else CodeGenerate_Error("The function "+identifier+" is redefined.",root->Children[1]);
+}
+
+void CodeGenerator::CodeGenerate_Parameter_List(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Parameter_List");
+
+    for(int i=0;i<root->Children.size();i+=2)
+    {
+        CodeGenerate_LocalVariable_Declaration(root->Children[i],true);
+    }
 }
 
 
@@ -174,7 +203,7 @@ void CodeGenerator::CodeGenerate_LocalVariable_Definition(ASTNode* root)
 {
     WhoAmI("CodeGenerate_LocalVariable_Definition");
 
-    string identifier=CodeGenerate_LocalVariable_Declaration(FirstChild(root));
+    string identifier=CodeGenerate_LocalVariable_Declaration(FirstChild(root),false);
     
     if(root->Children[1]->type==AST_ASSIGN)
     {
@@ -184,7 +213,7 @@ void CodeGenerator::CodeGenerate_LocalVariable_Definition(ASTNode* root)
 
 }
 
-string CodeGenerator::CodeGenerate_LocalVariable_Declaration(ASTNode* root)
+string CodeGenerator::CodeGenerate_LocalVariable_Declaration(ASTNode* root,bool is_parameter)
 {
     WhoAmI("CodeGenerate_LocalVariable_Declaration");
 
@@ -202,9 +231,10 @@ string CodeGenerator::CodeGenerate_LocalVariable_Declaration(ASTNode* root)
     else identifier=root->Children[1]->lexeme;
 
     Guarantee_InExist_LocalVartable(identifier,root->Children[1]);
-    Local_Vartable().Add(type,identifier);
-    CreateLocalVar(identifier);
-
+    
+    int stack_offset=CreateLocalVar(type,identifier,is_parameter);
+    Local_Vartable().Add(type,identifier,stack_offset);
+    
     return identifier;
 }
 
@@ -684,9 +714,20 @@ int CodeGenerator::CodeGenerate_FunctionCall_Expression(ASTNode* root)
     //if(!function_table.Exist(identifier))
         //CodeGenerate_Error("The function "+identifier+" is not defined.",FirstChild(root));
 
-    int expression_ri=CodeGenerate_Expression(root->Children[2]);
+    if(root->Children[2]->type==EXPRESSION)
+    {
+        ASTNode* expression_node=root->Children[2];
 
-    return FunctionCall(expression_ri,identifier);
+        // int arguments_size=(expression_node->Children.size()+1)/2;
+        // if(arguments_size!=function_table.Visit(identifier).parameter_list.size())
+        // {
+        //     CodeGenerate_Error("Function call arguments'amount is not match with the function definition.");
+        // }
+
+        StoreArgument(expression_node);
+    }
+
+    return FunctionCall(identifier);
 }
 
 
@@ -849,12 +890,12 @@ int CodeGenerator::CodeGenerate_IncDecPostfix_Expression(ASTNode* root)
         if(op==AST_INC)result_ri=IncLocalVar(identifier,"post");
         else if(op==AST_DEC)result_ri=DecLocalVar(identifier,"post");
     }
-    if(global_vartable.Exist(identifier))
+    else if(global_vartable.Exist(identifier))
     {
         if(op==AST_INC)result_ri=IncGlobalVar(identifier,"post");
         else if(op==AST_DEC)result_ri=DecGlobalVar(identifier,"post");
     }
-    else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
+    else CodeGenerate_Error("The variable "+identifier+" is not defined.hhh",FirstChild(root));
 
     return result_ri;
 }
@@ -927,7 +968,6 @@ int CodeGenerator::LoadLocalVar(string identifier)
 
 
 
-
 void CodeGenerator::StoreGlobalVar(int r_i,string identifier,bool free)
 {
     switch(global_vartable.Visit(identifier).type)
@@ -954,7 +994,7 @@ void CodeGenerator::StoreLocalVar(int r_i,string identifier,bool free)
     
     switch(local_variable_type)
     {
-         case T_CHAR:
+        case T_CHAR:
             OutFile<<"\tmov\tbyte [rbp+"<<local_variable_stack_offset<<"], "<<register_manager.Name(r_i,1)<<endl;break;
         case T_INT:
             OutFile<<"\tmov\tdword [rbp+"<<local_variable_stack_offset<<"], "<<register_manager.Name(r_i,4)<<endl;break;
@@ -1027,10 +1067,10 @@ void CodeGenerator::CreateGlobalVar(string identifier,int size)
     HeadData+="\n";
 }
 
-void CodeGenerator::CreateLocalVar(string identifier)
+int CodeGenerator::CreateLocalVar(Type type,string identifier,bool is_parameter)
 {   
     int new_var_stack_offset=0;
-    switch(Local_Vartable().Visit(identifier).type)
+    switch(type)
     {
         case T_CHAR:case T_INT:
             new_var_stack_offset=4;break;
@@ -1041,7 +1081,13 @@ void CodeGenerator::CreateLocalVar(string identifier)
 
     Now_Function().local_offset+=new_var_stack_offset; 
 
-    Local_Vartable().Visit(identifier).stack_offset=-Now_Function().local_offset;
+    if(is_parameter)
+    {
+        Now_Function().stack_align_offset+=new_var_stack_offset;
+        Now_Function().parameter_list.push_back(Parameter(type,identifier));
+    }
+
+    return -Now_Function().local_offset;
 }
 
 
@@ -1428,28 +1474,47 @@ void CodeGenerator::FunctionHead(string identifier)
     OutFile<<"\tpush\trbp"<<endl;
     OutFile<<"\tmov\trbp, rsp"<<endl;
     //very important
-    OutFile<<"\tadd\trsp, "<<-Now_Function().stack_align_offset<<endl;
+    if(Now_Function().stack_align_offset)OutFile<<"\tadd\trsp, "<<-Now_Function().stack_align_offset<<endl;
+    LoadParameter();
 }
 
 void CodeGenerator::FunctionTail(string identifier)
 {
     LablePrint(function_table.Visit(identifier).end_lable);
     //very important
-    OutFile<<"\tadd\trsp, "<<Now_Function().stack_align_offset<<endl;
+    if(Now_Function().stack_align_offset)OutFile<<"\tadd\trsp, "<<Now_Function().stack_align_offset<<endl;
 
     OutFile<<"\tpop\trbp"<<endl;
     OutFile<<"\tret"<<endl<<endl;
 }
 
-int CodeGenerator::FunctionCall(int r_i,string identifier)
+int CodeGenerator::FunctionCall(string identifier)
 {
+//temporary storage
+    vector<string>UsedRegister;
+    for(int i=0;i<register_manager.General_Register_Table.size();i++)
+    {
+        if(!register_manager.General_Register_Table[i].free)
+        {
+            UsedRegister.push_back(register_manager.Name(i));
+        }
+    }
+
+    for(int i=0;i<UsedRegister.size();i++)
+    {
+        OutFile<<"\tpush\t"<<UsedRegister[i]<<endl;
+    }
+
     int out_ri=register_manager.Alloc();
 
-    OutFile<<"\tmov\trdi, "<<register_manager.Name(r_i)<<endl;
     OutFile<<"\tcall\t"<<identifier<<endl;
     OutFile<<"\tmov\t"<<register_manager.Name(out_ri)<<", rax"<<endl;
 
-    register_manager.Free(r_i);
+//recover
+    for(int i=UsedRegister.size()-1;i>=0;i--)
+    {
+        OutFile<<"\tpop\t"<<UsedRegister[i]<<endl;
+    }
 
     return out_ri;
 }
@@ -1475,6 +1540,51 @@ void CodeGenerator::Return(int r_i,string identifier)
     if(function_table.Visit(identifier).type!=T_VOID)
         register_manager.Free(r_i);
 }
+
+
+
+void CodeGenerator::LoadParameter()
+{
+    for(int i=0;i<Now_Function().parameter_list.size();i++)
+    {
+        Type parameter_type=Now_Function().parameter_list[i].type;
+        string parameter_identifier=Now_Function().parameter_list[i].identifier;
+        int parameter_stack_offset=Local_Vartable().Visit(parameter_identifier).stack_offset;
+
+        switch(parameter_type)
+        {
+            case T_CHAR:
+                OutFile<<"\tmov\tbyte [rbp+"<<parameter_stack_offset<<"], "<<register_manager.Parameter_Register_Name(i,1)<<endl; 
+                break;
+            case T_INT:
+                OutFile<<"\tmov\tdword [rbp+"<<parameter_stack_offset<<"], "<<register_manager.Parameter_Register_Name(i,4)<<endl; 
+                break;
+            case T_LONG:
+            case T_CHAR_PTR: case T_INT_PTR: case T_LONG_PTR:
+                OutFile<<"\tmov\tqword [rbp+"<<parameter_stack_offset<<"], "<<register_manager.Parameter_Register_Name(i,8)<<endl; 
+                break;
+            default:
+                CodeGenerate_Error("Load "+parameter_identifier+" error.");
+        }
+
+    }
+}
+
+void CodeGenerator::StoreArgument(ASTNode* expression_node)
+{
+    int arguments_size=(expression_node->Children.size()+1)/2;
+    
+    for(int i=0,j=0;i<arguments_size;i++,j+=2)
+    {
+        int r_i=CodeGenerate_Assignment_Expression(expression_node->Children[j]);
+
+        OutFile<<"\tmov\t"<<register_manager.Parameter_Register_Name(i)<<", "
+               <<register_manager.Name(r_i)<<endl;
+        
+        register_manager.Free(r_i);
+    }
+}
+
 
 
 

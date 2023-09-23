@@ -52,6 +52,9 @@ class Parameter
 public:
     Type type;
     string identifier;
+    
+    Parameter(){}
+    Parameter(Type T,string Identifier):type(T),identifier(Identifier){}
 };
 
 class Function
@@ -66,8 +69,8 @@ public:
     int stack_align_offset;
 
     Function(){}
-    Function(Type T,string Identifier,vector<Parameter> Parameter_List,int End_Lable):
-        type(T),identifier(Identifier),parameter_list(Parameter_List),end_lable(End_Lable),
+    Function(Type T,string Identifier,int End_Lable):
+        type(T),identifier(Identifier),end_lable(End_Lable),
         local_offset(0),stack_align_offset(0){}
 };
 
@@ -76,7 +79,7 @@ class FunctionTable
 public:
     unordered_map<string,Function>table;
 
-    void Add(Type type,string identifier,vector<Parameter> parameter_list,int end_lable);
+    void Add(Type type,string identifier,int end_lable);
     bool Exist(string identifier);
     Function& Visit(string identifier);
 

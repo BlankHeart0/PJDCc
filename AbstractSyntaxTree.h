@@ -55,7 +55,8 @@ enum ASTNodeType
     // Definition, Declaration
     TYPE,
     FUNCTION_DEFINITION,
-    
+    PARAMETER_LIST,
+
     GLOBALVARIABLE_DEFINITION,
     GLOBALARRAY_DEFINITION,
 
@@ -159,6 +160,7 @@ static vector<string>ASTNodeType_text
     // Definition, Declaration
     "TYPE",
     "FUNCTION_DEFINITION",
+    "PARAMETER_LIST",
     
     "GLOBALVARIABLE_DEFINITION",
     "GLOBALARRAY_DEFINITION",

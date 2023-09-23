@@ -38,11 +38,11 @@ void VariableTable::Error(string error_message,string identifier)
 
 
 
-void FunctionTable::Add(Type type,string identifier,vector<Parameter> parameter_list,int end_lable)
+void FunctionTable::Add(Type type,string identifier,int end_lable)
 {
     if(!Exist(identifier))
     {
-        table.insert(pair<string,Function>(identifier,Function(type,identifier,parameter_list,end_lable)));
+        table.insert(pair<string,Function>(identifier,Function(type,identifier,end_lable)));
     }
     else Error("add",identifier);
 }

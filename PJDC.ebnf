@@ -6,7 +6,8 @@
 
 # Definition, Declaration
 <Type> ::= VOID | CHAR | INT | LONG
-<Function_Definition> ::= <Type> IDENTIFIER "(" ")" <Compound_Statement>
+<Function_Definition> ::= <Type>["*"] IDENTIFIER "(" [<Parameter_List>] ")" <Compound_Statement>
+<Parameter_List> ::= <LocalVariable_Declaration>{","<LocalVariable_Declaration>}
 
 <GlobalVariable_Definition> ::= <Type>["*"] IDENTIFIER";"
 <GlobalArray_Definition> ::= <Type>IDENTIFIER"["CONSTANT_INT"]" ";"
@@ -34,7 +35,6 @@
 <Expression_Statement> ::= [<Expression>]";"
 
 
-
 # Expression
 <Expression> ::= <Assignment_Expression>{","<Assignment_Expression>}
 <Assignment_Expression> ::= [(["*"]IDENTIFIER) | (IDENTIFIER"["<Expression>"]") "="]<LogicOr_Expression>
@@ -59,7 +59,7 @@
                         | <IncDecPrefix_Expression> | <IncDecPostfix_Expression> | "("<Expression>")" |  
                         | CONSTANT_INT | CONSTANT_CHAR | CONSTANT_STRING | IDENTIFIER  
 
-<FunctionCall_Expression> ::= IDENTIFIER"("<Expression>")"
+<FunctionCall_Expression> ::= IDENTIFIER"("[<Expression>]")"
 
 <Address_Expression> ::="&"IDENTIFIER [("+ "| "-") CONSTANT_INT]
 <Dreference_Expression> ::="*" ( IDENTIFIER | "(" IDENTIFIER [("+" | "-") CONSTANT_INT] ")" )

@@ -24,6 +24,7 @@ public:
 // Definition, Declaration
     ASTNode* Parse_Type();
     ASTNode* Parse_Function_Definition();
+    ASTNode* Parse_Parameter_List();
 
     ASTNode* Parse_GlobalVariable_Definition(); 
     ASTNode* Parse_GlobalArray_Definition();
