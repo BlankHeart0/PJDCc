@@ -3,13 +3,14 @@ char array[8];
 int main() {
 
 //1
-  print_string("Hello world\n");
+  printf("Hello world\n");
 
 
 //2 
-  s="Hello world\n";
-  print_string(s);
-
+  s="Hello world";
+  printf("%s\n",s);
+  int len=strlen(s);
+  printf("%d\n",len);
 
 //3  BUG
   array[0]='h';
@@ -19,9 +20,7 @@ int main() {
   array[4]='o';
   array[6]='\n';
 
-  print_char(array[3]);
-  print_char(*(array+3));
-  print_string(array);
+  printf("%s",array);
 
   return 0;
 }

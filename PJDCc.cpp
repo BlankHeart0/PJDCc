@@ -106,11 +106,14 @@ int main()
     //pjdcc.Compile("./test/CodeGen_Test/Array.c");
     //pjdcc.Compile("./test/CodeGen_Test/String.c");
     //pjdcc.Compile("./test/CodeGen_Test/Operator.c");
-    //pjdcc.Compile("./test/CodeGen_Test/Local.c");  
+    pjdcc.Compile("./test/CodeGen_Test/Local.c");  
 
-    pjdcc.Compile("./test/CodeGen_Test/Function.c");
+    //pjdcc.Compile("./test/CodeGen_Test/Function.c");
 //pjdcc.Compile("./test/CodeGen_Test/BubbleSort.c");
 //pjdcc.Compile("./test/CodeGen_Test/QuickSort.c");
+//pjdcc.Compile("./test/CodeGen_Test/MergeSort.c");
+
+
 
     return 0;
 }

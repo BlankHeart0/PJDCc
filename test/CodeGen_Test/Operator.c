@@ -55,23 +55,30 @@
 //   return 0;
 // }
 
-int a;
+// int a;
+// int main()
+// {
+//     a=0;
+//     print_int(a);
+//     print_int(a++);
+
+//     print_int(a);
+//     print_int(a--);
+
+//     print_int(a); 
+//     print_int(++a);
+
+//     print_int(a);
+//     print_int(--a);
+
+//     print_int(a);
+
+//     return 0;
+// }
+
 int main()
 {
-    a=0;
-    print_int(a);
-    print_int(a++);
-
-    print_int(a);
-    print_int(a--);
-
-    print_int(a); 
-    print_int(++a);
-
-    print_int(a);
-    print_int(--a);
-
-    print_int(a);
-
-    return 0;
+    int a=0;
+    int b=-1;
+    print_int(a>=b);
 }

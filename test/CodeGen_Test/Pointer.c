@@ -20,7 +20,7 @@ long  *a_ptr;
 long  *b_ptr;
 
 int main() {
-  a= 12; b=18; print_int(a);print_int(b);
+  a= -1; b=18; print_int(a);print_int(b);
   print_int(111111111);
 
   a_ptr= &a;      print_int(*a_ptr);

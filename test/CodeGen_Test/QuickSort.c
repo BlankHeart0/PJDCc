@@ -1,14 +1,27 @@
 
 int array[10];
 
+//{9,5,2,8,1,4,3,0,7,6}
+//{6,5,2,8,1,4,3,0,7,9}
+//{3,5,2,0,1,4,6,7,8,9}
+//{0,1,2,3,4,5,6,7,8,9}
+
+
 void Init()
 {
   array[0]=9;array[1]=5;array[2]=2;array[3]=8;array[4]=1;
   array[5]=4;array[6]=3;array[7]=0;array[8]=7;array[9]=6;
 }
 
-void Quick_Sort(int begin,int end)
+void Quick_Sort(long begin,long end)
 {
+  // print_int(begin);
+  // print_int(end);
+  // print_int(111);    
+
+
+  // if(++time==6)return;
+
     if(begin>=end)return;
 
     int left=begin;

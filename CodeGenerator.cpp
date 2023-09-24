@@ -24,10 +24,8 @@ void CodeGenerator::CodeGenerate(string path)
 
 void CodeGenerator::CodeGenerate_Head()
 {
-    OutFile<<"\textern print_int"<<endl;
-    OutFile<<"\textern print_long"<<endl;
-    OutFile<<"\textern print_char"<<endl;
-    OutFile<<"\textern print_string"<<endl<<endl;
+    OutFile<<"\textern printf"<<endl;
+    OutFile<<"\textern scanf"<<endl;
 }
 
 void CodeGenerator::CodeGenerate_Tail()
@@ -920,8 +918,9 @@ int CodeGenerator::LoadGlobalVar(string identifier)
             OutFile<<"\tmovzx\t"<<register_manager.Name(register_i,8)<<", byte ["<<identifier<<"]"<<endl;
             break;
         case T_INT:
-            OutFile<<"\txor\t"<<register_manager.Name(register_i,8)<<", "<<register_manager.Name(register_i,8)<<endl;
-            OutFile<<"\tmov\t"<<register_manager.Name(register_i,4)<<", dword ["<<identifier<<"]"<<endl;
+            OutFile<<"\tmovsxd\t"<<register_manager.Name(register_i,8)<<", dword ["<<identifier<<"]"<<endl;
+            //OutFile<<"\tmovsx\t"<<register_manager.Name(register_i,4)<<", dword ["<<identifier<<"]"<<endl;
+            //OutFile<<"\tmovsxd\t"<<register_manager.Name(register_i,8)<<", "<<register_manager.Name(register_i,4)<<endl;
             break;
         case T_LONG:
         case T_CHAR_PTR:    case T_INT_PTR:     case T_LONG_PTR:
@@ -951,8 +950,9 @@ int CodeGenerator::LoadLocalVar(string identifier)
             OutFile<<"\tmovzx\t"<<register_manager.Name(register_i,8)<<", byte [rbp+"<<local_variable_stack_offset<<"]"<<endl;
             break;
         case T_INT:
-            OutFile<<"\txor\t"<<register_manager.Name(register_i,8)<<", "<<register_manager.Name(register_i,8)<<endl;
-            OutFile<<"\tmov\t"<<register_manager.Name(register_i,4)<<", dword [rbp+"<<local_variable_stack_offset<<"]"<<endl;
+            //OutFile<<"\txor\t"<<register_manager.Name(register_i,8)<<", "<<register_manager.Name(register_i,8)<<endl;
+            //OutFile<<"\tmov\t"<<register_manager.Name(register_i,4)<<", dword [rbp+"<<local_variable_stack_offset<<"]"<<endl;
+            OutFile<<"\tmovsxd\t"<<register_manager.Name(register_i,8)<<", dword [rbp+"<<local_variable_stack_offset<<"]"<<endl;
             break;
         case T_LONG:
         case T_CHAR_PTR:    case T_INT_PTR:     case T_LONG_PTR:
@@ -1152,7 +1152,7 @@ int CodeGenerator::Dereference(int r_i,Type ptr_type)
             OutFile<<"\tmovzx\t"<<register_manager.Name(r_i)<<", byte ["<<register_manager.Name(r_i)<<"]"<<endl;
             break;
         case T_INT_PTR:case T_INT_ARRAY:
-            OutFile<<"\tmovzx\t"<<register_manager.Name(r_i)<<", word ["<<register_manager.Name(r_i)<<"]"<<endl;
+            OutFile<<"\tmovsx\t"<<register_manager.Name(r_i)<<", dword ["<<register_manager.Name(r_i)<<"]"<<endl;
             break;
         case T_LONG_PTR:case T_LONG_ARRAY:
             OutFile<<"\tmov\t"<<register_manager.Name(r_i)<<", ["<<register_manager.Name(r_i)<<"]"<<endl;
