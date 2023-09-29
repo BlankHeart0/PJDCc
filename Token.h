@@ -11,7 +11,8 @@ enum TokenType
     //Keyword
     VOID, CHAR, INT, LONG,
     IF, ELSE,
-    WHILE, DO,
+    WHILE, DO, FOR,
+    CONTINUE,BREAK,
     RETURN,
 
     //Separator
@@ -48,7 +49,8 @@ static vector<string>TokenType_text
     //Keyword
     "VOID", "CHAR", "INT", "LONG",
     "IF", "ELSE",
-    "WHILE", "DO",
+    "WHILE", "DO", "FOR",
+    "CONTINUE","BREAK",
     "RETURN",
 
     //Separator
@@ -84,7 +86,8 @@ static unordered_map<string,TokenType>Keyword_map
 {
     {"void",VOID},{"char",CHAR},{"int",INT},{"long",LONG},
     {"if",IF},{"else",ELSE},
-    {"while",WHILE},{"do",DO},
+    {"while",WHILE},{"do",DO},{"for",FOR},
+    {"continue",CONTINUE},{"break",BREAK},
     {"return",RETURN}
 };
 

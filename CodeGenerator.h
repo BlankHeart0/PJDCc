@@ -4,6 +4,7 @@
 
 #include "AbstractSyntaxTree.h"
 #include "Register.h"
+#include "Iteration.h"
 #include "SymbolTable.h"
 
 
@@ -13,6 +14,8 @@ public:
     AST ast;
 
     RegisterManager register_manager;
+    IterationManger iteration_manger;
+
     VariableTable global_vartable;
     FunctionTable function_table;
 
@@ -21,7 +24,7 @@ public:
     int LableNumber;
     int StringNumber;
     string NowInFunction;
-
+    
     string HeadData;
     string TailData;
 
@@ -61,6 +64,10 @@ public:
     void CodeGenerate_Iteration_Statement(ASTNode* root);
     void CodeGenerate_While_Statement(ASTNode* root);
     void CodeGenerate_DoWhile_Statement(ASTNode* root);
+    void CodeGenerate_For_Statement(ASTNode* root);
+
+    void CodeGenerate_Continue_Statement(ASTNode* root);
+    void CodeGenerate_Break_Statement(ASTNode* root);
 
     void CodeGenerate_Return_Statement(ASTNode* root);
     
@@ -115,7 +122,7 @@ public:
 
     int CreateString(string literal_string);
     string StringToIntlist(string liter_string);
-    int NewStringNubmer();
+    int NewString();
 
     int AddressGlobalVar(string identifier);
     int AddressLocalVar(string identifier);

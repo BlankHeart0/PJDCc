@@ -254,6 +254,10 @@ void CodeGenerator::CodeGenerate_Statement(ASTNode* root)
             CodeGenerate_If_Statement(FirstChild(root));break;
         case ITERATION_STATEMENT:
             CodeGenerate_Iteration_Statement(FirstChild(root));break;  
+        case CONTINUE_STATEMENT:
+            CodeGenerate_Continue_Statement(FirstChild(root));break;
+        case BREAK_STATEMENT:
+            CodeGenerate_Break_Statement(FirstChild(root));break;
         case RETURN_STATEMENT:
             CodeGenerate_Return_Statement(FirstChild(root));break;
         case EXPRESSION_STATEMENT:
@@ -314,6 +318,8 @@ void CodeGenerator::CodeGenerate_Iteration_Statement(ASTNode* root)
             CodeGenerate_While_Statement(FirstChild(root));break;
         case DOWHILE_STATEMENT:
             CodeGenerate_DoWhile_Statement(FirstChild(root));break;
+        case FOR_STATEMENT:
+            CodeGenerate_For_Statement(FirstChild(root));break;
     }
 }
 
@@ -321,34 +327,116 @@ void CodeGenerator::CodeGenerate_While_Statement(ASTNode* root)
 {
     WhoAmI("CodeGenerate_While_Statement");
 
-    int lable1=NewLable();
-    LablePrint(lable1);
+    int begin_lable=NewLable();
+    int end_lable=NewLable();
+
+    iteration_manger.Enter(I_WHILE,begin_lable,end_lable);
+
+    LablePrint(begin_lable);
 
     int expression_ri=CodeGenerate_Expression(root->Children[2]);
     CompareZero(expression_ri);
-
-    int lable2=NewLable();
-    Jump("je",lable2);
+    
+    Jump("je",end_lable);
 
     CodeGenerate_Statement(root->Children[4]);
-    Jump("jmp",lable1);
+    Jump("jmp",begin_lable);
 
-    LablePrint(lable2);
+    LablePrint(end_lable);
+
+    iteration_manger.Leave();
 }
 
 void CodeGenerator::CodeGenerate_DoWhile_Statement(ASTNode* root)
 {
     WhoAmI("CodeGenerate_DoWhile_Statement");
 
-    int lable=NewLable();
-    LablePrint(lable);
+    int begin_lable=NewLable();
+    int intermediate_lable=NewLable();
+    int end_lable=NewLable();
+
+    iteration_manger.Enter(I_DOWHILE,begin_lable,intermediate_lable,end_lable);
+
+    LablePrint(begin_lable);
 
     CodeGenerate_Statement(root->Children[1]);
+
+    LablePrint(intermediate_lable);
 
     int expression_ri=CodeGenerate_Expression(root->Children[4]);
     CompareZero(expression_ri);
 
-    Jump("jne",lable);
+    Jump("jne",begin_lable);
+
+    LablePrint(end_lable);
+
+    iteration_manger.Leave();
+}
+
+void CodeGenerator::CodeGenerate_For_Statement(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_For_Statement");
+
+    CodeGenerate_Expression_Statement(root->Children[2]);
+
+    int begin_lable=NewLable();
+    int intermediate_lable=NewLable();
+    int end_lable=NewLable();
+
+    iteration_manger.Enter(I_FOR,begin_lable,intermediate_lable,end_lable);
+
+    LablePrint(begin_lable);
+
+    if(root->Children[3]->Children[0]->type==EXPRESSION)
+    {
+        int expression_ri=CodeGenerate_Expression(root->Children[3]->Children[0]);
+        CompareZero(expression_ri);
+        Jump("je",end_lable);
+    }
+
+    if(root->Children[4]->type==EXPRESSION)
+    {
+        CodeGenerate_Statement(root->Children[6]);
+        
+        LablePrint(intermediate_lable);
+
+        int expression_ri=CodeGenerate_Expression(root->Children[4]);
+        register_manager.Free(expression_ri);
+    }
+    else 
+    {
+        CodeGenerate_Statement(root->Children[5]);
+
+        LablePrint(intermediate_lable);
+    }
+
+    Jump("jmp",begin_lable);
+
+    LablePrint(end_lable);
+
+    iteration_manger.Leave();
+}
+
+
+
+void CodeGenerator::CodeGenerate_Continue_Statement(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Continue_Statement");
+
+    switch(iteration_manger.NowInIteration().type)
+    {
+        case I_WHILE:    
+            Jump("jmp",iteration_manger.NowInIteration().begin_lable);break;
+        case I_DOWHILE:case I_FOR:
+            Jump("jmp",iteration_manger.NowInIteration().intermediate_lable);break;
+    }
+}
+
+void CodeGenerator::CodeGenerate_Break_Statement(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Break_Statement");
+
+    Jump("jmp",iteration_manger.NowInIteration().end_lable);
 }
 
 
@@ -1094,7 +1182,7 @@ int CodeGenerator::CreateLocalVar(Type type,string identifier,bool is_parameter)
 
 int CodeGenerator::CreateString(string literal_string)
 {
-    string string_name="Str"+to_string(NewStringNubmer());
+    string string_name="Str"+to_string(NewString());
 
     TailData+="\t"+string_name+" db "+StringToIntlist(literal_string)+",0\n";
     
@@ -1116,7 +1204,7 @@ string CodeGenerator::StringToIntlist(string liter_string)
     return int_list;
 }
 
-int CodeGenerator::NewStringNubmer()
+int CodeGenerator::NewString()
 {
     return ++StringNumber;
 }
@@ -1657,7 +1745,7 @@ Type CodeGenerator::Type_To_ArrayType(Type type)
     {
         case T_CHAR:array_type=T_CHAR_ARRAY;break;
         case T_INT: array_type=T_INT_ARRAY;break;
-        case T_LONG:array_type=T_LONG_PTR;break;
+        case T_LONG:array_type=T_LONG_ARRAY;break;
     }
 
     return array_type;

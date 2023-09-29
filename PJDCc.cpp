@@ -82,6 +82,8 @@ void PJDCc::Compile(string path)
     path.push_back('s');
     path.push_back('m');
 
+    path.insert(6,"_create");
+
     CG.CodeGenerate(path);
     
     
@@ -94,26 +96,24 @@ int main()
 {
     PJDCc pjdcc;
 
-    //pjdcc.Compile("./test/Frontend_Test.c");
-
-
     //CodeGen
 
-    //pjdcc.Compile("./test/CodeGen_Test/test.c");
+        //pjdcc.Compile("./test/test.c");
 
 
-    //pjdcc.Compile("./test/CodeGen_Test/Pointer.c");
-    //pjdcc.Compile("./test/CodeGen_Test/Array.c");
-    //pjdcc.Compile("./test/CodeGen_Test/String.c");
-    //pjdcc.Compile("./test/CodeGen_Test/Operator.c");
-    pjdcc.Compile("./test/CodeGen_Test/Local.c");  
+    //pjdcc.Compile("./test/Pointer.c");
+    //pjdcc.Compile("./test/Array.c");
+    //pjdcc.Compile("./test/String.c");
+    //pjdcc.Compile("./test/Operator.c");
+    //pjdcc.Compile("./test/Local.c");  
 
-    //pjdcc.Compile("./test/CodeGen_Test/Function.c");
-//pjdcc.Compile("./test/CodeGen_Test/BubbleSort.c");
-//pjdcc.Compile("./test/CodeGen_Test/QuickSort.c");
-//pjdcc.Compile("./test/CodeGen_Test/MergeSort.c");
+    //pjdcc.Compile("./test/Function.c");
+//pjdcc.Compile("./test/BubbleSort.c");
+//pjdcc.Compile("./test/QuickSort.c");
+pjdcc.Compile("./test/MergeSort.c");
 
 
+//pjdcc.Compile("./test/swap.c");
 
     return 0;
 }

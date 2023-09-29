@@ -8,25 +8,21 @@ void Init()
 
 void Bubble_Sort()
 {
-  int i=0;
-  int j=0;
+  int i;
+  int j;
   int temp;
 
-  while(i<10-1)
+  for(i=0;i<10-1;i++)
   {
-    j=0;
-    while(j<10-1-i)
+    for(j=0;j<10-1-i;j++)
     {
       if(array[j]>array[j+1])
       {
         temp=array[j];array[j]=array[j+1];array[j+1]=temp;
       }
-      j=j+1;
     }
-    i=i+1;
   }
 
-  return;
 }
 
 int main()
@@ -34,11 +30,10 @@ int main()
   Init();
   Bubble_Sort();
 
-  int i=0;
-  while(i<10)
+  int i;
+  for(i=0;i<10;i++)
   {
-    print_int(array[i]);
-    i=i+1;
+    printf("%d\n",array[i]);
   }
 
   return 0;

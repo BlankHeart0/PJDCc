@@ -1,17 +1,25 @@
-Type:
-Easy Type:
-    void char int long 
-Complex Type:
-    struct union enum
-    
-Constant:
-    int char string
+Todo:
+    switch-case
+    //break
+    //continue
+    //for
+    kiss
+    sizeof
+    : ?
 
-Pointer&Array:
-    All Type's 1 dimension Pointer and Array
+Optimizer
 
-Statement:
-    if else while do-while for break continue
 
-Function:
-    recursion
+
+
+detial:
+1.rdi rsi rdx...also need to be saved
+2.Left value *(xx+constanInt)
+//3.a=b=c=1;
+//4.int a=0,b=0;
+//5.LocalArray
+6.Initialize
+7.function check
+8.register spill
+9.make its usage is like GCC
+10.&arr[xxxx]

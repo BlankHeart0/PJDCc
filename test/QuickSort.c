@@ -1,5 +1,5 @@
 
-int array[10];
+long array[10];
 
 //{9,5,2,8,1,4,3,0,7,6}
 //{6,5,2,8,1,4,3,0,7,9}
@@ -15,20 +15,14 @@ void Init()
 
 void Quick_Sort(long begin,long end)
 {
-  // print_int(begin);
-  // print_int(end);
-  // print_int(111);    
-
-
-  // if(++time==6)return;
 
     if(begin>=end)return;
 
-    int left=begin;
-    int right=end;
+    long left=begin;
+    long right=end;
 
-    int key_i=begin;
-    int temp;
+    long key_i=begin;
+    long temp;
     
     while(begin<end)
     {
@@ -53,7 +47,7 @@ int main()
   int i=0;
   while(i<10)
   {
-    print_int(array[i]);
+    printf("%ld",array[i]);
     i=i+1;
   }
 

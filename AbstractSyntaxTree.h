@@ -15,7 +15,8 @@ enum ASTNodeType
     AST_VOID, AST_CHAR, AST_INT, AST_LONG,
     AST_PRINT,
     AST_IF, AST_ELSE,
-    AST_WHILE, AST_DO,
+    AST_WHILE, AST_DO, AST_FOR,
+    AST_CONTINUE, AST_BREAK,
     AST_RETURN,
 
     //Separator
@@ -75,6 +76,10 @@ enum ASTNodeType
     ITERATION_STATEMENT,
     WHILE_STATEMENT,
     DOWHILE_STATEMENT,
+    FOR_STATEMENT,
+
+    CONTINUE_STATEMENT,
+    BREAK_STATEMENT,
 
     RETURN_STATEMENT,
 
@@ -121,7 +126,8 @@ static vector<string>ASTNodeType_text
     "AST_VOID", "AST_CHAR", "AST_INT", "AST_LONG",
     "AST_PRINT",
     "AST_IF", "AST_ELSE",
-    "AST_WHILE", "AST_DO",
+    "AST_WHILE", "AST_DO", "AST_FOR",
+    "AST_CONTINUE", "AST_BREAK",
     "AST_RETURN",
 
     //Separator
@@ -180,6 +186,10 @@ static vector<string>ASTNodeType_text
     "ITERATION_STATEMENT",
     "WHILE_STATEMENT",
     "DOWHILE_STATEMENT",
+    "FOR_STATEMENT",
+
+    "CONTINUE_STATEMENT",
+    "BREAK_STATEMENT",
 
     "RETURN_STATEMENT",
 

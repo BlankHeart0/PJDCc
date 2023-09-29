@@ -20,15 +20,19 @@
 
 # Statement
 <Statement> ::= <Compound_Statement> | <LocalVariable_Definition> | <If_Statement> | <Iteration_Statement> | 
-              | <Return_Statement> | <Expression_Statement>
+              | <Continue_Statement> | <Break_Statement>| <Return_Statement> | <Expression_Statement> 
 
 <Compound_Statement> ::= "{"{<Statement>}"}"
 
 <If_Statement> ::= IF"("<Expression>")"<Statement>[ELSE<Statement>]
 
-<Iteration_Statement> ::= <While_Statement> | <DoWhile_Statement>
+<Iteration_Statement> ::= <While_Statement> | <DoWhile_Statement> | <For_Statement>
 <While_Statement> ::= WHILE"("<Expression>")"<Statement>
 <DoWhile_Statement> ::= DO<Statement>WHILE"("<Expression>")"";"
+<For_Statement> ::= FOR"("<Expression_Statement><Expression_Statement>[<Expression>]")"<Statement>
+
+<Continue_Statement> ::= CONTINUE";"
+<Break_Statement> ::= BREAK";"
 
 <Return_Statement> ::= RETURN [<Expression>] ";"
 

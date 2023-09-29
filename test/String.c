@@ -8,9 +8,9 @@ int main() {
 
 //2 
   s="Hello world";
-  printf("%s\n",s);
-  int len=strlen(s);
-  printf("%d\n",len);
+  printf("%s\nlen=%d",s,strlen(s));
+  //int len=strlen(s);
+ // printf("%d\n",len);
 
 //3  BUG
   array[0]='h';

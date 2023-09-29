@@ -43,7 +43,11 @@ public:
     ASTNode* Parse_Iteration_Statement();
     ASTNode* Parse_While_Statement();
     ASTNode* Parse_DoWhile_Statement();
+    ASTNode* Parse_For_Statement();
 
+    ASTNode* Parse_Continue_Statement();
+    ASTNode* Parse_Break_Statement();
+    
     ASTNode* Parse_Return_Statement();
 
     ASTNode* Parse_Expression_Statement();

@@ -206,10 +206,18 @@ ASTNode* Parser::Parse_Statement()
     ASTNode* node=new ASTNode(STATEMENT);
 
     if(Peek(LEFT_BRACE))Add_Child(node,Parse_Compound_Statement());
+    
     else if(Peek_Type())Add_Child(node,Parse_LocalVariable_Definition());
+    
     else if(Peek(IF))Add_Child(node,Parse_If_Statement());
-    else if(Peek(WHILE)||Peek(DO))Add_Child(node,Parse_Iteration_Statement());
+    
+    else if(Peek(WHILE)||Peek(DO)||Peek(FOR))Add_Child(node,Parse_Iteration_Statement());
+    
+    else if(Peek(CONTINUE))Add_Child(node,Parse_Continue_Statement());
+    else if(Peek(BREAK))Add_Child(node,Parse_Break_Statement());
+    
     else if(Peek(RETURN))Add_Child(node,Parse_Return_Statement());
+    
     else Add_Child(node,Parse_Expression_Statement());
 
     return node;
@@ -280,6 +288,7 @@ ASTNode* Parser::Parse_Iteration_Statement()
 
     if(Peek(WHILE))Add_Child(node,Parse_While_Statement());
     else if(Peek(DO))Add_Child(node,Parse_DoWhile_Statement());
+    else if(Peek(FOR))Add_Child(node,Parse_For_Statement());
     else Parse_Error("Wrong loop statement.");
 
     return node;
@@ -342,6 +351,72 @@ ASTNode* Parser::Parse_DoWhile_Statement()
         else Parse_Error("Keyword while loss.");
     }
     else Parse_Error("Keyword do loss.");
+
+    return node;
+}
+
+ASTNode* Parser::Parse_For_Statement()
+{
+    WhoAmI("Parse_For_Statement");
+
+    ASTNode* node=new ASTNode(FOR_STATEMENT);
+
+    if(Match(FOR))
+    {
+        Add_Child(node,new ASTNode(AST_FOR,Previous_Token()));
+        if(Match(LEFT_PAREN))
+        {
+            Add_Child(node,new ASTNode(AST_LEFT_PAREN,Previous_Token()));
+            Add_Child(node,Parse_Expression_Statement());
+            Add_Child(node,Parse_Expression_Statement());
+            if(!Peek(RIGHT_PAREN))
+            {
+                Add_Child(node,Parse_Expression());
+            }
+            if(Match(RIGHT_PAREN))
+            {
+                Add_Child(node,new ASTNode(AST_RIGHT_PAREN,Previous_Token()));
+                Add_Child(node,Parse_Statement());
+            }
+            else Parse_Error("Right paren ) loss.");
+        }
+        else Parse_Error("Left paren ( loss.");
+    }
+    else Parse_Error("Keyword for loss.");
+
+    return node;
+}
+
+
+
+ASTNode* Parser::Parse_Continue_Statement()
+{
+    WhoAmI("Parse_Continue_Statement");
+
+    ASTNode* node=new ASTNode(CONTINUE_STATEMENT);
+
+    if(Match(CONTINUE))
+    {
+        Add_Child(node,new ASTNode(AST_CONTINUE,Previous_Token()));
+        Match_Semicolon(node);
+    }
+    else Parse_Error("Keyword continue loss.");
+
+    return node;
+}
+
+ASTNode* Parser::Parse_Break_Statement()
+{
+    WhoAmI("Parse_Break_Statement");
+
+    ASTNode* node=new ASTNode(BREAK_STATEMENT);
+
+    if(Match(BREAK))
+    {
+        Add_Child(node,new ASTNode(AST_BREAK,Previous_Token()));
+        Match_Semicolon(node);
+    }
+    else Parse_Error("Keyword break loss.");
 
     return node;
 }

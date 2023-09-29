@@ -77,7 +77,7 @@ int main()
   int i=0;
   while(i<10)
   {
-    print_int(array[i]);
+    printf("%d\n",array[i]);
     i=i+1;
   }
 
