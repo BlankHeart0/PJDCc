@@ -875,16 +875,16 @@ ASTNode* Parser::Parse_Address_Expression()
         if(Match(ID))
         {
             Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
-            if(Match(PLUS)||Match(MINUS))
+
+            if(Match(LEFT_SQUARE))
             {
-                if(Previous_Token().type==PLUS)
-                    Add_Child(node,new ASTNode(AST_PLUS,Previous_Token()));
-                else if(Previous_Token().type==MINUS)
-                    Add_Child(node,new ASTNode(AST_MINUS,Previous_Token()));
-                
-                if(Match(CONSTANT_INT))
-                    Add_Child(node,new ASTNode(AST_CONSTANT_INT,Previous_Token()));
-                else Parse_Error("Int value loss.");
+                Add_Child(node,new ASTNode(AST_LEFT_SQUARE,Previous_Token()));
+                Add_Child(node,Parse_Expression());
+                if(Match(RIGHT_SQUARE))
+                {
+                    Add_Child(node,new ASTNode(AST_RIGHT_SQUARE,Previous_Token()));
+                }
+                else Parse_Error("Right square ] loss.");
             }
         }
         else Parse_Error("Identifier loss.");
@@ -907,29 +907,6 @@ ASTNode* Parser::Parse_Dreference_Expression()
         {
             Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
         }
-        else if(Match(LEFT_PAREN))
-        {
-            Add_Child(node,new ASTNode(AST_LEFT_PAREN,Previous_Token()));
-            if(Match(ID))
-            {
-                Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
-                if(Match(PLUS)||Match(MINUS))
-                {
-                    if(Previous_Token().type==PLUS)
-                        Add_Child(node,new ASTNode(AST_PLUS,Previous_Token()));
-                    else if(Previous_Token().type==MINUS)
-                        Add_Child(node,new ASTNode(AST_MINUS,Previous_Token()));
-                
-                    if(Match(CONSTANT_INT))
-                        Add_Child(node,new ASTNode(AST_CONSTANT_INT,Previous_Token()));
-                    else Parse_Error("Int value loss.");
-
-                    if(Match(RIGHT_PAREN))Add_Child(node,new ASTNode(AST_RIGHT_PAREN,Previous_Token()));
-                    else Parse_Error("Right paren ) loss.");
-                }
-            }
-            else Parse_Error("Identifier loss.");
-        }
         else Parse_Error("Identifier loss.");
     }
     else Parse_Error("Star * loss.");
@@ -950,7 +927,10 @@ ASTNode* Parser::Parse_Array_Expression()
         {
             Add_Child(node,new ASTNode(AST_LEFT_SQUARE,Previous_Token()));
             Add_Child(node,Parse_Expression());
-            if(Match(RIGHT_SQUARE))Add_Child(node,new ASTNode(AST_RIGHT_SQUARE,Previous_Token()));
+            if(Match(RIGHT_SQUARE))
+            {
+                Add_Child(node,new ASTNode(AST_RIGHT_SQUARE,Previous_Token()));
+            }
             else Parse_Error("Right square ] loss.");
         }
         else Parse_Error("Left square [ loss.");

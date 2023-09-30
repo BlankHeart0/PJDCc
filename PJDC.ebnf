@@ -67,8 +67,8 @@
 
 <FunctionCall_Expression> ::= IDENTIFIER"("[<Expression>]")"
 
-<Address_Expression> ::="&"IDENTIFIER [("+ "| "-") CONSTANT_INT]
-<Dreference_Expression> ::="*" ( IDENTIFIER | "(" IDENTIFIER [("+" | "-") CONSTANT_INT] ")" )
+<Address_Expression> ::="&"IDENTIFIER ["["<Expression>"]"] 
+<Dreference_Expression> ::="*"IDENTIFIER 
 <Array_Expression> ::= IDENTIFIER"[" <Expression> "]"
 
 <Sizeof_Expression> ::= SIZEOF "("( (<Type>["*"]) | IDENTIFIER )")"

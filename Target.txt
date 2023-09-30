@@ -1,25 +1,13 @@
-Todo:
-    //switch-case
-    //break
-    //continue
-    //for
-    //kiss
-    //sizeof
+
 : ?
 
 Optimizer
 
 
-
-
 detial:
 1.rdi rsi rdx...also need to be saved
-2.Left value *(xx+constanInt)
-//3.a=b=c=1;
-//4.int a=0,b=0;
-//5.LocalArray
+
 6.Initialize
-//7.functioncheck
+
 8.register spill
 9.make its usage is like GCC
-10.&arr[xxxx]

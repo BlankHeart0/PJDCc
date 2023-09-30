@@ -856,43 +856,24 @@ int CodeGenerator::CodeGenerate_Address_Expression(ASTNode* root)
 //Local
     if(Local_Vartable().Exist(identifier))
     {
-        //offset
-        if(root->Children.size()>2)
-        {
-            int offset=root->Children[3]->literal_int;
-    
-            int r1_i=AddressLocalVar(identifier);
-            int r2_i=Load(offset);
-
-            int scale_factor=Address_ScaleFactor(Local_Vartable().Visit(identifier).type);
-
-            if(root->Children[2]->type==AST_PLUS)return Add(r1_i,ShiftLeftConstant(r2_i,scale_factor));
-            else if(root->Children[2]->type==AST_MINUS)return Sub(r1_i,ShiftLeftConstant(r2_i,scale_factor));
-        }
-
-        //no offset
         return AddressLocalVar(identifier);
     }
 
 //Global
-    if(!global_vartable.Exist(identifier))
-        CodeGenerate_Error("The variable "+identifier+" is not defined.",root->Children[1]);
+    Guarantee_Exist_GlobalVartable(identifier,root->Children[1]);
     
-    //offset
-    if(root->Children.size()>2)
-    {
-        int offset=root->Children[3]->literal_int;
-    
+    //array
+    if(root->Children.size()>2&&root->Children[2]->type==AST_LEFT_SQUARE)
+    {    
         int r1_i=AddressGlobalVar(identifier);
-        int r2_i=Load(offset);
+        int r2_i=CodeGenerate_Expression(root->Children[3]);
 
         int scale_factor=Address_ScaleFactor(global_vartable.Visit(identifier).type);
 
-        if(root->Children[2]->type==AST_PLUS)return Add(r1_i,ShiftLeftConstant(r2_i,scale_factor));
-        else if(root->Children[2]->type==AST_MINUS)return Sub(r1_i,ShiftLeftConstant(r2_i,scale_factor));
+        return Add(r1_i,ShiftLeftConstant(r2_i,scale_factor));
     }
 
-    //no offset
+    //normal variable
     return AddressGlobalVar(identifier);
 }
 
@@ -900,43 +881,6 @@ int CodeGenerator::CodeGenerate_Dreference_Expression(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Dreference_Expression");
 
-//Local
-
-    if(root->Children.size()>2)
-    {
-        string identifier=root->Children[2]->lexeme;
-
-        bool isGlobal;
-        if(Local_Vartable().Exist(identifier))isGlobal=false;
-        else if(global_vartable.Exist(identifier))isGlobal=true;
-        else CodeGenerate_Error("The variable "+identifier+" is not defined.",root->Children[1]);
-
-        int offset=root->Children[4]->literal_int;
-
-        int r1_i;
-        if(isGlobal)r1_i=LoadGlobalVar(identifier);
-        else r1_i=LoadLocalVar(identifier);
-
-        int r2_i=Load(offset);
-
-        int scale_factor;
-        Type type;
-        if(isGlobal)
-        {
-            scale_factor=Dreference_ScaleFactor(global_vartable.Visit(identifier).type);
-            type=global_vartable.Visit(identifier).type;
-        }
-        else 
-        {
-            scale_factor=Dreference_ScaleFactor(Local_Vartable().Visit(identifier).type);
-            type=Local_Vartable().Visit(identifier).type;
-        }
-
-        if(root->Children[3]->type==AST_PLUS)return Dereference(Add(r1_i,ShiftLeftConstant(r2_i,scale_factor)),type);
-        else if(root->Children[3]->type==AST_MINUS)return Dereference(Sub(r1_i,ShiftLeftConstant(r2_i,scale_factor)),type);;
-    }
-
-    //no offset    
     string identifier=root->Children[1]->lexeme;
 //Local
     if(Local_Vartable().Exist(identifier))
@@ -954,14 +898,16 @@ int CodeGenerator::CodeGenerate_Array_Expression(ASTNode* root)
     WhoAmI("CodeGenerate_Array_Expression");
 
     string identifier=FirstChild(root)->lexeme;
-    if(!global_vartable.Exist(identifier))
-        CodeGenerate_Error("The variable "+identifier+" is not defined.",root->Children[1]);
 
-    int offset_ri=CodeGenerate_Expression(root->Children[2]);
+    Guarantee_Exist_GlobalVartable(identifier,FirstChild(root));
+
+    int r1_i=AddressGlobalVar(identifier);
+    int r2_i=CodeGenerate_Expression(root->Children[2]);
+
     Type type=global_vartable.Visit(identifier).type;
-
     int scale_factor=Dreference_ScaleFactor(type);
-    return Dereference(Add(AddressGlobalVar(identifier),ShiftLeftConstant(offset_ri,scale_factor)),type);
+
+    return Dereference(Add(r1_i,ShiftLeftConstant(r2_i,scale_factor)),type);
 }
 
 
@@ -1097,8 +1043,6 @@ int CodeGenerator::LoadGlobalVar(string identifier)
             break;
         case T_INT:
             OutFile<<"\tmovsxd\t"<<register_manager.Name(register_i,8)<<", dword ["<<identifier<<"]"<<endl;
-            //OutFile<<"\tmovsx\t"<<register_manager.Name(register_i,4)<<", dword ["<<identifier<<"]"<<endl;
-            //OutFile<<"\tmovsxd\t"<<register_manager.Name(register_i,8)<<", "<<register_manager.Name(register_i,4)<<endl;
             break;
         case T_LONG:
         case T_CHAR_PTR:    case T_INT_PTR:     case T_LONG_PTR:
@@ -1847,9 +1791,9 @@ int CodeGenerator::Address_ScaleFactor(Type type)
 
     switch(type)
     {
-        case T_CHAR:factor=0;break;
-        case T_INT: factor=2;break;
-        case T_LONG: factor=3;break;
+        case T_CHAR:    case T_CHAR_ARRAY:  factor=0;break;
+        case T_INT:     case T_INT_ARRAY:   factor=2;break;
+        case T_LONG:    case T_LONG_ARRAY:  factor=3;break;
     }
 
     return factor;
