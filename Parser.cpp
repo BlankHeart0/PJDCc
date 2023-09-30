@@ -142,6 +142,20 @@ ASTNode* Parser::Parse_GlobalVariable_Definition()
     if(Match(ID))Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
     else Parse_Error("Variable identifier loss.");
 
+    if(Match(ASSIGN))
+    {
+        Add_Child(node,new ASTNode(AST_ASSIGN,Previous_Token()));
+        if(Match(CONSTANT_INT))
+        {
+            Add_Child(node,new ASTNode(AST_CONSTANT_INT,Previous_Token()));
+        }
+        else if(Match(CONSTANT_CHAR))
+        {
+            Add_Child(node,new ASTNode(AST_CONSTANT_CHAR,Previous_Token()));
+        }
+        else Parse_Error("Initialization value loss.");
+    }
+
     Match_Semicolon(node);
 
     return node;
@@ -167,6 +181,13 @@ ASTNode* Parser::Parse_GlobalArray_Definition()
                 if(Match(RIGHT_SQUARE))
                 {
                     Add_Child(node,new ASTNode(AST_RIGHT_SQUARE,Previous_Token()));
+                    
+                    if(Match(ASSIGN))
+                    {
+                        Add_Child(node,new ASTNode(AST_ASSIGN,Previous_Token()));
+                        Add_Child(node,Parse_Initialize_List());
+                    }
+                    
                     Match_Semicolon(node);
                 }
                 else Parse_Error("Right square ] loss.");
@@ -176,6 +197,52 @@ ASTNode* Parser::Parse_GlobalArray_Definition()
         else Parse_Error("Left square [ loss.");
     }
     else Parse_Error("Array identifier loss.");
+
+    return node;
+}
+
+ASTNode* Parser::Parse_Initialize_List()
+{
+    WhoAmI("Parse_Initialize_List");
+
+    ASTNode* node=new ASTNode(INITIALIZE_LIST);
+
+    if(Match(LEFT_BRACE))
+    {
+        Add_Child(node,new ASTNode(AST_LEFT_BARCE,Previous_Token()));
+
+        if(Match(CONSTANT_INT))
+        {
+            Add_Child(node,new ASTNode(AST_CONSTANT_INT,Previous_Token()));
+        }
+        else if(Match(CONSTANT_CHAR))
+        {
+            Add_Child(node,new ASTNode(AST_CONSTANT_CHAR,Previous_Token()));
+        }
+        else Parse_Error("Initialization value loss.");
+
+        while(Match(COMMA))
+        {
+            Add_Child(node,new ASTNode(AST_COMMA,Previous_Token()));
+            if(Match(CONSTANT_INT))
+            {
+                Add_Child(node,new ASTNode(AST_CONSTANT_INT,Previous_Token()));
+            }
+            else if(Match(CONSTANT_CHAR))
+            {
+                Add_Child(node,new ASTNode(AST_CONSTANT_CHAR,Previous_Token()));
+            }
+            else Parse_Error("Initialization value loss.");
+        }
+
+        if(Match(RIGHT_BRACE))
+        {
+            Add_Child(node,new ASTNode(AST_RIGHT_BRACE,Previous_Token()));
+        }
+        else Parse_Error("Right barce { loss.");
+
+    }
+    else Parse_Error("Left barce { loss.");
 
     return node;
 }

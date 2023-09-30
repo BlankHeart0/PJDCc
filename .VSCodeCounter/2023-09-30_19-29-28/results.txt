@@ -1,0 +1,66 @@
+Date : 2023-09-30 19:29:28
+Directory : /home/blankheart0/PJDCc
+Total : 34 files,  3675 codes, 248 comments, 1367 blanks, all 5290 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C++      |         16 |      3,284 |        122 |      1,198 |      4,604 |
+| C        |         12 |        302 |        122 |        113 |        537 |
+| BNF      |          1 |         44 |          4 |         29 |         77 |
+| Makefile |          1 |         16 |          0 |         13 |         29 |
+| nasm     |          1 |         15 |          0 |          5 |         20 |
+| TXT      |          2 |         13 |          0 |          8 |         21 |
+| Markdown |          1 |          1 |          0 |          1 |          2 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                           | files      | code       | comment    | blank      | total      |
++------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                              |         34 |      3,675 |        248 |      1,367 |      5,290 |
+| . (Files)                                      |         22 |      3,373 |        126 |      1,254 |      4,753 |
+| test                                           |         12 |        302 |        122 |        113 |        537 |
++------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                       | language | code       | comment    | blank      | total      |
++------------------------------------------------+----------+------------+------------+------------+------------+
+| /home/blankheart0/PJDCc/AbstractSyntaxTree.cpp | C++      |         21 |          0 |          9 |         30 |
+| /home/blankheart0/PJDCc/AbstractSyntaxTree.h   | C++      |        167 |         22 |         94 |        283 |
+| /home/blankheart0/PJDCc/CodeGenerator.cpp      | C++      |      1,372 |         37 |        462 |      1,871 |
+| /home/blankheart0/PJDCc/CodeGenerator.h        | C++      |        132 |          7 |         68 |        207 |
+| /home/blankheart0/PJDCc/Iteration.cpp          | C++      |         30 |          0 |         11 |         41 |
+| /home/blankheart0/PJDCc/Iteration.h            | C++      |         28 |          0 |         12 |         40 |
+| /home/blankheart0/PJDCc/Makefile               | Makefile |         16 |          0 |         13 |         29 |
+| /home/blankheart0/PJDCc/Note.txt               | TXT      |          6 |          0 |          1 |          7 |
+| /home/blankheart0/PJDCc/PJDC.ebnf              | BNF      |         44 |          4 |         29 |         77 |
+| /home/blankheart0/PJDCc/PJDCc.cpp              | C++      |         66 |         20 |         33 |        119 |
+| /home/blankheart0/PJDCc/Parser.cpp             | C++      |        809 |          5 |        290 |      1,104 |
+| /home/blankheart0/PJDCc/Parser.h               | C++      |         64 |          5 |         38 |        107 |
+| /home/blankheart0/PJDCc/Printf.asm             | nasm     |         15 |          0 |          5 |         20 |
+| /home/blankheart0/PJDCc/README.md              | Markdown |          1 |          0 |          1 |          2 |
+| /home/blankheart0/PJDCc/Register.cpp           | C++      |        103 |          2 |         28 |        133 |
+| /home/blankheart0/PJDCc/Register.h             | C++      |         26 |          2 |         12 |         40 |
+| /home/blankheart0/PJDCc/Scanner.cpp            | C++      |        182 |         11 |         54 |        247 |
+| /home/blankheart0/PJDCc/Scanner.h              | C++      |         30 |          1 |         17 |         48 |
+| /home/blankheart0/PJDCc/SymbolTable.cpp        | C++      |         81 |          0 |         19 |        100 |
+| /home/blankheart0/PJDCc/SymbolTable.h          | C++      |         79 |          0 |         23 |        102 |
+| /home/blankheart0/PJDCc/Target.txt             | TXT      |          7 |          0 |          7 |         14 |
+| /home/blankheart0/PJDCc/Token.h                | C++      |         94 |         10 |         28 |        132 |
+| /home/blankheart0/PJDCc/test/Array.c           | C        |         39 |          0 |          3 |         42 |
+| /home/blankheart0/PJDCc/test/BubbleSort.c      | C        |         34 |          0 |          6 |         40 |
+| /home/blankheart0/PJDCc/test/Function.c        | C        |         20 |         14 |         10 |         44 |
+| /home/blankheart0/PJDCc/test/Local.c           | C        |         18 |         25 |         14 |         57 |
+| /home/blankheart0/PJDCc/test/MergeSort.c       | C        |         66 |          4 |         15 |         85 |
+| /home/blankheart0/PJDCc/test/Operator.c        | C        |          6 |         59 |         19 |         84 |
+| /home/blankheart0/PJDCc/test/Pointer.c         | C        |         10 |         11 |          6 |         27 |
+| /home/blankheart0/PJDCc/test/QuickSort.c       | C        |         36 |          4 |         15 |         55 |
+| /home/blankheart0/PJDCc/test/Sizeof.c          | C        |         28 |          0 |         10 |         38 |
+| /home/blankheart0/PJDCc/test/String.c          | C        |         15 |          5 |          6 |         26 |
+| /home/blankheart0/PJDCc/test/swap.c            | C        |         22 |          0 |          7 |         29 |
+| /home/blankheart0/PJDCc/test/test.c            | C        |          8 |          0 |          2 |         10 |
+| Total                                          |          |      3,675 |        248 |      1,367 |      5,290 |
++------------------------------------------------+----------+------------+------------+------------+------------+

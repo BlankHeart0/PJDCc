@@ -1,13 +1,6 @@
-
-int array[10];
+int array[10]={9,5,2,8,1,4,3,0,7,6};
 int temp[10];
 
-void Init()
-{
-  array[0]=9;array[1]=5;array[2]=2;array[3]=8;array[4]=1;
-  array[5]=4;array[6]=3;array[7]=0;array[8]=7;array[9]=6;
-}
-    
 void MergeSort(int left, int right)
 {
     //分解：
@@ -68,11 +61,8 @@ void MergeSort(int left, int right)
 
 }
 
-
-
 int main()
 {
-  Init();
   MergeSort(0,9);
   int i=0;
   while(i<10)

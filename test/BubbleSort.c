@@ -1,9 +1,10 @@
-int array[10];
+int array[10]={9,5,2,8,1,4,3,0,7,6};
 
-void Init()
+void swap(int*a,int* b)
 {
-  array[0]=9;array[1]=5;array[2]=2;array[3]=8;array[4]=1;
-  array[5]=4;array[6]=3;array[7]=0;array[8]=7;array[9]=6;
+  int temp=*a;
+  *a=*b;
+  *b=temp;
 }
 
 void Bubble_Sort()
@@ -16,18 +17,14 @@ void Bubble_Sort()
   {
     for(j=0;j<10-1-i;j++)
     {
-      if(array[j]>array[j+1])
-      {
-        temp=array[j];array[j]=array[j+1];array[j+1]=temp;
-      }
+      if(array[j]>array[j+1])swap(&array[j],&array[j+1]);
     }
   }
 
 }
-int i;
+
 int main()
 {
-  Init();
   Bubble_Sort();
 
   int i;

@@ -11,8 +11,9 @@
 <Function_Definition> ::= <Type>["*"] IDENTIFIER "(" [<Parameter_List>] ")" <Compound_Statement>
 <Parameter_List> ::= <LocalVariable_Declaration>{","<LocalVariable_Declaration>}
 
-<GlobalVariable_Definition> ::= <Type>["*"] IDENTIFIER";"
-<GlobalArray_Definition> ::= <Type>IDENTIFIER"["CONSTANT_INT"]" ";"
+<GlobalVariable_Definition> ::= <Type>["*"] IDENTIFIER ["="(CONSTANT_INT | CONSTANT_CHAR)] ";"
+<GlobalArray_Definition> ::= <Type>IDENTIFIER"["CONSTANT_INT"]" ["="<Initialize_List>] ";"
+<Initialize_List> ::= "{" (CONSTANT_INT|CONSTANT_CHAR){","(CONSTANT_INT|CONSTANT_CHAR)} "}"
 
 <LocalVariable_Definition> ::= <LocalVariable_Declaration>["="<Expression>]";"
 <LocalVariable_Declaration> ::= <Type>["*"] IDENTIFIER

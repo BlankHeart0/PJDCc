@@ -183,18 +183,34 @@ void CodeGenerator::CodeGenerate_GlobalVariable_Definition(ASTNode* root)
     if(type==T_VOID)CodeGenerate_Error("Illegal variable type",root->Children[1]);
     
     string identifier;
+    int id_index=1;
     //type cast
     if(root->Children[1]->type==AST_STAR)
     {
         type=Type_To_PtrType(type);
-        identifier=root->Children[2]->lexeme;
+        id_index=2;
     }
-    else identifier=root->Children[1]->lexeme;
+    identifier=root->Children[id_index]->lexeme;
 
-    Guarantee_InExist_GlobalVartable(identifier,root->Children[1]);
+    Guarantee_InExist_GlobalVartable(identifier,root->Children[id_index]);
     global_vartable.Add(type,identifier);
     
-    CreateGlobalVar(identifier);
+    int initialization_value=0;
+
+    if(root->Children[id_index+1]->type==AST_ASSIGN)
+    {
+        ASTNode* constant_node=root->Children[id_index+2];
+        if(constant_node->type==AST_CONSTANT_INT)
+        {
+            initialization_value=constant_node->literal_int;
+        }
+        else if(constant_node->type==AST_CONSTANT_CHAR)
+        {
+            initialization_value=constant_node->literal_char;
+        }
+    }
+
+    CreateGlobalVar(identifier,initialization_value);
 }
 
 void CodeGenerator::CodeGenerate_GlobalArray_Definition(ASTNode* root)
@@ -215,8 +231,37 @@ void CodeGenerator::CodeGenerate_GlobalArray_Definition(ASTNode* root)
 
     global_vartable.Add(type,identifier,elem_n);
 
-    CreateGlobalVar(identifier);
+    vector<int>initializer_list;
+
+    if(root->Children[5]->type==AST_ASSIGN)
+    {
+        initializer_list=CodeGenerate_Initialize_List(root->Children[6]);
+    }
+
+    CreateGlobalArray(identifier,initializer_list);
 }
+
+vector<int> CodeGenerator::CodeGenerate_Initialize_List(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Initialize_List");
+
+    vector<int>initialize_list;
+
+    for(int i=1;i<root->Children.size();i+=2)
+    {
+        if(root->Children[i]->type==AST_CONSTANT_INT)
+        {
+            initialize_list.push_back(root->Children[i]->literal_int);
+        }
+        else if(root->Children[i]->type==AST_CONSTANT_CHAR)
+        {
+            initialize_list.push_back(root->Children[i]->literal_char);
+        }
+    }
+
+    return initialize_list;
+}
+
 
 
 
@@ -1150,30 +1195,34 @@ void CodeGenerator::Store(int r1_i,int r2_i,Type type,bool free)
 
 
 
-void CodeGenerator::CreateGlobalVar(string identifier)
+void CodeGenerator::CreateGlobalVar(string identifier,int initialization_value)
 {
+    OutFile<<"global\t"<<identifier<<endl;
+        
+    switch(global_vartable.Visit(identifier).type)
+    {        
+        case T_CHAR:
+            OutFile<<"\t"<<identifier<<":\tdb\t"<<initialization_value<<endl;break;
+        case T_INT:
+            OutFile<<"\t"<<identifier<<":\tdd\t"<<initialization_value<<endl;break;
+        case T_LONG: 
+        case T_CHAR_PTR: case T_INT_PTR: case T_LONG_PTR:
+            OutFile<<"\t"<<identifier<<":\tdq\t"<<initialization_value<<endl;break;
+    }
+
+    OutFile<<endl;
+}
+
+void CodeGenerator::CreateGlobalArray(string identifier,vector<int> initialize_list)
+{    
     OutFile<<"global\t"<<identifier<<endl;
 
     int elem_n=global_vartable.Visit(identifier).elem_n;
+    Type type=global_vartable.Visit(identifier).type;
 
-//normal global variable
-    if(elem_n==1)
+    if(initialize_list.size()==0)
     {
-        switch(global_vartable.Visit(identifier).type)
-        {        
-            case T_CHAR:
-                OutFile<<"\t"<<identifier<<":\tdb\t0"<<endl;break;
-            case T_INT:
-                OutFile<<"\t"<<identifier<<":\tdd\t0"<<endl;break;
-            case T_LONG: 
-            case T_CHAR_PTR: case T_INT_PTR: case T_LONG_PTR:
-                OutFile<<"\t"<<identifier<<":\tdq\t0"<<endl;break;
-        }
-    }
-//global array
-    else if(elem_n>1)
-    {
-        switch(global_vartable.Visit(identifier).type)
+        switch(type)
         {        
             case T_CHAR_ARRAY:
                 OutFile<<"\t"<<identifier<<":\ttimes "<<elem_n<<" db\t0"<<endl;break;
@@ -1182,6 +1231,31 @@ void CodeGenerator::CreateGlobalVar(string identifier)
             case T_LONG_ARRAY:
                 OutFile<<"\t"<<identifier<<":\ttimes "<<elem_n<<" dq\t0"<<endl;break;
         }
+    }
+    else
+    {
+        switch(type)
+        {        
+            case T_CHAR_ARRAY:
+                OutFile<<"\t"<<identifier<<":\tdb\t";break;
+            case T_INT_ARRAY:
+                OutFile<<"\t"<<identifier<<":\tdd\t";break;
+            case T_LONG_ARRAY:
+                OutFile<<"\t"<<identifier<<":\tdq\t";break;
+        }
+
+        for(int i=0;i<initialize_list.size();i++)
+        {
+            if(i>0)OutFile<<",";
+            OutFile<<initialize_list[i];
+        }
+
+        for(int i=0;i<elem_n-initialize_list.size();i++)
+        {
+            OutFile<<",0";
+        }
+        
+        OutFile<<endl;
     }
 
     OutFile<<endl;

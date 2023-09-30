@@ -98,10 +98,10 @@ int main()
 
     //CodeGen
 
-        //pjdcc.Compile("./test/test.c");
+    //pjdcc.Compile("./test/test.c");
 
 
-    pjdcc.Compile("./test/Pointer.c");
+    //pjdcc.Compile("./test/Pointer.c");
     //pjdcc.Compile("./test/Array.c");
     //pjdcc.Compile("./test/String.c");
     //pjdcc.Compile("./test/Operator.c");
@@ -110,7 +110,7 @@ int main()
     //pjdcc.Compile("./test/Function.c");
 //pjdcc.Compile("./test/BubbleSort.c");
 //pjdcc.Compile("./test/QuickSort.c");
-//pjdcc.Compile("./test/MergeSort.c");
+pjdcc.Compile("./test/MergeSort.c");
 
 
 //pjdcc.Compile("./test/swap.c");

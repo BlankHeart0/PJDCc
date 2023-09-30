@@ -52,6 +52,7 @@ public:
     
     void CodeGenerate_GlobalVariable_Definition(ASTNode* root);
     void CodeGenerate_GlobalArray_Definition(ASTNode* root);
+    vector<int> CodeGenerate_Initialize_List(ASTNode* root);
 
     void CodeGenerate_LocalVariable_Definition(ASTNode* root);
     string CodeGenerate_LocalVariable_Declaration(ASTNode* root,bool is_parameter);
@@ -121,7 +122,8 @@ public:
     void StoreLocalVar(int r_i,string identifier,bool free);
     void Store(int r1_i,int r2_i,Type type,bool free);
 
-    void CreateGlobalVar(string identifier);
+    void CreateGlobalVar(string identifier,int initialization_value);
+    void CreateGlobalArray(string identifier,vector<int> initialize_list);
     int CreateLocalVar(Type type,string identifier,bool is_parameter);
 
     int CreateString(string literal_string);

@@ -30,6 +30,7 @@ public:
 
     ASTNode* Parse_GlobalVariable_Definition(); 
     ASTNode* Parse_GlobalArray_Definition();
+    ASTNode* Parse_Initialize_List();
 
     ASTNode* Parse_LocalVariable_Definition();   
     ASTNode* Parse_LocalVariable_Declaration();
