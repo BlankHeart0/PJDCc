@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 using namespace std;
@@ -26,10 +27,11 @@ public:
     string identifier;
     StorePositionType position;
     int stack_offset;
+    int elem_n;
 
     Variable(){}
-    Variable(Type T,string Identifier,StorePositionType Position,int Stack_Offset):
-        type(T),identifier(Identifier),position(Position),stack_offset(Stack_Offset){}
+    Variable(Type T,string Identifier,StorePositionType Position,int Elem_N,int Stack_Offset):
+        type(T),identifier(Identifier),position(Position),elem_n(Elem_N),stack_offset(Stack_Offset){}
 };
 
 class VariableTable
@@ -38,7 +40,9 @@ public:
     unordered_map<string,Variable>table;
 
     void Add(Type type,string identifier);
-    void Add(Type type,string identifier,int stack_offset);
+    void Add(Type type,string identifier,int elem_n);
+    void Add(Type type,string identifier,int elem_n,int stack_offset);
+    
     bool Exist(string identifier);
     Variable& Visit(string identifier);
 
@@ -82,6 +86,17 @@ public:
     void Add(Type type,string identifier,int end_lable);
     bool Exist(string identifier);
     Function& Visit(string identifier);
+
+    void Error(string error_message,string identifier);
+};
+
+class KissFunctionTable
+{
+public:
+    unordered_set<string>table;
+
+    void Add(string identifier);
+    bool Exist(string identifier);
 
     void Error(string error_message,string identifier);
 };

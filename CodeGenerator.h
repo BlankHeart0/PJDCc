@@ -18,6 +18,7 @@ public:
 
     VariableTable global_vartable;
     FunctionTable function_table;
+    KissFunctionTable kissfunction_table;
 
     ofstream OutFile;
 
@@ -25,12 +26,12 @@ public:
     int StringNumber;
     string NowInFunction;
     
-    string HeadData;
+    //string HeadData;
     string TailData;
 
     bool DEBUG;
 
-    CodeGenerator():LableNumber(0),StringNumber(0),NowInFunction(""),HeadData(""),TailData(""),DEBUG(false){}
+    CodeGenerator():LableNumber(0),StringNumber(0),NowInFunction(""),TailData(""),DEBUG(false){}
 
     void CodeGenerate(string path);
 
@@ -42,7 +43,9 @@ public:
     void CodeGenerate_Translation_Unit(ASTNode* root);
 
 
-// Definition, Declaration    
+// Definition, Declaration
+    void CodeGenerate_Kiss_Declaration(ASTNode* root);
+
     Type CodeGenerate_Type(ASTNode* root);
     void CodeGenerate_Function_Definition(ASTNode* root);
     void CodeGenerate_Parameter_List(ASTNode* root);
@@ -102,6 +105,8 @@ public:
     int CodeGenerate_Dreference_Expression(ASTNode* root);
     int CodeGenerate_Array_Expression(ASTNode* root);
 
+    int CodeGenerate_Sizeof_Expression(ASTNode* root);
+
     int CodeGenerate_IncDecPrefix_Expression(ASTNode* root);
     int CodeGenerate_IncDecPostfix_Expression(ASTNode* root);
 
@@ -117,7 +122,6 @@ public:
     void Store(int r1_i,int r2_i,Type type,bool free);
 
     void CreateGlobalVar(string identifier);
-    void CreateGlobalVar(string identifier,int size);
     int CreateLocalVar(Type type,string identifier,bool is_parameter);
 
     int CreateString(string literal_string);

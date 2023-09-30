@@ -1,11 +1,11 @@
 Todo:
-    switch-case
+    //switch-case
     //break
     //continue
     //for
-    kiss
-    sizeof
-    : ?
+    //kiss
+    //sizeof
+: ?
 
 Optimizer
 
@@ -19,7 +19,7 @@ detial:
 //4.int a=0,b=0;
 //5.LocalArray
 6.Initialize
-7.function check
+//7.functioncheck
 8.register spill
 9.make its usage is like GCC
 10.&arr[xxxx]

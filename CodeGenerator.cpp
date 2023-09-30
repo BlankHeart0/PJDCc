@@ -24,8 +24,10 @@ void CodeGenerator::CodeGenerate(string path)
 
 void CodeGenerator::CodeGenerate_Head()
 {
-    OutFile<<"\textern printf"<<endl;
-    OutFile<<"\textern scanf"<<endl;
+    OutFile<<"extern printf"<<endl;
+    kissfunction_table.Add("printf");
+    OutFile<<"extern scanf"<<endl;
+    kissfunction_table.Add("scanf");
 }
 
 void CodeGenerator::CodeGenerate_Tail()
@@ -46,27 +48,27 @@ void CodeGenerator::CodeGenerate_Translation_Unit(ASTNode* root)
 
     for(int i=0;i<root->Children.size();i++)
     {
+        if(root->Children[i]->type==KISS_DECLARATION)
+        {
+            CodeGenerate_Kiss_Declaration(root->Children[i]);
+        }
+    }
+    OutFile<<endl;
+
+    OutFile<<"section\t.data"<<endl;
+    for(int i=0;i<root->Children.size();i++)
+    {
         switch(root->Children[i]->type)
         {
             case GLOBALVARIABLE_DEFINITION:
                 CodeGenerate_GlobalVariable_Definition(root->Children[i]);break;
             case GLOBALARRAY_DEFINITION:
                 CodeGenerate_GlobalArray_Definition(root->Children[i]);break;
-            case FUNCTION_DEFINITION:break;
-            
-            default:
-                CodeGenerate_Error("Illegal translation unit!");
-                break;
         }
-  
     }
-    
-    if(HeadData!="")
-    {
-        OutFile<<"section .data"<<endl;
-        OutFile<<HeadData<<endl;
-    }
-    
+    OutFile<<endl;
+
+    OutFile<<"section\t.text"<<endl;
     for(int i=0;i<root->Children.size();i++)
     {
         if(root->Children[i]->type==FUNCTION_DEFINITION)
@@ -74,12 +76,26 @@ void CodeGenerator::CodeGenerate_Translation_Unit(ASTNode* root)
             CodeGenerate_Function_Definition(root->Children[i]);
         }
     }
-
+    OutFile<<endl;
 }
 
 
 
 // Definition, Declaration
+void CodeGenerator::CodeGenerate_Kiss_Declaration(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Kiss_Declaration");
+
+    string identifier=root->Children[1]->lexeme;
+    if(!kissfunction_table.Exist(identifier))
+    {
+        kissfunction_table.Add(identifier);
+        OutFile<<"extern "<<identifier<<endl;
+    }
+}
+
+
+
 Type CodeGenerator::CodeGenerate_Type(ASTNode* root)
 {
     WhoAmI("CodeGenerate_Type");
@@ -110,6 +126,11 @@ void CodeGenerator::CodeGenerate_Function_Definition(ASTNode* root)
         id_index=2;
     }
     identifier=root->Children[id_index]->lexeme;
+
+    if(kissfunction_table.Exist(identifier))
+    {
+        CodeGenerate_Error("The function "+identifier+" is declared as a kiss.",root->Children[1]);
+    }
 
     if(!function_table.Exist(identifier))
     {   
@@ -189,10 +210,12 @@ void CodeGenerator::CodeGenerate_GlobalArray_Definition(ASTNode* root)
     string identifier=root->Children[1]->lexeme;
 
     Guarantee_InExist_GlobalVartable(identifier,root->Children[1]);
-    global_vartable.Add(type,identifier);
+    
+    int elem_n=root->Children[3]->literal_int;
 
-    int size=root->Children[3]->literal_int;
-    CreateGlobalVar(identifier,size);
+    global_vartable.Add(type,identifier,elem_n);
+
+    CreateGlobalVar(identifier);
 }
 
 
@@ -231,7 +254,7 @@ string CodeGenerator::CodeGenerate_LocalVariable_Declaration(ASTNode* root,bool 
     Guarantee_InExist_LocalVartable(identifier,root->Children[1]);
     
     int stack_offset=CreateLocalVar(type,identifier,is_parameter);
-    Local_Vartable().Add(type,identifier,stack_offset);
+    Local_Vartable().Add(type,identifier,1,stack_offset);
     
     return identifier;
 }
@@ -767,13 +790,15 @@ int CodeGenerator::CodeGenerate_Primary_Expression(ASTNode* root)
     else if(FirstChild(root)->type==DREFERENCE_EXPRESSION)return CodeGenerate_Dreference_Expression(FirstChild(root));
     else if(FirstChild(root)->type==ARRAY_EXPRESSION)return CodeGenerate_Array_Expression(FirstChild(root));
 
+    else if(FirstChild(root)->type==SIZEOF_EXPRESSION)return CodeGenerate_Sizeof_Expression(FirstChild(root));
+
     else if(FirstChild(root)->type==INCDECPREFIX_EXPRESSION)return CodeGenerate_IncDecPrefix_Expression(FirstChild(root));
     else if(FirstChild(root)->type==INCDECPOSTFIX_EXPRESSION)return CodeGenerate_IncDecPostfix_Expression(FirstChild(root));
 
     else if(FirstChild(root)->type==AST_LEFT_PAREN)return CodeGenerate_Expression(root->Children[1]);
 
     else if(FirstChild(root)->type==AST_CONSTANT_INT)return Load(FirstChild(root)->literal_int);
-    else if(FirstChild(root)->type==AST_CONSTANT_CHAR)return Load((char)(FirstChild(root)->literal_char));
+    else if(FirstChild(root)->type==AST_CONSTANT_CHAR)return Load(FirstChild(root)->literal_char);
     else if(FirstChild(root)->type==AST_CONSTANT_STRING)return CreateString(FirstChild(root)->literal_string);
     
     else if(FirstChild(root)->type==AST_ID)
@@ -796,19 +821,23 @@ int CodeGenerator::CodeGenerate_FunctionCall_Expression(ASTNode* root)
     
     string identifier=FirstChild(root)->lexeme;
 
-//don't check for now
-    //if(!function_table.Exist(identifier))
-        //CodeGenerate_Error("The function "+identifier+" is not defined.",FirstChild(root));
+    if(!function_table.Exist(identifier)&&!kissfunction_table.Exist(identifier))
+    {
+        CodeGenerate_Error("The function "+identifier+" is not defined.",FirstChild(root));
+    }
 
     if(root->Children[2]->type==EXPRESSION)
     {
         ASTNode* expression_node=root->Children[2];
 
-        // int arguments_size=(expression_node->Children.size()+1)/2;
-        // if(arguments_size!=function_table.Visit(identifier).parameter_list.size())
-        // {
-        //     CodeGenerate_Error("Function call arguments'amount is not match with the function definition.");
-        // }
+        if(function_table.Exist(identifier))
+        {
+            int arguments_size=(expression_node->Children.size()+1)/2;
+            if(arguments_size!=function_table.Visit(identifier).parameter_list.size())
+            {
+               CodeGenerate_Error("Function call arguments'amount is not match with the function definition.");
+            }
+        }
 
         StoreArgument(expression_node);
     }
@@ -937,8 +966,69 @@ int CodeGenerator::CodeGenerate_Array_Expression(ASTNode* root)
 
 
 
+int CodeGenerator::CodeGenerate_Sizeof_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Sizeof_Expression");
 
-int CodeGenerator::CodeGenerator::CodeGenerate_IncDecPrefix_Expression(ASTNode* root)
+    int result_size=0;
+
+    if(root->Children[2]->type==AST_ID)
+    {
+        string identifier=root->Children[2]->lexeme;
+        int elem_n=0;
+        int elem_size=0;
+        Type type;
+
+        if(global_vartable.Exist(identifier))
+        {
+            type=global_vartable.Visit(identifier).type;
+            elem_n=global_vartable.Visit(identifier).elem_n;
+        }
+        else if(Local_Vartable().Exist(identifier))
+        {
+            type=Local_Vartable().Visit(identifier).type;
+            elem_n=Local_Vartable().Visit(identifier).elem_n;
+        }
+        else CodeGenerate_Error("The variable "+identifier+" is not defined.",root->Children[2]);
+
+        switch(type)
+        {
+            case T_CHAR:        case T_CHAR_ARRAY:
+                elem_size=1;break;
+            case T_INT:         case T_INT_ARRAY:
+                elem_size=4;break;
+            case T_LONG:        case T_LONG_ARRAY:
+            case T_CHAR_PTR:    case T_INT_PTR:     case T_LONG_PTR:
+                elem_size=8;break;
+        }
+
+        result_size=elem_n*elem_size;
+    }
+    else
+    {
+        Type type=CodeGenerate_Type(root->Children[2]);
+        //type check
+        if(type==T_VOID)CodeGenerate_Error("Illegal variable type",root->Children[2]);
+
+        switch(type)
+        {
+            case T_CHAR:result_size=1;break;
+            case T_INT:result_size=4;break;
+            case T_LONG:result_size=8;break;
+        }
+
+        if(root->Children[3]->type==AST_STAR)
+        {
+            result_size=8;
+        }
+    }
+
+    return Load(result_size);
+}
+
+
+
+int CodeGenerator::CodeGenerate_IncDecPrefix_Expression(ASTNode* root)
 {
     WhoAmI("CodeGenerate_IncDecPrefix_Expression");
 
@@ -1118,41 +1208,39 @@ void CodeGenerator::Store(int r1_i,int r2_i,Type type,bool free)
 
 void CodeGenerator::CreateGlobalVar(string identifier)
 {
-    CreateGlobalVar(identifier,1);
-}
+    OutFile<<"global\t"<<identifier<<endl;
 
-void CodeGenerator::CreateGlobalVar(string identifier,int size)
-{
-    HeadData+="global\t"+identifier+"\n";
+    int elem_n=global_vartable.Visit(identifier).elem_n;
+
 //normal global variable
-    if(size==1)
+    if(elem_n==1)
     {
         switch(global_vartable.Visit(identifier).type)
         {        
             case T_CHAR:
-                HeadData+="\t"+identifier+":\tdb\t0\n";break;
+                OutFile<<"\t"<<identifier<<":\tdb\t0"<<endl;break;
             case T_INT:
-                HeadData+="\t"+identifier+":\tdd\t0\n";break;
+                OutFile<<"\t"<<identifier<<":\tdd\t0"<<endl;break;
             case T_LONG: 
             case T_CHAR_PTR: case T_INT_PTR: case T_LONG_PTR:
-                HeadData+="\t"+identifier+":\tdq\t0\n";break;
+                OutFile<<"\t"<<identifier<<":\tdq\t0"<<endl;break;
         }
     }
 //global array
-    else if(size>1)
+    else if(elem_n>1)
     {
         switch(global_vartable.Visit(identifier).type)
         {        
             case T_CHAR_ARRAY:
-                HeadData+="\t"+identifier+":\ttimes "+to_string(size)+" db\t0\n";break;
+                OutFile<<"\t"<<identifier<<":\ttimes "<<elem_n<<" db\t0"<<endl;break;
             case T_INT_ARRAY:
-                HeadData+="\t"+identifier+":\ttimes "+to_string(size)+" dd\t0\n";break;
+                OutFile<<"\t"<<identifier<<":\ttimes "<<elem_n<<" dd\t0"<<endl;break;
             case T_LONG_ARRAY:
-                HeadData+="\t"+identifier+":\ttimes "+to_string(size)+" dq\t0\n";break;
+                OutFile<<"\t"<<identifier<<":\ttimes "<<elem_n<<" dq\t0"<<endl;break;
         }
     }
 
-    HeadData+="\n";
+    OutFile<<endl;
 }
 
 int CodeGenerator::CreateLocalVar(Type type,string identifier,bool is_parameter)
@@ -1555,7 +1643,7 @@ int CodeGenerator::DecLocalVar(string identifier,string pre_post)
 
 void CodeGenerator::FunctionHead(string identifier)
 {
-    OutFile<<"section\t.text"<<endl;
+    //OutFile<<"section\t.text"<<endl;
     OutFile<<"global\t"<<identifier<<endl;
 
     OutFile<<identifier<<":"<<endl;
@@ -1573,7 +1661,7 @@ void CodeGenerator::FunctionTail(string identifier)
     if(Now_Function().stack_align_offset)OutFile<<"\tadd\trsp, "<<Now_Function().stack_align_offset<<endl;
 
     OutFile<<"\tpop\trbp"<<endl;
-    OutFile<<"\tret"<<endl<<endl;
+    OutFile<<"\tret"<<endl<<endl<<endl;
 }
 
 int CodeGenerator::FunctionCall(string identifier)

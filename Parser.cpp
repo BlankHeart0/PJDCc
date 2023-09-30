@@ -21,8 +21,9 @@ ASTNode* Parser::Parse_Translation_Unit()
     ASTNode* node=new ASTNode(TRANSLATION_UNIT);
 
     while(!Is_AtEnd())
-    {
-        if(Peek(LEFT_PAREN,3))Add_Child(node,Parse_Function_Definition());
+    {   
+        if(Peek(KISS))Add_Child(node,Parse_Kiss_Declaration());
+        else if(Peek(LEFT_PAREN,3)||Peek(LEFT_PAREN,4))Add_Child(node,Parse_Function_Definition());
         else if(Peek(LEFT_SQUARE,3))Add_Child(node,Parse_GlobalArray_Definition());
         else Add_Child(node,Parse_GlobalVariable_Definition());
     }
@@ -32,6 +33,29 @@ ASTNode* Parser::Parse_Translation_Unit()
 
 
 // Definition, Declaration
+ASTNode* Parser::Parse_Kiss_Declaration()
+{
+    WhoAmI("Parse_Kiss_Declaration");
+
+    ASTNode* node=new ASTNode(KISS_DECLARATION);
+
+    if(Match(KISS))
+    {
+        Add_Child(node,new ASTNode(AST_KISS,Previous_Token()));
+        if(Match(ID))
+        {
+            Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
+            Match_Semicolon(node);
+        }
+        else Parse_Error("Kiss identifier loss.");
+    }
+    else Parse_Error("Keyword kiss loss.");
+
+    return node;
+}
+
+
+
 ASTNode* Parser::Parse_Type()
 {
     WhoAmI("Parse_Type");
@@ -801,6 +825,8 @@ ASTNode* Parser::Parse_Primary_Expression()
     else if(Peek(AMPERSAND))Add_Child(node,Parse_Address_Expression());
     else if(Peek(STAR))Add_Child(node,Parse_Dreference_Expression());
     
+    else if(Peek(SIZEOF))Add_Child(node,Parse_Sizeof_Expression());
+
     else if(Peek(INC)||Peek(DEC))Add_Child(node,Parse_IncDecPrefix_Expression());
 
     else Parse_Error("Primary character loss.");
@@ -933,7 +959,41 @@ ASTNode* Parser::Parse_Array_Expression()
 
     return node;
 }
- 
+
+
+
+ASTNode* Parser::Parse_Sizeof_Expression()
+{
+    WhoAmI("Parse_Sizeof_Expression");
+
+    ASTNode* node=new ASTNode(SIZEOF_EXPRESSION);
+
+    if(Match(SIZEOF))
+    {
+        Add_Child(node,new ASTNode(AST_SIZEOF,Previous_Token()));
+        if(Match(LEFT_PAREN))
+        {
+            Add_Child(node,new ASTNode(AST_LEFT_PAREN,Previous_Token()));
+            if(Match(ID))
+            {
+                Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
+            }
+            else 
+            {
+                Add_Child(node,Parse_Type());
+                if(Match(STAR))Add_Child(node,new ASTNode(AST_STAR,Previous_Token()));
+            }
+
+            if(Match(RIGHT_PAREN))Add_Child(node,new ASTNode(AST_RIGHT_PAREN,Previous_Token()));
+            else Parse_Error("Right paren ) loss.");
+        }
+        else Parse_Error("Left paren ( loss.");
+    }
+    else Parse_Error("Keyword sizeof loss.");
+
+    return node;
+}
+
 
 
 ASTNode* Parser::Parse_IncDecPrefix_Expression()
@@ -955,14 +1015,6 @@ ASTNode* Parser::Parse_IncDecPrefix_Expression()
 
         if(Match(ID))Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
         else Parse_Error("Identifier loss.");
-
-        // if(Match(LEFT_SQUARE))
-        // {
-        //     Add_Child(node,new ASTNode(AST_LEFT_SQUARE,Previous_Token()));
-        //     Add_Child(node,Parse_Expression());
-        //     if(Match(RIGHT_SQUARE))Add_Child(node,new ASTNode(AST_RIGHT_SQUARE,Previous_Token()));
-        //     else Parse_Error("Right square ] loss.");
-        // }
     }
     else Parse_Error("Inc ++ or Dec -- loss.");
 
@@ -978,14 +1030,6 @@ ASTNode* Parser::Parse_IncDecPostfix_Expression()
     if(Match(ID))
     {
         Add_Child(node,new ASTNode(AST_ID,Previous_Token()));
-
-        // if(Match(LEFT_SQUARE))
-        // {
-        //     Add_Child(node,new ASTNode(AST_LEFT_SQUARE,Previous_Token()));
-        //     Add_Child(node,Parse_Expression());
-        //     if(Match(RIGHT_SQUARE))Add_Child(node,new ASTNode(AST_RIGHT_SQUARE,Previous_Token()));
-        //     else Parse_Error("Right square ] loss.");
-        // }
 
         if(Match(INC)||Match(DEC))
         {

@@ -1,6 +1,7 @@
 
 int array[10];
 int temp[10];
+
 void Init()
 {
   array[0]=9;array[1]=5;array[2]=2;array[3]=8;array[4]=1;
@@ -73,7 +74,6 @@ int main()
 {
   Init();
   MergeSort(0,9);
-
   int i=0;
   while(i<10)
   {

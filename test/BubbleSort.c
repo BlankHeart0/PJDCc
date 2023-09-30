@@ -24,7 +24,7 @@ void Bubble_Sort()
   }
 
 }
-
+int i;
 int main()
 {
   Init();

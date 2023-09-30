@@ -1,10 +1,12 @@
 
 # Begin
-<Translation_Unit> ::= {<Function_Definition> | <GlobalVariable_Definition> | <GlobalArray_Definition>}CODE_EOF
+<Translation_Unit> ::= {<Kiss_Declaration> | <Function_Definition> | <GlobalVariable_Definition> | <GlobalArray_Definition>}CODE_EOF
 
 
 
 # Definition, Declaration
+<Kiss_Declaration> ::= KISS IDENTIFIER ";"
+
 <Type> ::= VOID | CHAR | INT | LONG
 <Function_Definition> ::= <Type>["*"] IDENTIFIER "(" [<Parameter_List>] ")" <Compound_Statement>
 <Parameter_List> ::= <LocalVariable_Declaration>{","<LocalVariable_Declaration>}
@@ -60,7 +62,7 @@
 
 <Unary_Expression> ::= ["-" | "~" | "!"]<Primary_Expression> 
 <Primary_Expression> ::= <FunctionCall_Expression> | <Address_Expression> | <Dreference_Expression> | <Array_Expression> |
-                        | <IncDecPrefix_Expression> | <IncDecPostfix_Expression> | "("<Expression>")" |  
+                        | <Sizeof_Expression> | <IncDecPrefix_Expression> | <IncDecPostfix_Expression> | "("<Expression>")" |  
                         | CONSTANT_INT | CONSTANT_CHAR | CONSTANT_STRING | IDENTIFIER  
 
 <FunctionCall_Expression> ::= IDENTIFIER"("[<Expression>]")"
@@ -68,6 +70,8 @@
 <Address_Expression> ::="&"IDENTIFIER [("+ "| "-") CONSTANT_INT]
 <Dreference_Expression> ::="*" ( IDENTIFIER | "(" IDENTIFIER [("+" | "-") CONSTANT_INT] ")" )
 <Array_Expression> ::= IDENTIFIER"[" <Expression> "]"
+
+<Sizeof_Expression> ::= SIZEOF "("( (<Type>["*"]) | IDENTIFIER )")"
 
 <IncDecPrefix_Expression> ::= ("++" | "--")IDENTIFIER
 <IncDecPostfix_Expression> ::= IDENTIFIER("++" | "--")

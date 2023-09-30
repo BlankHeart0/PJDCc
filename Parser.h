@@ -22,6 +22,8 @@ public:
 
 
 // Definition, Declaration
+    ASTNode* Parse_Kiss_Declaration();
+
     ASTNode* Parse_Type();
     ASTNode* Parse_Function_Definition();
     ASTNode* Parse_Parameter_List();
@@ -80,6 +82,8 @@ public:
     ASTNode* Parse_Address_Expression();
     ASTNode* Parse_Dreference_Expression();
     ASTNode* Parse_Array_Expression();
+    
+    ASTNode* Parse_Sizeof_Expression();
     
     ASTNode* Parse_IncDecPrefix_Expression();
     ASTNode* Parse_IncDecPostfix_Expression();

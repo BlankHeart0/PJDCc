@@ -109,8 +109,8 @@ int main()
 
     //pjdcc.Compile("./test/Function.c");
 //pjdcc.Compile("./test/BubbleSort.c");
-//pjdcc.Compile("./test/QuickSort.c");
-pjdcc.Compile("./test/MergeSort.c");
+pjdcc.Compile("./test/QuickSort.c");
+//pjdcc.Compile("./test/MergeSort.c");
 
 
 //pjdcc.Compile("./test/swap.c");

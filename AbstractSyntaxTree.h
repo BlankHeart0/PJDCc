@@ -12,12 +12,14 @@ enum ASTNodeType
 //Terminal
 
     //Keyword
+    AST_KISS,
     AST_VOID, AST_CHAR, AST_INT, AST_LONG,
     AST_PRINT,
     AST_IF, AST_ELSE,
     AST_WHILE, AST_DO, AST_FOR,
     AST_CONTINUE, AST_BREAK,
     AST_RETURN,
+    AST_SIZEOF,
 
     //Separator
     AST_SEMICOLON, AST_COMMA, // ; ,
@@ -54,6 +56,8 @@ enum ASTNodeType
 
 
     // Definition, Declaration
+    KISS_DECLARATION,
+
     TYPE,
     FUNCTION_DEFINITION,
     PARAMETER_LIST,
@@ -114,6 +118,8 @@ enum ASTNodeType
     DREFERENCE_EXPRESSION, 
     ARRAY_EXPRESSION,
 
+    SIZEOF_EXPRESSION,
+    
     INCDECPREFIX_EXPRESSION,
     INCDECPOSTFIX_EXPRESSION
 };
@@ -123,12 +129,14 @@ static vector<string>ASTNodeType_text
 //Terminal
 
     //Keyword
+    "AST_KISS",
     "AST_VOID", "AST_CHAR", "AST_INT", "AST_LONG",
     "AST_PRINT",
     "AST_IF", "AST_ELSE",
     "AST_WHILE", "AST_DO", "AST_FOR",
     "AST_CONTINUE", "AST_BREAK",
     "AST_RETURN",
+    "AST_SIZEOF",
 
     //Separator
     "AST_SEMICOLON", "AST_COMMA", // ; ,
@@ -164,6 +172,8 @@ static vector<string>ASTNodeType_text
 
 
     // Definition, Declaration
+    "KISS_DECLARATION",
+
     "TYPE",
     "FUNCTION_DEFINITION",
     "PARAMETER_LIST",
@@ -224,6 +234,8 @@ static vector<string>ASTNodeType_text
     "DREFERENCE_EXPRESSION",  
     "ARRAY_EXPRESSION",
 
+    "SIZEOF_EXPRESSION",
+    
     "INCDECPREFIX_EXPRESSION",
     "INCDECPOSTFIX_EXPRESSION"
 };

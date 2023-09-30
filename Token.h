@@ -9,11 +9,13 @@ using namespace std;
 enum TokenType
 {
     //Keyword
+    KISS,
     VOID, CHAR, INT, LONG,
     IF, ELSE,
     WHILE, DO, FOR,
     CONTINUE,BREAK,
     RETURN,
+    SIZEOF,
 
     //Separator
     SEMICOLON, COMMA, // ; ,
@@ -47,11 +49,13 @@ enum TokenType
 static vector<string>TokenType_text
 {
     //Keyword
+    "KISS",
     "VOID", "CHAR", "INT", "LONG",
     "IF", "ELSE",
     "WHILE", "DO", "FOR",
     "CONTINUE","BREAK",
     "RETURN",
+    "SIZEOF",
 
     //Separator
     "SEMICOLON", "COMMA", // ; ,
@@ -84,11 +88,13 @@ static vector<string>TokenType_text
 
 static unordered_map<string,TokenType>Keyword_map
 {
+    {"kiss",KISS},
     {"void",VOID},{"char",CHAR},{"int",INT},{"long",LONG},
     {"if",IF},{"else",ELSE},
     {"while",WHILE},{"do",DO},{"for",FOR},
     {"continue",CONTINUE},{"break",BREAK},
-    {"return",RETURN}
+    {"return",RETURN},
+    {"sizeof",SIZEOF}
 };
 
 enum LiteralType
