@@ -6,8 +6,7 @@ Optimizer
 
 detial:
 1.rdi rsi rdx...also need to be saved
-
-6.Initialize
-
 8.register spill
+
+
 9.make its usage is like GCC

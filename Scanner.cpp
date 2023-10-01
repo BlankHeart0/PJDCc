@@ -30,6 +30,9 @@ void Scanner::Scan()
             case '~':Add_Token(INVERT);break;
             case '^':Add_Token(XOR);break;
             
+            case ':':Add_Token(COLON);break;
+            case '?':Add_Token(QUESTION);break;
+            
             //two character
             case '=':Add_Token(Match('=')?EQUAL:ASSIGN);break;
             case '!':Add_Token(Match('=')?NOT_EQUAL:NOT);break;

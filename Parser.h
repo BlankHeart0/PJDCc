@@ -60,6 +60,8 @@ public:
     ASTNode* Parse_Expression();
     ASTNode* Parse_Assignment_Expression();
 
+    ASTNode* Parse_Conditional_Expression();
+    
     ASTNode* Parse_LogicOr_Expression();
     ASTNode* Parse_LogicAnd_Expression();
 

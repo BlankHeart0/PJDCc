@@ -37,6 +37,8 @@ enum TokenType
 
     INVERT, AMPERSAND, BITOR, XOR, // ~ & | ^
 
+    COLON, QUESTION, // : ?
+
     //Constant
     CONSTANT_INT, CONSTANT_CHAR, CONSTANT_STRING,
 
@@ -77,6 +79,8 @@ static vector<string>TokenType_text
 
     "INVERT", "AMPERSAND", "BITOR", "XOR", // ~ & | ^
 
+    "COLON", "QUESTION", // : ?
+
     //Constant
     "CONSTANT_INT", "CONSTANT_CHAR", "CONSTANT_STRING",
 
@@ -111,6 +115,7 @@ public:
 
     bool literal_have;
     LiteralType literal_type;
+    
     int literal_int;
     char literal_char;
     string literal_string;

@@ -44,7 +44,9 @@
 
 # Expression
 <Expression> ::= <Assignment_Expression>{","<Assignment_Expression>}
-<Assignment_Expression> ::= [(["*"]IDENTIFIER) | (IDENTIFIER"["<Expression>"]") "="]<LogicOr_Expression>
+<Assignment_Expression> ::= [(["*"]IDENTIFIER) | (IDENTIFIER"["<Expression>"]") "="]<Conditional_Expression>
+
+<Conditional_Expression> ::= <LogicOr_Expression>["?"<Expression>":"<Expression>]
 
 <LogicOr_Expression> ::= <LogicAnd_Expression>{"||"<LogicAnd_Expression>}
 <LogicAnd_Expression> ::= <Or_Expression>{"&&"<Or_Expression>}

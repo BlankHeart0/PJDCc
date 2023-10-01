@@ -82,6 +82,8 @@ public:
     int CodeGenerate_Expression(ASTNode* root);
     int CodeGenerate_Assignment_Expression(ASTNode* root);
 
+    int CodeGenerate_Conditional_Expression(ASTNode* root);
+
     int CodeGenerate_LogicOr_Expression(ASTNode* root);
     int CodeGenerate_LogicAnd_Expression(ASTNode* root);
 
@@ -137,6 +139,8 @@ public:
 
     int Comma(int r1_i,int r2_i);
 
+    int Copy(int r1_i,int r2_i);
+    
     int Compare(int r1_i,int r2_i,string setx);
     int Equal(int r1_i,int r2_i);
     int NotEqual(int r1_i,int r2_i);

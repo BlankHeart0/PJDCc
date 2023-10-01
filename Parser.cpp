@@ -600,10 +600,36 @@ ASTNode* Parser::Parse_Assignment_Expression()
         }
     }
 
-    Add_Child(node,Parse_LogicOr_Expression());
+    Add_Child(node,Parse_Conditional_Expression());
 
     return node; 
 }
+
+
+
+ASTNode* Parser::Parse_Conditional_Expression()
+{
+    WhoAmI("Parse_Conditional_Expression");
+
+    ASTNode* node=new ASTNode(CONDITIONAL_EXPRESSION);
+
+    Add_Child(node,Parse_LogicOr_Expression());
+
+    if(Match(QUESTION))
+    {
+        Add_Child(node,new ASTNode(AST_QUESTION,Previous_Token()));
+        Add_Child(node,Parse_Expression());
+        if(Match(COLON))
+        {
+            Add_Child(node,new ASTNode(AST_COLON,Previous_Token()));
+            Add_Child(node,Parse_Expression());
+        }
+        else Parse_Error("Colon : loss.");
+    }
+
+    return node;
+}
+
 
 
 

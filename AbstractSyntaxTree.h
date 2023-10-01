@@ -41,6 +41,8 @@ enum ASTNodeType
 
     AST_INVERT, AST_AMPERSAND, AST_BITOR, AST_XOR, // ~ & | ^
 
+    AST_COLON, AST_QUESTION, // : ?
+
     //Constant
     AST_CONSTANT_INT, AST_CONSTANT_CHAR, AST_CONSTANT_STRING,
 
@@ -94,6 +96,8 @@ enum ASTNodeType
     // Expression  
     EXPRESSION,
     ASSIGNMENT_EXPRESSION,
+
+    CONDITIONAL_EXPRESSION,
 
     LOGICOR_EXPRESSION,
     LOGICAND_EXPRESSION,
@@ -159,6 +163,8 @@ static vector<string>ASTNodeType_text
 
     "AST_INVERT", "AST_AMPERSAND", "AST_BITOR", "AST_XOR", // ~ & | ^
 
+    "AST_COLON", "AST_QUESTION", // : ?
+
     //Constant
     "AST_CONSTANT_INT", "AST_CONSTANT_CHAR", "AST_CONSTANT_STRING",
 
@@ -212,6 +218,8 @@ static vector<string>ASTNodeType_text
     "EXPRESSION",
     "ASSIGNMENT_EXPRESSION",
 
+    "CONDITIONAL_EXPRESSION",
+    
     "LOGICOR_EXPRESSION",
     "LOGICAND_EXPRESSION",
 

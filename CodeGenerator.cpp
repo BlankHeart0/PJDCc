@@ -573,15 +573,15 @@ int CodeGenerator::CodeGenerate_Assignment_Expression(ASTNode* root)
 
         if(Local_Vartable().Exist(identifier))
         {
-            int LogicOr_expression_ri=CodeGenerate_LogicOr_Expression(root->Children[2]);
-            StoreLocalVar(LogicOr_expression_ri,identifier,false);
-            return LogicOr_expression_ri;
+            int Conditional_expression_ri=CodeGenerate_Conditional_Expression(root->Children[2]);
+            StoreLocalVar(Conditional_expression_ri,identifier,false);
+            return Conditional_expression_ri;
         }
         else if(global_vartable.Exist(identifier))
         {
-            int LogicOr_expression_ri=CodeGenerate_LogicOr_Expression(root->Children[2]);
-            StoreGlobalVar(LogicOr_expression_ri,identifier,false);
-            return LogicOr_expression_ri;
+            int Conditional_expression_ri=CodeGenerate_Conditional_Expression(root->Children[2]);
+            StoreGlobalVar(Conditional_expression_ri,identifier,false);
+            return Conditional_expression_ri;
         }
         else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
     }
@@ -591,17 +591,17 @@ int CodeGenerator::CodeGenerate_Assignment_Expression(ASTNode* root)
         string identifier=root->Children[1]->lexeme;
         if(Local_Vartable().Exist(identifier))
         {
-            int LogicOr_expression_ri=CodeGenerate_LogicOr_Expression(root->Children[3]);
+            int Conditional_expression_ri=CodeGenerate_Conditional_Expression(root->Children[3]);
             Type type=Local_Vartable().Visit(identifier).type;
-            Store(LogicOr_expression_ri,LoadLocalVar(identifier),type,false);
-            return LogicOr_expression_ri;
+            Store(Conditional_expression_ri,LoadLocalVar(identifier),type,false);
+            return Conditional_expression_ri;
         }
         else if(global_vartable.Exist(identifier))
         {
-            int LogicOr_expression_ri=CodeGenerate_LogicOr_Expression(root->Children[3]);
+            int Conditional_expression_ri=CodeGenerate_Conditional_Expression(root->Children[3]);
             Type type=global_vartable.Visit(identifier).type;
-            Store(LogicOr_expression_ri,LoadGlobalVar(identifier),type,false);
-            return LogicOr_expression_ri;
+            Store(Conditional_expression_ri,LoadGlobalVar(identifier),type,false);
+            return Conditional_expression_ri;
         }
         else CodeGenerate_Error("The variable "+identifier+" is not defined.",FirstChild(root));
     }
@@ -611,14 +611,48 @@ int CodeGenerator::CodeGenerate_Assignment_Expression(ASTNode* root)
         string identifier=FirstChild(root)->lexeme;
         Guarantee_Exist_GlobalVartable(identifier,FirstChild(root));
 
-        int LogicOr_expression_ri=CodeGenerate_LogicOr_Expression(root->Children[5]);
+        int Conditional_expression_ri=CodeGenerate_Conditional_Expression(root->Children[5]);
         int offset_ri=CodeGenerate_Expression(root->Children[2]);
         Type type=global_vartable.Visit(identifier).type;
         int scale_factor=Dreference_ScaleFactor(type);
         
-        Store(LogicOr_expression_ri,Add(AddressGlobalVar(identifier),ShiftLeftConstant(offset_ri,scale_factor)),type,false);
+        Store(Conditional_expression_ri,Add(AddressGlobalVar(identifier),ShiftLeftConstant(offset_ri,scale_factor)),type,false);
 
-        return LogicOr_expression_ri;
+        return Conditional_expression_ri;
+    }
+
+    return  CodeGenerate_Conditional_Expression(FirstChild(root));
+}
+
+
+
+int CodeGenerator::CodeGenerate_Conditional_Expression(ASTNode* root)
+{
+    WhoAmI("CodeGenerate_Conditional_Expression");
+
+    if(root->Children.size()==5&&root->Children[1]->type==AST_QUESTION&&root->Children[3]->type==AST_COLON)
+    {
+        int result_ri=Load(0);
+
+        int condition_ri=CodeGenerate_LogicOr_Expression(FirstChild(root));
+        CompareZero(condition_ri);
+
+        int lable1=NewLable();
+        int lable2=NewLable();
+
+        Jump("je",lable1);
+
+        int value1_ri=CodeGenerate_Expression(root->Children[2]);
+        Copy(result_ri,value1_ri);
+        Jump("jmp",lable2);
+
+        LablePrint(lable1);
+        int value2_ri=CodeGenerate_Expression(root->Children[4]);
+        Copy(result_ri,value2_ri);
+
+        LablePrint(lable2);
+
+        return result_ri;
     }
 
     return  CodeGenerate_LogicOr_Expression(FirstChild(root));
@@ -1366,6 +1400,16 @@ int CodeGenerator::Comma(int r1_i,int r2_i)
 {
     register_manager.Free(r1_i);
     return r2_i;
+}
+
+
+
+int CodeGenerator::Copy(int r1_i,int r2_i)
+{
+    OutFile<<"\tmov\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
+    
+    register_manager.Free(r2_i);
+    return r1_i;
 }
 
 
