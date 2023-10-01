@@ -13,7 +13,9 @@ class CodeGenerator
 public:
     AST ast;
 
-    RegisterManager register_manager;
+    GeneralRegister general_register;
+    ParameterRegister parameter_register;
+
     IterationManger iteration_manger;
 
     VariableTable global_vartable;
@@ -140,7 +142,7 @@ public:
     int Comma(int r1_i,int r2_i);
 
     int Copy(int r1_i,int r2_i);
-    
+
     int Compare(int r1_i,int r2_i,string setx);
     int Equal(int r1_i,int r2_i);
     int NotEqual(int r1_i,int r2_i);

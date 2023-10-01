@@ -9,7 +9,8 @@ void CodeGenerator::CodeGenerate(string path)
         return;
     }
 
-    register_manager.FreeAll();
+    general_register.FreeAll();
+    parameter_register.FreeAll();
 
     cout<<endl<<"--- CodeGenerate Begin ---"<<endl;
 
@@ -469,7 +470,7 @@ void CodeGenerator::CodeGenerate_For_Statement(ASTNode* root)
         LablePrint(intermediate_lable);
 
         int expression_ri=CodeGenerate_Expression(root->Children[4]);
-        register_manager.Free(expression_ri);
+        general_register.Free(expression_ri);
     }
     else 
     {
@@ -542,7 +543,7 @@ void CodeGenerator::CodeGenerate_Expression_Statement(ASTNode* root)
         int expression_ri=CodeGenerate_Expression(FirstChild(root));
         
         //very very important
-        register_manager.Free(expression_ri);
+        general_register.Free(expression_ri);
     }
 }
 
@@ -1105,30 +1106,30 @@ int CodeGenerator::CodeGenerate_IncDecPostfix_Expression(ASTNode* root)
 //Atomic instruction
 int CodeGenerator::Load(int constant_value)
 {
-    int register_i=register_manager.Alloc();
+    int register_i=general_register.Alloc();
 
-    OutFile<<"\tmov\t"<<register_manager.Name(register_i)<<", "<<constant_value<<endl;
+    OutFile<<"\tmov\t"<<general_register.Name(register_i)<<", "<<constant_value<<endl;
     return register_i;
 }
 
 int CodeGenerator::LoadGlobalVar(string identifier)
 {
-    int register_i=register_manager.Alloc();
+    int register_i=general_register.Alloc();
 
     switch(global_vartable.Visit(identifier).type)
     {
         case T_CHAR:
-            OutFile<<"\tmovzx\t"<<register_manager.Name(register_i,8)<<", byte ["<<identifier<<"]"<<endl;
+            OutFile<<"\tmovzx\t"<<general_register.Name(register_i,8)<<", byte ["<<identifier<<"]"<<endl;
             break;
         case T_INT:
-            OutFile<<"\tmovsxd\t"<<register_manager.Name(register_i,8)<<", dword ["<<identifier<<"]"<<endl;
+            OutFile<<"\tmovsxd\t"<<general_register.Name(register_i,8)<<", dword ["<<identifier<<"]"<<endl;
             break;
         case T_LONG:
         case T_CHAR_PTR:    case T_INT_PTR:     case T_LONG_PTR:
-            OutFile<<"\tmov\t"<<register_manager.Name(register_i,8)<<", ["<<identifier<<"]"<<endl;
+            OutFile<<"\tmov\t"<<general_register.Name(register_i,8)<<", ["<<identifier<<"]"<<endl;
             break;
         case T_CHAR_ARRAY:  case T_INT_ARRAY:   case T_LONG_ARRAY:
-            OutFile<<"\tmov\t"<<register_manager.Name(register_i,8)<<", "<<identifier<<endl;
+            OutFile<<"\tmov\t"<<general_register.Name(register_i,8)<<", "<<identifier<<endl;
             break;
             
         default:
@@ -1140,7 +1141,7 @@ int CodeGenerator::LoadGlobalVar(string identifier)
 
 int CodeGenerator::LoadLocalVar(string identifier)
 {
-    int register_i=register_manager.Alloc();
+    int register_i=general_register.Alloc();
 
     Type local_variable_type=Local_Vartable().Visit(identifier).type;
     int local_variable_stack_offset=Local_Vartable().Visit(identifier).stack_offset;
@@ -1148,16 +1149,14 @@ int CodeGenerator::LoadLocalVar(string identifier)
     switch(local_variable_type)
     {
         case T_CHAR:
-            OutFile<<"\tmovzx\t"<<register_manager.Name(register_i,8)<<", byte [rbp+"<<local_variable_stack_offset<<"]"<<endl;
+            OutFile<<"\tmovzx\t"<<general_register.Name(register_i,8)<<", byte [rbp+"<<local_variable_stack_offset<<"]"<<endl;
             break;
         case T_INT:
-            //OutFile<<"\txor\t"<<register_manager.Name(register_i,8)<<", "<<register_manager.Name(register_i,8)<<endl;
-            //OutFile<<"\tmov\t"<<register_manager.Name(register_i,4)<<", dword [rbp+"<<local_variable_stack_offset<<"]"<<endl;
-            OutFile<<"\tmovsxd\t"<<register_manager.Name(register_i,8)<<", dword [rbp+"<<local_variable_stack_offset<<"]"<<endl;
+            OutFile<<"\tmovsxd\t"<<general_register.Name(register_i,8)<<", dword [rbp+"<<local_variable_stack_offset<<"]"<<endl;
             break;
         case T_LONG:
         case T_CHAR_PTR:    case T_INT_PTR:     case T_LONG_PTR:
-            OutFile<<"\tmov\t"<<register_manager.Name(register_i,8)<<", [rbp+"<<local_variable_stack_offset<<"]"<<endl;
+            OutFile<<"\tmov\t"<<general_register.Name(register_i,8)<<", [rbp+"<<local_variable_stack_offset<<"]"<<endl;
             break;
                      
         default:
@@ -1174,18 +1173,18 @@ void CodeGenerator::StoreGlobalVar(int r_i,string identifier,bool free)
     switch(global_vartable.Visit(identifier).type)
     {
         case T_CHAR:
-            OutFile<<"\tmov\t["<<identifier<<"], "<<register_manager.Name(r_i,1)<<endl;break;
+            OutFile<<"\tmov\t["<<identifier<<"], "<<general_register.Name(r_i,1)<<endl;break;
         case T_INT:
-            OutFile<<"\tmov\t["<<identifier<<"], "<<register_manager.Name(r_i,4)<<endl;break;
+            OutFile<<"\tmov\t["<<identifier<<"], "<<general_register.Name(r_i,4)<<endl;break;
         case T_LONG:
         case T_CHAR_PTR: case T_INT_PTR: case T_LONG_PTR:
-            OutFile<<"\tmov\t["<<identifier<<"], "<<register_manager.Name(r_i,8)<<endl;break;
+            OutFile<<"\tmov\t["<<identifier<<"], "<<general_register.Name(r_i,8)<<endl;break;
         default:
             CodeGenerate_Error("Store variable "+identifier+" error.");
     }
 
 
-    if(free)register_manager.Free(r_i);
+    if(free)general_register.Free(r_i);
 }
 
 void CodeGenerator::StoreLocalVar(int r_i,string identifier,bool free)
@@ -1196,17 +1195,17 @@ void CodeGenerator::StoreLocalVar(int r_i,string identifier,bool free)
     switch(local_variable_type)
     {
         case T_CHAR:
-            OutFile<<"\tmov\tbyte [rbp+"<<local_variable_stack_offset<<"], "<<register_manager.Name(r_i,1)<<endl;break;
+            OutFile<<"\tmov\tbyte [rbp+"<<local_variable_stack_offset<<"], "<<general_register.Name(r_i,1)<<endl;break;
         case T_INT:
-            OutFile<<"\tmov\tdword [rbp+"<<local_variable_stack_offset<<"], "<<register_manager.Name(r_i,4)<<endl;break;
+            OutFile<<"\tmov\tdword [rbp+"<<local_variable_stack_offset<<"], "<<general_register.Name(r_i,4)<<endl;break;
         case T_LONG:
         case T_CHAR_PTR: case T_INT_PTR: case T_LONG_PTR:
-            OutFile<<"\tmov\tqword [rbp+"<<local_variable_stack_offset<<"], "<<register_manager.Name(r_i,8)<<endl;break;
+            OutFile<<"\tmov\tqword [rbp+"<<local_variable_stack_offset<<"], "<<general_register.Name(r_i,8)<<endl;break;
         default:
             CodeGenerate_Error("Store variable "+identifier+" error.");
     }
 
-    if(free)register_manager.Free(r_i);
+    if(free)general_register.Free(r_i);
 }
 
 void CodeGenerator::Store(int r1_i,int r2_i,Type type,bool free)
@@ -1214,17 +1213,17 @@ void CodeGenerator::Store(int r1_i,int r2_i,Type type,bool free)
     switch(type)
     {
         case T_CHAR_PTR:case T_CHAR_ARRAY:
-            OutFile<<"\tmov\t["<<register_manager.Name(r2_i)<<"], "<<register_manager.Name(r1_i,1)<<endl;break;
+            OutFile<<"\tmov\t["<<general_register.Name(r2_i)<<"], "<<general_register.Name(r1_i,1)<<endl;break;
         case T_INT_PTR:case T_INT_ARRAY:
-            OutFile<<"\tmov\t["<<register_manager.Name(r2_i)<<"], "<<register_manager.Name(r1_i,4)<<endl;break;
+            OutFile<<"\tmov\t["<<general_register.Name(r2_i)<<"], "<<general_register.Name(r1_i,4)<<endl;break;
         case T_LONG_PTR:case T_LONG_ARRAY:
-            OutFile<<"\tmov\t["<<register_manager.Name(r2_i)<<"], "<<register_manager.Name(r1_i,8)<<endl;break;
+            OutFile<<"\tmov\t["<<general_register.Name(r2_i)<<"], "<<general_register.Name(r1_i,8)<<endl;break;
         default:
             CodeGenerate_Error("Store variable  error.");
     }   
 
-    register_manager.Free(r2_i);
-    if(free)register_manager.Free(r1_i);
+    general_register.Free(r2_i);
+    if(free)general_register.Free(r1_i);
 }
 
 
@@ -1326,9 +1325,9 @@ int CodeGenerator::CreateString(string literal_string)
 
     TailData+="\t"+string_name+" db "+StringToIntlist(literal_string)+",0\n";
     
-    int register_i=register_manager.Alloc();
+    int register_i=general_register.Alloc();
     
-    OutFile<<"\tmov\t"<<register_manager.Name(register_i)<<", "<<string_name<<endl;
+    OutFile<<"\tmov\t"<<general_register.Name(register_i)<<", "<<string_name<<endl;
 
     return register_i;
 }
@@ -1353,19 +1352,19 @@ int CodeGenerator::NewString()
 
 int CodeGenerator::AddressGlobalVar(string identifier)
 {
-    int register_i=register_manager.Alloc();
+    int register_i=general_register.Alloc();
 
-    OutFile<<"\tmov\t"<<register_manager.Name(register_i)<<", "<<identifier<<endl;
+    OutFile<<"\tmov\t"<<general_register.Name(register_i)<<", "<<identifier<<endl;
 
     return register_i;
 }
 
 int CodeGenerator::AddressLocalVar(string identifier)
 {
-    int register_i=register_manager.Alloc();
+    int register_i=general_register.Alloc();
 
     int local_variable_stack_offset=Local_Vartable().Visit(identifier).stack_offset;
-    OutFile<<"\tlea\t"<<register_manager.Name(register_i)<<", [rbp+"<<local_variable_stack_offset<<"]"<<endl;
+    OutFile<<"\tlea\t"<<general_register.Name(register_i)<<", [rbp+"<<local_variable_stack_offset<<"]"<<endl;
 
     return register_i;
 }
@@ -1377,13 +1376,13 @@ int CodeGenerator::Dereference(int r_i,Type ptr_type)
     switch(ptr_type)
     {
         case T_CHAR_PTR:case T_CHAR_ARRAY:
-            OutFile<<"\tmovzx\t"<<register_manager.Name(r_i)<<", byte ["<<register_manager.Name(r_i)<<"]"<<endl;
+            OutFile<<"\tmovzx\t"<<general_register.Name(r_i)<<", byte ["<<general_register.Name(r_i)<<"]"<<endl;
             break;
         case T_INT_PTR:case T_INT_ARRAY:
-            OutFile<<"\tmovsx\t"<<register_manager.Name(r_i)<<", dword ["<<register_manager.Name(r_i)<<"]"<<endl;
+            OutFile<<"\tmovsx\t"<<general_register.Name(r_i)<<", dword ["<<general_register.Name(r_i)<<"]"<<endl;
             break;
         case T_LONG_PTR:case T_LONG_ARRAY:
-            OutFile<<"\tmov\t"<<register_manager.Name(r_i)<<", ["<<register_manager.Name(r_i)<<"]"<<endl;
+            OutFile<<"\tmov\t"<<general_register.Name(r_i)<<", ["<<general_register.Name(r_i)<<"]"<<endl;
             break;
         default:
             CodeGenerate_Error("This type can't be dereferenced.");
@@ -1398,7 +1397,7 @@ int CodeGenerator::Dereference(int r_i,Type ptr_type)
 //For consistency
 int CodeGenerator::Comma(int r1_i,int r2_i)
 {
-    register_manager.Free(r1_i);
+    general_register.Free(r1_i);
     return r2_i;
 }
 
@@ -1406,9 +1405,9 @@ int CodeGenerator::Comma(int r1_i,int r2_i)
 
 int CodeGenerator::Copy(int r1_i,int r2_i)
 {
-    OutFile<<"\tmov\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
+    OutFile<<"\tmov\t"<<general_register.Name(r1_i)<<", "<<general_register.Name(r2_i)<<endl;
     
-    register_manager.Free(r2_i);
+    general_register.Free(r2_i);
     return r1_i;
 }
 
@@ -1416,11 +1415,11 @@ int CodeGenerator::Copy(int r1_i,int r2_i)
 
 int CodeGenerator::Compare(int r1_i,int r2_i,string setx)
 {
-    OutFile<<"\tcmp\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
-    OutFile<<"\t"<<setx<<"\t"<<register_manager.Name(r1_i,1)<<endl;
-    OutFile<<"\tand\t"<<register_manager.Name(r1_i)<<", 255"<<endl;
+    OutFile<<"\tcmp\t"<<general_register.Name(r1_i)<<", "<<general_register.Name(r2_i)<<endl;
+    OutFile<<"\t"<<setx<<"\t"<<general_register.Name(r1_i,1)<<endl;
+    OutFile<<"\tand\t"<<general_register.Name(r1_i)<<", 255"<<endl;
 
-    register_manager.Free(r2_i);
+    general_register.Free(r2_i);
     return r1_i;
 }
 
@@ -1456,9 +1455,9 @@ int CodeGenerator::GreaterEqual(int r1_i,int r2_i)
 
 void CodeGenerator::CompareZero(int r_i)
 {
-    OutFile<<"\tcmp\t"<<register_manager.Name(r_i)<<", 0"<<endl;
+    OutFile<<"\tcmp\t"<<general_register.Name(r_i)<<", 0"<<endl;
 
-    register_manager.Free(r_i);
+    general_register.Free(r_i);
 }
 
 
@@ -1482,93 +1481,93 @@ void CodeGenerator::Jump(string jump,int lable_numbr)
 
 int CodeGenerator::Add(int r1_i,int r2_i)
 {
-    OutFile<<"\tadd\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
+    OutFile<<"\tadd\t"<<general_register.Name(r1_i)<<", "<<general_register.Name(r2_i)<<endl;
     
-    register_manager.Free(r2_i);
+    general_register.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Sub(int r1_i,int r2_i)
 {
-    OutFile<<"\tsub\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
+    OutFile<<"\tsub\t"<<general_register.Name(r1_i)<<", "<<general_register.Name(r2_i)<<endl;
     
-    register_manager.Free(r2_i);
+    general_register.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Mul(int r1_i,int r2_i)
 {
-    OutFile<<"\timul\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
+    OutFile<<"\timul\t"<<general_register.Name(r1_i)<<", "<<general_register.Name(r2_i)<<endl;
 
-    register_manager.Free(r2_i);
+    general_register.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Div(int r1_i,int r2_i)
 {
-    OutFile<<"\tmov\trax, "<<register_manager.Name(r1_i)<<endl;
+    OutFile<<"\tmov\trax, "<<general_register.Name(r1_i)<<endl;
     OutFile<<"\tcqo"<<endl;
-    OutFile<<"\tidiv\t"<<register_manager.Name(r2_i)<<endl;
-    OutFile<<"\tmov\t"<<register_manager.Name(r1_i)<<", rax"<<endl;
+    OutFile<<"\tidiv\t"<<general_register.Name(r2_i)<<endl;
+    OutFile<<"\tmov\t"<<general_register.Name(r1_i)<<", rax"<<endl;
 
-    register_manager.Free(r2_i);
+    general_register.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Mod(int r1_i,int r2_i)
 {
-    OutFile<<"\tmov\trax, "<<register_manager.Name(r1_i)<<endl;
+    OutFile<<"\tmov\trax, "<<general_register.Name(r1_i)<<endl;
     OutFile<<"\tcqo"<<endl;
-    OutFile<<"\tidiv\t"<<register_manager.Name(r2_i)<<endl;
-    OutFile<<"\tmov\t"<<register_manager.Name(r1_i)<<", rdx"<<endl;
+    OutFile<<"\tidiv\t"<<general_register.Name(r2_i)<<endl;
+    OutFile<<"\tmov\t"<<general_register.Name(r1_i)<<", rdx"<<endl;
 
-    register_manager.Free(r2_i);
+    general_register.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::And(int r1_i,int r2_i)
 {
-    OutFile<<"\tand\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
+    OutFile<<"\tand\t"<<general_register.Name(r1_i)<<", "<<general_register.Name(r2_i)<<endl;
 
-    register_manager.Free(r2_i);
+    general_register.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Or(int r1_i,int r2_i)
 {
-    OutFile<<"\tor\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
+    OutFile<<"\tor\t"<<general_register.Name(r1_i)<<", "<<general_register.Name(r2_i)<<endl;
 
-    register_manager.Free(r2_i);
+    general_register.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Xor(int r1_i,int r2_i)
 {
-    OutFile<<"\txor\t"<<register_manager.Name(r1_i)<<", "<<register_manager.Name(r2_i)<<endl;
+    OutFile<<"\txor\t"<<general_register.Name(r1_i)<<", "<<general_register.Name(r2_i)<<endl;
 
-    register_manager.Free(r2_i);
+    general_register.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::Invert(int r_i)
 {
-    OutFile<<"\tnot\t"<<register_manager.Name(r_i)<<endl;
+    OutFile<<"\tnot\t"<<general_register.Name(r_i)<<endl;
     
     return r_i;
 }
 
 int CodeGenerator::Not(int r_i)
 {
-    OutFile<<"\ttest\t"<<register_manager.Name(r_i)<<", "<<register_manager.Name(r_i)<<endl;
-    OutFile<<"\tsete\t"<<register_manager.Name(r_i,1)<<endl;
-    OutFile<<"\tmovzx\t"<<register_manager.Name(r_i)<<", "<<register_manager.Name(r_i,1)<<endl;
+    OutFile<<"\ttest\t"<<general_register.Name(r_i)<<", "<<general_register.Name(r_i)<<endl;
+    OutFile<<"\tsete\t"<<general_register.Name(r_i,1)<<endl;
+    OutFile<<"\tmovzx\t"<<general_register.Name(r_i)<<", "<<general_register.Name(r_i,1)<<endl;
     
     return r_i;
 }
 
 int CodeGenerator::Negate(int r_i)
 {
-    OutFile<<"\tneg\t"<<register_manager.Name(r_i)<<endl;
+    OutFile<<"\tneg\t"<<general_register.Name(r_i)<<endl;
     
     return r_i;
 }
@@ -1577,25 +1576,25 @@ int CodeGenerator::Negate(int r_i)
 
 int CodeGenerator::ShiftLeftConstant(int r_i,int constant)
 {
-    OutFile<<"\tsal\t"<<register_manager.Name(r_i)<<", "<<constant<<endl;
+    OutFile<<"\tsal\t"<<general_register.Name(r_i)<<", "<<constant<<endl;
     return r_i;
 }
 
 int CodeGenerator::ShiftLeft(int r1_i,int r2_i)
 {
-    OutFile<<"\tmov\tcl, "<<register_manager.Name(r2_i,1)<<endl;
-    OutFile<<"\tshl\t"<<register_manager.Name(r1_i)<<", cl"<<endl;
+    OutFile<<"\tmov\tcl, "<<general_register.Name(r2_i,1)<<endl;
+    OutFile<<"\tshl\t"<<general_register.Name(r1_i)<<", cl"<<endl;
 
-    register_manager.Free(r2_i);
+    general_register.Free(r2_i);
     return r1_i;
 }
 
 int CodeGenerator::ShiftRight(int r1_i,int r2_i)
 {
-    OutFile<<"\tmov\tcl, "<<register_manager.Name(r2_i,1)<<endl;
-    OutFile<<"\tshr\t"<<register_manager.Name(r1_i)<<", cl"<<endl;
+    OutFile<<"\tmov\tcl, "<<general_register.Name(r2_i,1)<<endl;
+    OutFile<<"\tshr\t"<<general_register.Name(r1_i)<<", cl"<<endl;
 
-    register_manager.Free(r2_i);
+    general_register.Free(r2_i);
     return r1_i;
 }
 
@@ -1705,7 +1704,6 @@ int CodeGenerator::DecLocalVar(string identifier,string pre_post)
 
 void CodeGenerator::FunctionHead(string identifier)
 {
-    //OutFile<<"section\t.text"<<endl;
     OutFile<<"global\t"<<identifier<<endl;
 
     OutFile<<identifier<<":"<<endl;
@@ -1713,6 +1711,7 @@ void CodeGenerator::FunctionHead(string identifier)
     OutFile<<"\tmov\trbp, rsp"<<endl;
     //very important
     if(Now_Function().stack_align_offset)OutFile<<"\tadd\trsp, "<<-Now_Function().stack_align_offset<<endl;
+    
     LoadParameter();
 }
 
@@ -1729,29 +1728,23 @@ void CodeGenerator::FunctionTail(string identifier)
 int CodeGenerator::FunctionCall(string identifier)
 {
 //temporary storage
-    vector<string>UsedRegister;
-    for(int i=0;i<register_manager.General_Register_Table.size();i++)
+    general_register.FlashUsed();
+
+    for(int i=0;i<general_register.used_register.size();i++)
     {
-        if(!register_manager.General_Register_Table[i].free)
-        {
-            UsedRegister.push_back(register_manager.Name(i));
-        }
+        OutFile<<"\tpush\t"<<general_register.used_register[i]<<endl;
     }
 
-    for(int i=0;i<UsedRegister.size();i++)
-    {
-        OutFile<<"\tpush\t"<<UsedRegister[i]<<endl;
-    }
 
-    int out_ri=register_manager.Alloc();
+    int out_ri=general_register.Alloc();
 
     OutFile<<"\tcall\t"<<identifier<<endl;
-    OutFile<<"\tmov\t"<<register_manager.Name(out_ri)<<", rax"<<endl;
+    OutFile<<"\tmov\t"<<general_register.Name(out_ri)<<", rax"<<endl;
 
 //recover
-    for(int i=UsedRegister.size()-1;i>=0;i--)
+    for(int i=general_register.used_register.size()-1;i>=0;i--)
     {
-        OutFile<<"\tpop\t"<<UsedRegister[i]<<endl;
+        OutFile<<"\tpop\t"<<general_register.used_register[i]<<endl;
     }
 
     return out_ri;
@@ -1763,20 +1756,20 @@ void CodeGenerator::Return(int r_i,string identifier)
     {
         case T_VOID:break;        
         case T_CHAR:
-            OutFile<<"\tmovzx\teax, "<<register_manager.Name(r_i,1)<<endl;
+            OutFile<<"\tmovzx\teax, "<<general_register.Name(r_i,1)<<endl;
             break;
         case T_INT:
-            OutFile<<"\tmov\teax, "<<register_manager.Name(r_i,4)<<endl;
+            OutFile<<"\tmov\teax, "<<general_register.Name(r_i,4)<<endl;
             break;
         case T_LONG:
-            OutFile<<"\tmov\trax, "<<register_manager.Name(r_i,8)<<endl;
+            OutFile<<"\tmov\trax, "<<general_register.Name(r_i,8)<<endl;
             break;
     }
 
     Jump("jmp",function_table.Visit(identifier).end_lable);
 
     if(function_table.Visit(identifier).type!=T_VOID)
-        register_manager.Free(r_i);
+        general_register.Free(r_i);
 }
 
 
@@ -1792,19 +1785,18 @@ void CodeGenerator::LoadParameter()
         switch(parameter_type)
         {
             case T_CHAR:
-                OutFile<<"\tmov\tbyte [rbp+"<<parameter_stack_offset<<"], "<<register_manager.Parameter_Register_Name(i,1)<<endl; 
+                OutFile<<"\tmov\tbyte [rbp+"<<parameter_stack_offset<<"], "<<parameter_register.Name(i,1)<<endl; 
                 break;
             case T_INT:
-                OutFile<<"\tmov\tdword [rbp+"<<parameter_stack_offset<<"], "<<register_manager.Parameter_Register_Name(i,4)<<endl; 
+                OutFile<<"\tmov\tdword [rbp+"<<parameter_stack_offset<<"], "<<parameter_register.Name(i,4)<<endl; 
                 break;
             case T_LONG:
             case T_CHAR_PTR: case T_INT_PTR: case T_LONG_PTR:
-                OutFile<<"\tmov\tqword [rbp+"<<parameter_stack_offset<<"], "<<register_manager.Parameter_Register_Name(i,8)<<endl; 
+                OutFile<<"\tmov\tqword [rbp+"<<parameter_stack_offset<<"], "<<parameter_register.Name(i,8)<<endl; 
                 break;
             default:
                 CodeGenerate_Error("Load "+parameter_identifier+" error.");
         }
-
     }
 }
 
@@ -1812,15 +1804,23 @@ void CodeGenerator::StoreArgument(ASTNode* expression_node)
 {
     int arguments_size=(expression_node->Children.size()+1)/2;
     
+    vector<int>parameter_ri_list;
+    
+//ths sequence is very vrey important!
     for(int i=0,j=0;i<arguments_size;i++,j+=2)
     {
         int r_i=CodeGenerate_Assignment_Expression(expression_node->Children[j]);
-
-        OutFile<<"\tmov\t"<<register_manager.Parameter_Register_Name(i)<<", "
-               <<register_manager.Name(r_i)<<endl;
-        
-        register_manager.Free(r_i);
+        parameter_ri_list.push_back(r_i);
     }
+    
+    for(int i=0;i<arguments_size;i++)
+    {
+        OutFile<<"\tmov\t"  <<parameter_register.Name(i)<<", "
+                            <<general_register.Name(parameter_ri_list[i])<<endl;
+        
+        general_register.Free(parameter_ri_list[i]);
+    }
+
 }
 
 

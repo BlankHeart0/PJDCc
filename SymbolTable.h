@@ -90,6 +90,8 @@ public:
     void Error(string error_message,string identifier);
 };
 
+
+
 class KissFunctionTable
 {
 public:

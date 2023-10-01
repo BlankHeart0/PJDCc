@@ -8,33 +8,48 @@ using namespace std;
 class Register
 {
 public:
-    string name;
+    vector<string> name;
     bool free;
     
-    Register(string Name,bool Free):name(Name),free(Free){}
+    Register(vector<string> Name):name(Name),free(true){}
 };
 
 
 
-class RegisterManager
+class GeneralRegister
 {
 public:
-    vector<Register> General_Register_Table;
-    vector<vector<string>> Parameter_Register_Table;
+    vector<Register> table;
+    vector<string> used_register;
 
-    RegisterManager();
+    GeneralRegister();
 
-//Alloc and Free
     int Alloc();
     void Free(int register_i);
     void FreeAll();
 
-//Visit
     string Name(int register_i);
     string Name(int register_i,int byte);
 
-    string Parameter_Register_Name(int register_i);
-    string Parameter_Register_Name(int register_i,int byte);
-
-    void Register_Error(string error_message);
+    void FlashUsed();
 };
+
+class ParameterRegister
+{
+public:
+    vector<Register> table;
+    vector<string> used_register;
+
+    ParameterRegister();
+
+    void Alloc(int register_i);
+    void Free(int register_i);
+    void FreeAll();
+
+    string Name(int register_i);
+    string Name(int register_i,int byte); 
+
+    void FlashUsed();
+};
+
+static void Register_Error(string error_message);

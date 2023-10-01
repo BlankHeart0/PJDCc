@@ -33,11 +33,10 @@ int factorial(int n)
 int main()
 {
 
-  int i=1;
-  while(i<=10)
-  {
-    print_int(factorial(i));
-    i=i+1;
+  int i;
+  for(i=1;i<=10;i++)
+  { 
+    printf("%d\n",fib(i));
   }
 
   return 0;

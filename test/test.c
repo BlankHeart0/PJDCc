@@ -1,11 +1,29 @@
-int x;
-int y= 3;
+// kiss strlen;
 
-int main() {
-  for (y= 0; y < 10; y++) {
-    x= (y < 4) ? y + 2 :
-       (y > 7) ? 1000 : y + 9;
-    printf("%d\n", x);
-  }
+// int main()
+// {
+//   char*s="hello!\n";
+//   printf("%s",s);
+
+//   int len=strlen(s);
+//   printf("len1=%d\n",len);
+
+//   printf("len2=%d\n",strlen(s));
+
+//   return 0;
+// }
+
+int sum(int a,int b)
+{
+  return a+b;
+}
+
+int main()
+{
+  //int sum=sum(1,2);
+  //printf("1+2=%d\n",sum);
+
+  printf("1+2=%d,%d,%d,%d\n",sum(1,2),sum(1,2),sum(1,2),sum(1,2));
+
   return 0;
 }
