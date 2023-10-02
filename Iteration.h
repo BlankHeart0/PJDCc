@@ -5,6 +5,8 @@
 
 using namespace std;
 
+extern char* out_file_path;
+
 enum IterationType
 {
     I_WHILE,I_DOWHILE,I_FOR

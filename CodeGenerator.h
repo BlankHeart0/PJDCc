@@ -7,7 +7,7 @@
 #include "Iteration.h"
 #include "SymbolTable.h"
 
-extern string out_file_path;
+extern char* out_file_path;
 
 class CodeGenerator
 {
@@ -118,7 +118,7 @@ public:
 
     
 
-//Atomic instruction
+//x86 instruction
     int Load(int constant_value);
     int LoadGlobalVar(string identifier);
     int LoadLocalVar(string identifier);

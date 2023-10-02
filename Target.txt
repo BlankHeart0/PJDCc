@@ -1,7 +1,0 @@
-Optimizer
-
-detial:
-
-1.remove the asm file when it compile failed
-
-2.make its usage is like GCC

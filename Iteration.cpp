@@ -37,5 +37,8 @@ Iteration IterationManger::NowInIteration()
 void IterationManger::Iteration_Error(string error_message)
 {
     cout<<"Iteration Manger Error : "<<error_message<<endl;
+    
+    remove(out_file_path);
+
     exit(6);
 }

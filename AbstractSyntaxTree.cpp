@@ -22,9 +22,7 @@ void AST::AST_Print(ASTNode* root,int depth)
 
 void AST::AST_Print()
 {
-    cout<<endl<<"----- The AST -----"<<endl;
 
     AST_Print(Translation,0);
 
-    cout<<endl<<"----- Print Done -----"<<endl;
 }

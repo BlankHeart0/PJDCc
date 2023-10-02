@@ -5,6 +5,8 @@
 #include <unordered_set>
 #include <vector>
 
+extern char* out_file_path;
+
 using namespace std;
 
 enum Type

@@ -44,6 +44,9 @@ Variable& VariableTable::Visit(string identifier)
 void VariableTable::Error(string error_message,string identifier)
 {
     cout<< "Variable table Error: "<<error_message<<" "<<identifier<<endl;
+
+    remove(out_file_path);
+
     exit(4);
 }
 
@@ -73,6 +76,9 @@ Function& FunctionTable::Visit(string identifier)
 void FunctionTable::Error(string error_message,string identifier)
 {
     cout<< "Function table Error: "<<error_message<<" "<<identifier<<endl;
+
+    remove(out_file_path);
+
     exit(4);
 }
 
@@ -96,5 +102,8 @@ bool KissFunctionTable::Exist(string identifier)
 void KissFunctionTable::Error(string error_message,string identifier)
 {
     cout<< "Kiss Function table Error: "<<error_message<<" "<<identifier<<endl;
+
+    remove(out_file_path);
+
     exit(4);
 }

@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cstring>
 
 #include "Token.h"
 #include "Scanner.h"
@@ -10,49 +11,54 @@
 
 using namespace std;
 
-string out_file_path;
+char* out_file_path;
+
+
+
+enum CompileType
+{
+    C_EXECUTABLE, C_ASSEMBLY, C_TOKEN, C_AST
+};
+
+
 
 class PJDCc
 {
 public:
-    void Compile(string path);
+    void Compile(char* input_file_path,CompileType compile_type);
 
     string source;
-    void Load(string path);
+    void Load(char* input_file_path);
     void Load_Test();
 
-    Scanner S;
+    Scanner scanner;
     
-    Parser P;
+    Parser parser;
 
-    CodeGenerator CG;
+    CodeGenerator generator;
 
 };
 
 
-//Read the source code to the string--source
-void PJDCc::Load(string path)
+
+void PJDCc::Load(char* input_file_path)
 {
-    //Open
     ifstream file;
-    file.open(path,ios::in);
+    file.open(input_file_path,ios::in);
     if(!file.is_open())
     {
         cout<<"Open the code file error!"<<endl;
-        return;
+        exit(-1);
     }
 
-    //Load it
     source="";
     string buffer;
     while(getline(file,buffer))
     {
         source+=buffer;
-        //Add newline to protect the integrity of the code
         source+='\n';
     }
     
-    //Close
     file.close();
 }
 
@@ -61,62 +67,111 @@ void PJDCc::Load_Test()
     cout<<source;
 }
 
-void PJDCc::Compile(string path)
+
+
+void PJDCc::Compile(char* input_file_path,CompileType compile_type)
 {
     //Read source
-    Load(path);
-    Load_Test();
+    Load(input_file_path);
+
 
     //Scan
-    S.source=this->source;
-    S.Scan();
-    S.Tokens_PrintTable();
+    scanner.source=this->source;
+    scanner.Scan();
+    if(compile_type==C_TOKEN)
+    {
+        scanner.Tokens_PrintTable();
+        exit(0);
+    }
+        
 
     //Parse
-    P.tokens=S.tokens;
-    P.Parse();
-    P.ast.AST_Print();
+    parser.tokens=scanner.tokens;
+    parser.Parse();
+    if(compile_type==C_AST)
+    {
+        parser.ast.AST_Print();
+        exit(0);
+    }
 
     //Genernate
-    CG.ast=P.ast;
-    path[path.size()-1]='a';
-    path.push_back('s');
-    path.push_back('m');
+    int len=strlen(input_file_path);
+    input_file_path[len-1]='s';
+    out_file_path=input_file_path;
 
-    path.insert(6,"_create");
-
-    out_file_path=path;
-
-    CG.CodeGenerate();
+    generator.ast=parser.ast;
+    generator.CodeGenerate();
+    if(compile_type==C_ASSEMBLY)exit(0);
     
-    
-    cout<<endl<<"--- Compile Successfully! ---"<<endl;
+    //Nasm assembly and GCC-ld link
+    if(compile_type==C_EXECUTABLE)
+    {
+        char* nasm_command=new char(14+len);
+        sprintf(nasm_command,"%s %s","nasm -f elf64",input_file_path);
+        system(nasm_command);
 
+        input_file_path[len-1]='o';
+        char* executable_file=new char(len);
+        strncpy(executable_file,input_file_path,len);
+        executable_file[len-2]='\0';
+
+        char* gcc_command=new char(16+len+(len-2));
+        sprintf(gcc_command,"%s %s %s %s","gcc -no-pie",input_file_path,"-o",executable_file);
+        system(gcc_command);
+
+        remove(input_file_path);
+        input_file_path[len-1]='s';
+        remove(input_file_path);
+
+        delete nasm_command;
+        delete executable_file;
+        delete gcc_command;
+    }
 }   
 
+void Print_Usage()
+{
+    cout<<"Usage: pjdcc [-ESTA] input_file"<<endl;
+    cout<<"-E: Generate executable file (default)"<<endl;
+    cout<<"-S: Compile to assembly file"<<endl;
+    cout<<"-T: Scan the code, print tokens"<<endl;
+    cout<<"-A: Parse the code, print abstract syntax tree"<<endl;
+    exit(-1);
+}
 
-int main()
+int main(int argc,char* argv[])
 {
     PJDCc pjdcc;
 
-    //CodeGen
+    if(argc==2)
+    {
+        char* input_file_path=argv[1];
+        CompileType compile_type=C_EXECUTABLE;
 
-    pjdcc.Compile("./test/test.c");
+        pjdcc.Compile(input_file_path,compile_type);
+    }
+    else if(argc==3)
+    {
+        if(argv[1][0]!='-')Print_Usage();
+        if(argv[1][1]!='E'&&argv[1][1]!='S'&&argv[1][1]!='T'&&argv[1][1]!='A')Print_Usage();
+        if(strlen(argv[1])!=2)Print_Usage();
 
+        
+        char* input_file_path=argv[2];
+        CompileType compile_type;
 
-    //pjdcc.Compile("./test/Pointer.c");
-    //pjdcc.Compile("./test/Array.c");
-    //pjdcc.Compile("./test/String.c");
-    //pjdcc.Compile("./test/Operator.c");
-    //pjdcc.Compile("./test/Local.c");  
+        switch(argv[1][1])
+        {
+            case 'E':compile_type=C_EXECUTABLE;break;
+            case 'S':compile_type=C_ASSEMBLY;break;
+            case 'T':compile_type=C_TOKEN;break;
+            case 'A':compile_type=C_AST;break;
+        }
 
-//pjdcc.Compile("./test/Function.c");
-//pjdcc.Compile("./test/BubbleSort.c");
-//pjdcc.Compile("./test/QuickSort.c");
-//pjdcc.Compile("./test/MergeSort.c");
-
-
-//pjdcc.Compile("./test/swap.c");
+        pjdcc.Compile(input_file_path,compile_type);
+        
+    }
+    else Print_Usage();
 
     return 0;
 }

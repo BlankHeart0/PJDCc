@@ -216,5 +216,8 @@ void ParameterRegister::FlashUsed()
 static void Register_Error(string error_message)
 {
     cout<< "Register Manager Error : "<<error_message<<endl;
+    
+    remove(out_file_path);
+    
     exit(3);
 }

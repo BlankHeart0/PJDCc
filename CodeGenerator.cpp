@@ -2,25 +2,23 @@
 
 void CodeGenerator::CodeGenerate()
 {
-
+//Create or Empty the file
     OutFile.open(out_file_path,ios::out);
     if(!OutFile.is_open())CodeGenerate_Error("Empty the assembly file error!");
     OutFile.close();
 
+//Ready to write
     OutFile.open(out_file_path,ios::app);
     if(!OutFile.is_open())CodeGenerate_Error("Open the assembly file error!");
-
 
     general_register.FreeAll();
     parameter_register.FreeAll();
 
-    cout<<endl<<"--- CodeGenerate Begin ---"<<endl;
 
     CodeGenerate_Head();
     CodeGenerate_Translation_Unit(ast.Translation);
     CodeGenerate_Tail();
 
-    cout<<"--- CodeGenerate Done ---"<<endl<<endl;
 
     OutFile.close();
 }
@@ -1750,7 +1748,7 @@ int CodeGenerator::FunctionCall(string identifier)
 
     int out_ri=general_register.Alloc();
     OutFile<<"\tmov\t"<<general_register.Name(out_ri)<<", rax"<<endl;
-    
+
     return out_ri;
 }
 
@@ -1983,11 +1981,17 @@ void CodeGenerator::WhoAmI(string name)
 void CodeGenerator::CodeGenerate_Error(string error_message)
 {
     cout<< "CodeGenerate Error: "<<": "<<error_message<<endl;
+    
+    remove(out_file_path);
+
     exit(5);
 }
 
 void CodeGenerator::CodeGenerate_Error(string error_message,ASTNode* error_node)
 {
     cout<< "CodeGenerate Error: Line "<<error_node->line<<": "<<error_message<<endl;
+    
+    remove(out_file_path);
+
     exit(5);
 }

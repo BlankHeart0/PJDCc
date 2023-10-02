@@ -6,7 +6,7 @@
 
 using namespace std;
 
-extern string out_file_path;
+extern char* out_file_path;
 
 class Register
 {

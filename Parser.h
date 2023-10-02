@@ -12,7 +12,7 @@ public:
 
     bool DEBUG;
 
-    Parser():current(0),DEBUG(true){}
+    Parser():current(0),DEBUG(false){}
 
     void Parse();
 
