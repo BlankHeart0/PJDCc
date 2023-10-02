@@ -7,11 +7,13 @@
 #include "Iteration.h"
 #include "SymbolTable.h"
 
+extern string out_file_path;
 
 class CodeGenerator
 {
 public:
     AST ast;
+    ofstream OutFile;
 
     GeneralRegister general_register;
     ParameterRegister parameter_register;
@@ -22,8 +24,7 @@ public:
     FunctionTable function_table;
     KissFunctionTable kissfunction_table;
 
-    ofstream OutFile;
-
+    
     int LableNumber;
     int StringNumber;
     string NowInFunction;
@@ -35,7 +36,7 @@ public:
 
     CodeGenerator():LableNumber(0),StringNumber(0),NowInFunction(""),TailData(""),DEBUG(false){}
 
-    void CodeGenerate(string path);
+    void CodeGenerate();
 
     void CodeGenerate_Head();
     void CodeGenerate_Tail();

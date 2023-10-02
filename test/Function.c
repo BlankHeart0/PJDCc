@@ -36,7 +36,7 @@ int main()
   int i;
   for(i=1;i<=10;i++)
   { 
-    printf("%d\n",fib(i));
+    printf("fib(%d)=%d  factorial(%d)=%d\n",i,fib(i),i,factorial(i));
   }
 
   return 0;

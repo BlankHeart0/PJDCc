@@ -13,17 +13,23 @@
 //   return 0;
 // }
 
-int sum(int a,int b)
+int sum(int a,int b,int c,int d,int e,int f)
 {
-  return a+b;
+  return a+b+c+d+e+f;
 }
 
 int main()
 {
-  //int sum=sum(1,2);
-  //printf("1+2=%d\n",sum);
-
-  printf("1+2=%d,%d,%d,%d\n",sum(1,2),sum(1,2),sum(1,2),sum(1,2));
+  printf("%d,%d,%d,%d,%d\n",sum(1,0,0,0,0,0),sum(2,0,0,0,0,0),sum(3,0,0,0,0,0),sum(4,0,0,0,0,0),sum(5,0,0,0,0,0));
 
   return 0;
 }
+
+// int main()
+// {
+//   int x;
+//   x= 1 + (2 + (3 + (4 + (5 + (6 + (7 + 8))))));
+
+//   printf("%d\n",x);
+
+// }

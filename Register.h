@@ -2,8 +2,11 @@
 
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 using namespace std;
+
+extern string out_file_path;
 
 class Register
 {
@@ -19,8 +22,11 @@ public:
 class GeneralRegister
 {
 public:
+    int spill_register;
     vector<Register> table;
     vector<string> used_register;
+
+    ofstream OutFile;
 
     GeneralRegister();
 
@@ -32,6 +38,8 @@ public:
     string Name(int register_i,int byte);
 
     void FlashUsed();
+
+    void Append(string assembly_code);
 };
 
 class ParameterRegister

@@ -1,7 +1,0 @@
-
-4. type_compatible
-5. -xx 
-6. sign problem
-7. atleast one return
-11. unsafe ptr ,not enough check
-12. multiple variable declaration

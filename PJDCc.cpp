@@ -10,6 +10,7 @@
 
 using namespace std;
 
+string out_file_path;
 
 class PJDCc
 {
@@ -84,7 +85,9 @@ void PJDCc::Compile(string path)
 
     path.insert(6,"_create");
 
-    CG.CodeGenerate(path);
+    out_file_path=path;
+
+    CG.CodeGenerate();
     
     
     cout<<endl<<"--- Compile Successfully! ---"<<endl;
@@ -98,7 +101,7 @@ int main()
 
     //CodeGen
 
-    //pjdcc.Compile("./test/test.c");
+    pjdcc.Compile("./test/test.c");
 
 
     //pjdcc.Compile("./test/Pointer.c");
@@ -110,7 +113,7 @@ int main()
 //pjdcc.Compile("./test/Function.c");
 //pjdcc.Compile("./test/BubbleSort.c");
 //pjdcc.Compile("./test/QuickSort.c");
-pjdcc.Compile("./test/MergeSort.c");
+//pjdcc.Compile("./test/MergeSort.c");
 
 
 //pjdcc.Compile("./test/swap.c");

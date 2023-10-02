@@ -2,8 +2,6 @@ Optimizer
 
 detial:
 
-1.register spill
+1.remove the asm file when it compile failed
 
-2.remove the asm file when it compile failed
-
-3.make its usage is like GCC
+2.make its usage is like GCC

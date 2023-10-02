@@ -17,6 +17,8 @@
         "deque": "c",
         "string": "c",
         "unordered_map": "c",
-        "unordered_set": "c"
+        "unordered_set": "c",
+        "iosfwd": "cpp",
+        "fstream": "cpp"
     }
 }

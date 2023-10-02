@@ -1,13 +1,15 @@
 #include "CodeGenerator.h"
 
-void CodeGenerator::CodeGenerate(string path)
+void CodeGenerator::CodeGenerate()
 {
-    OutFile.open(path,ios::out);
-    if(!OutFile.is_open())
-    {
-        cout<<"Create the assembly file error!"<<endl;
-        return;
-    }
+
+    OutFile.open(out_file_path,ios::out);
+    if(!OutFile.is_open())CodeGenerate_Error("Empty the assembly file error!");
+    OutFile.close();
+
+    OutFile.open(out_file_path,ios::app);
+    if(!OutFile.is_open())CodeGenerate_Error("Open the assembly file error!");
+
 
     general_register.FreeAll();
     parameter_register.FreeAll();
@@ -857,6 +859,7 @@ int CodeGenerator::CodeGenerate_Unary_Expression(ASTNode* root)
     }
     return result_ri;
 }
+
 
 
 int CodeGenerator::CodeGenerate_Primary_Expression(ASTNode* root)
@@ -1727,6 +1730,8 @@ void CodeGenerator::FunctionTail(string identifier)
 
 int CodeGenerator::FunctionCall(string identifier)
 {
+//The sequence is very important!
+
 //temporary storage
     general_register.FlashUsed();
 
@@ -1735,11 +1740,7 @@ int CodeGenerator::FunctionCall(string identifier)
         OutFile<<"\tpush\t"<<general_register.used_register[i]<<endl;
     }
 
-
-    int out_ri=general_register.Alloc();
-
     OutFile<<"\tcall\t"<<identifier<<endl;
-    OutFile<<"\tmov\t"<<general_register.Name(out_ri)<<", rax"<<endl;
 
 //recover
     for(int i=general_register.used_register.size()-1;i>=0;i--)
@@ -1747,6 +1748,9 @@ int CodeGenerator::FunctionCall(string identifier)
         OutFile<<"\tpop\t"<<general_register.used_register[i]<<endl;
     }
 
+    int out_ri=general_register.Alloc();
+    OutFile<<"\tmov\t"<<general_register.Name(out_ri)<<", rax"<<endl;
+    
     return out_ri;
 }
 
@@ -1805,15 +1809,16 @@ void CodeGenerator::StoreArgument(ASTNode* expression_node)
     int arguments_size=(expression_node->Children.size()+1)/2;
     
     vector<int>parameter_ri_list;
-    
+
 //ths sequence is very vrey important!
     for(int i=0,j=0;i<arguments_size;i++,j+=2)
     {
         int r_i=CodeGenerate_Assignment_Expression(expression_node->Children[j]);
         parameter_ri_list.push_back(r_i);
     }
-    
-    for(int i=0;i<arguments_size;i++)
+
+//Need to reverse transmit to ensure unspill register true
+    for(int i=arguments_size-1;i>=0;i--)
     {
         OutFile<<"\tmov\t"  <<parameter_register.Name(i)<<", "
                             <<general_register.Name(parameter_ri_list[i])<<endl;
