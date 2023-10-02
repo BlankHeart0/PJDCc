@@ -91,6 +91,7 @@ void PJDCc::Compile(char* input_file_path,CompileType compile_type)
     if(compile_type==C_AST)
     {
         parser.ast.AST_Print();
+        parser.ast.AST_Clean();
         exit(0);
     }
 
@@ -101,7 +102,11 @@ void PJDCc::Compile(char* input_file_path,CompileType compile_type)
 
     generator.ast=parser.ast;
     generator.CodeGenerate();
-    if(compile_type==C_ASSEMBLY)exit(0);
+    if(compile_type==C_ASSEMBLY)
+    {
+        parser.ast.AST_Clean();
+        exit(0);
+    }
     
     //Nasm assembly and GCC-ld link
     if(compile_type==C_EXECUTABLE)
@@ -126,6 +131,9 @@ void PJDCc::Compile(char* input_file_path,CompileType compile_type)
         delete nasm_command;
         delete executable_file;
         delete gcc_command;
+
+        parser.ast.AST_Clean();
+        exit(0);
     }
 }   
 

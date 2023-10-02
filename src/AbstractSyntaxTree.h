@@ -290,4 +290,8 @@ public:
 
     void AST_Print(ASTNode* root,int depth);
     void AST_Print();
+
+    void AST_Clean(ASTNode* root);
+    void AST_Clean();
+
 };

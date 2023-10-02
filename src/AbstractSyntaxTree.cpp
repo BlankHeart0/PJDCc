@@ -26,3 +26,22 @@ void AST::AST_Print()
     AST_Print(Translation,0);
 
 }
+
+
+
+void AST::AST_Clean(ASTNode* root)
+{
+    for(ASTNode* node:root->Children)
+    {
+        delete node;
+    }
+    
+    delete root;
+}
+
+void AST::AST_Clean()
+{
+
+    AST_Clean(Translation);
+
+}
