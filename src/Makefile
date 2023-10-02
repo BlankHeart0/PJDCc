@@ -21,9 +21,14 @@ SymbolTable.o: SymbolTable.h
 Iteration.o: Iteration.h
 
 
+.PHONY:install
+install:
+	cp pjdcc /usr/bin
+.PHONY:uninstall
+uninstall:
+	rm /usr/bin/pjdcc
 
 
 .PHONY: clean
 clean:
 	-rm pjdcc $(objects)
-	-rm ./test_create/*
