@@ -81,7 +81,7 @@ If you pjdcc -S xxx.c, I will generate the assembly file named xxx.s.
 ### Statement
 
 * Selection Statement: if and if-else, if else-if else-if...
-* Iteration Statement: while, do-wile, for
+* Iteration Statement: while, do-while, for
 * Continue and Break
 * Function Return
 
