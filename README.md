@@ -1,6 +1,8 @@
 # PJDCc
 
-# A compiler of PJDC (C Programming Language ' s Subset)
+# A compiler of PJDC 
+
+# (C Programming Language ' s Subset)
 
 ## Framework
 
@@ -10,7 +12,9 @@
 
 After you clone this reposity, you just need to run my shell script : )
 
-### bash install.sh
+```shell
+bash install.sh
+```
 
 **Note:**
 
@@ -24,13 +28,17 @@ PJDCC can compile code to assembly. I borrow nasm to assembly, gcc's ld to link.
 
 Just like install, I have write a shell script for you :
 
-### bash uninstall.sh
+```shell
+bash uninstall.sh
+```
 
 ## Usage
 
 PJDCC's usage is very easy.
 
-### pjdcc [-ESTA] input_file
+```shell
+pjdcc [-ESTA] input_file
+```
 
 **-E**: Generate executable file (default)
 
