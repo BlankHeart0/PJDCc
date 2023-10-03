@@ -33,12 +33,13 @@ int main()
 {
   Quick_Sort(0,9);
 
-  int i=0;
-  while(i<10)
+  int i;
+  for(i=0;i<10;i++)
   {
-    printf("%ld",array[i]);
-    i=i+1;
+    printf("%d ",array[i]);
   }
+
+  printf("\n");
 
   return 0;
 }

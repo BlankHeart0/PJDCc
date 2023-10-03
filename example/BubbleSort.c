@@ -13,12 +13,22 @@ void Bubble_Sort()
   int j;
   int temp;
 
+  int done_flag;
+
   for(i=0;i<10-1;i++)
   {
+    done_flag=1;
+
     for(j=0;j<10-1-i;j++)
     {
-      if(array[j]>array[j+1])swap(&array[j],&array[j+1]);
+      if(array[j]>array[j+1])
+      {
+        swap(&array[j],&array[j+1]);
+        done_flag=0;
+      }
     }
+
+    if(done_flag)break;
   }
 
 }
@@ -30,8 +40,10 @@ int main()
   int i;
   for(i=0;i<10;i++)
   {
-    printf("%d\n",array[i]);
+    printf("%d ",array[i]);
   }
+
+  printf("\n");
 
   return 0;
 }

@@ -113,6 +113,7 @@ void PJDCc::Compile(char* input_file_path,CompileType compile_type)
     {
         char* nasm_command=new char(14+len);
         sprintf(nasm_command,"%s %s","nasm -f elf64",input_file_path);
+        //printf("%s\n",nasm_command);
         system(nasm_command);
 
         input_file_path[len-1]='o';
@@ -122,6 +123,7 @@ void PJDCc::Compile(char* input_file_path,CompileType compile_type)
 
         char* gcc_command=new char(16+len+(len-2));
         sprintf(gcc_command,"%s %s %s %s","gcc -no-pie",input_file_path,"-o",executable_file);
+        //printf("%s\n",gcc_command);
         system(gcc_command);
 
         remove(input_file_path);

@@ -12,8 +12,6 @@ long arr3[4];
 
 int main()
 {
-    int main=-10;
-    printf("main=%d\n",main);
     int c1;
     char c2;
     long c3;
