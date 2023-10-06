@@ -18,7 +18,7 @@ bash install.sh
 
 **Note:**
 
-PJDCC can compile code to assembly. I borrow nasm to assembly, gcc's ld to link. So I will install nasm and gcc for you at first.
+PJDCC can compile code to x86 assembly. I borrow nasm to assembly, gcc's ld to link. So I will install nasm and gcc for you at first.
 
 ### I have write some examples in "example" directory
 
@@ -54,7 +54,7 @@ You don't need to input out_file's name.
 
 If you pjdcc [-E] xxx.c, I will generate the executable file named xxx.
 
-If you pjdcc -S xxx.c, I will generate the assembly file named xxx.s.
+If you pjdcc -S xxx.c, I will generate the x86 assembly file named xxx.s.
 
 ## Support
 

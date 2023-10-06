@@ -26,7 +26,7 @@ install:
 	cp pjdcc /usr/bin
 .PHONY:uninstall
 uninstall:
-	rm /usr/bin/pjdcc
+	-rm /usr/bin/pjdcc
 
 
 .PHONY: clean
