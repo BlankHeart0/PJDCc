@@ -97,6 +97,11 @@ If you pjdcc -S xxx.c, I will generate the x86 assembly file named xxx.s.
 * Arithmetic: + - * / %
 * Increment Decrement: ++ --
 * Sizeof: sizeof(Type) sizeof(identifier)
+
+### Comment
+
+* Single-line: //xxx
+* Multi-line: /* xxx */
   
 ## Kiss declaration ( ^ 3 ^ )
 
